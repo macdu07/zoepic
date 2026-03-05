@@ -14,6 +14,7 @@ import {
   ChevronDown,
 } from "lucide-react";
 import { SignedIn, SignedOut, useUser } from "@insforge/nextjs";
+import PayPalSubscribeButton from "@/components/core/PayPalSubscribeButton";
 
 export default function LandingPage() {
   const { user } = useUser();
@@ -336,9 +337,20 @@ export default function LandingPage() {
                   Soporte prioritario
                 </li>
               </ul>
-              <Button className="w-full font-semibold shadow-md">
-                Próximamente
-              </Button>
+              <SignedIn>
+                <PayPalSubscribeButton
+                  planKey="pro"
+                  planLabel="Pro"
+                  onSuccess={() => (window.location.href = "/dashboard/usage")}
+                />
+              </SignedIn>
+              <SignedOut>
+                <Link href="/signup">
+                  <Button className="w-full font-semibold shadow-md">
+                    Crear Cuenta para Suscribirte
+                  </Button>
+                </Link>
+              </SignedOut>
             </CardContent>
           </Card>
 
@@ -376,9 +388,20 @@ export default function LandingPage() {
                   Soporte prioritario
                 </li>
               </ul>
-              <Button className="w-full font-semibold shadow-md">
-                Próximamente
-              </Button>
+              <SignedIn>
+                <PayPalSubscribeButton
+                  planKey="agency"
+                  planLabel="Agency"
+                  onSuccess={() => (window.location.href = "/dashboard/usage")}
+                />
+              </SignedIn>
+              <SignedOut>
+                <Link href="/signup">
+                  <Button className="w-full font-semibold shadow-md">
+                    Crear Cuenta para Suscribirte
+                  </Button>
+                </Link>
+              </SignedOut>
             </CardContent>
           </Card>
         </div>
