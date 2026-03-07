@@ -42,12 +42,16 @@ export default function DashboardLayout({
 
   return (
     <div className="min-h-screen bg-background text-foreground flex flex-col">
-      <header className="bg-background border-b border-border shadow-sm sticky top-0 z-50">
+      <header className="sticky top-0 z-50 backdrop-blur-md bg-background/80 border-b border-border/50">
         <div className="container mx-auto px-4 py-3 flex items-center justify-between">
           <div className="flex items-center gap-6">
-            <Link href="/" className="flex items-center gap-2 text-primary">
-              <ImagePlay className="h-6 w-6" />
-              <h1 className="text-xl font-semibold">ZoePic</h1>
+            <Link href="/" className="flex items-center gap-2.5">
+              <div className="w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center">
+                <ImagePlay className="h-5 w-5 text-primary" />
+              </div>
+              <span className="text-xl font-bold tracking-tight">
+                Zoe<span className="text-primary">Pic</span>
+              </span>
             </Link>
             <nav className="hidden sm:flex items-center gap-1">
               {navItems.map((item) => (

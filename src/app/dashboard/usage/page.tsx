@@ -14,6 +14,7 @@ import {
   Loader2,
   AlertTriangle,
   CheckCircle,
+  Check,
 } from "lucide-react";
 import {
   getUserProfile,
@@ -252,9 +253,18 @@ export default function UsagePage() {
             </CardHeader>
             <CardContent className="space-y-4">
               <ul className="text-sm space-y-1.5 text-muted-foreground">
-                <li>✓ 3,000 renombrados con IA/mes</li>
-                <li>✓ Hasta 50 imágenes por lote</li>
-                <li>✓ Soporte prioritario</li>
+                <li className="flex items-center gap-2">
+                  <Check className="h-3.5 w-3.5 text-primary flex-shrink-0" />
+                  3,000 renombrados con IA/mes
+                </li>
+                <li className="flex items-center gap-2">
+                  <Check className="h-3.5 w-3.5 text-primary flex-shrink-0" />
+                  Hasta 50 imágenes por lote
+                </li>
+                <li className="flex items-center gap-2">
+                  <Check className="h-3.5 w-3.5 text-primary flex-shrink-0" />
+                  Soporte prioritario
+                </li>
               </ul>
               <PayPalSubscribeButton
                 planKey="pro"
@@ -276,9 +286,18 @@ export default function UsagePage() {
             </CardHeader>
             <CardContent className="space-y-4">
               <ul className="text-sm space-y-1.5 text-muted-foreground">
-                <li>✓ 20,000 renombrados con IA/mes</li>
-                <li>✓ Hasta 100 imágenes por lote</li>
-                <li>✓ Soporte prioritario</li>
+                <li className="flex items-center gap-2">
+                  <Check className="h-3.5 w-3.5 text-primary flex-shrink-0" />
+                  20,000 renombrados con IA/mes
+                </li>
+                <li className="flex items-center gap-2">
+                  <Check className="h-3.5 w-3.5 text-primary flex-shrink-0" />
+                  Hasta 100 imágenes por lote
+                </li>
+                <li className="flex items-center gap-2">
+                  <Check className="h-3.5 w-3.5 text-primary flex-shrink-0" />
+                  Soporte prioritario
+                </li>
               </ul>
               <PayPalSubscribeButton
                 planKey="agency"

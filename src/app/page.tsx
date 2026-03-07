@@ -12,6 +12,8 @@ import {
   FileImage,
   Download,
   ChevronDown,
+  Check,
+  X,
 } from "lucide-react";
 import { SignedIn, SignedOut, useUser } from "@insforge/nextjs";
 import PayPalSubscribeButton from "@/components/core/PayPalSubscribeButton";
@@ -270,19 +272,19 @@ export default function LandingPage() {
               </p>
               <ul className="space-y-3 text-sm mb-8 flex-grow">
                 <li className="flex items-center gap-2">
-                  <span className="text-primary font-bold">✓</span>
+                  <Check className="h-4 w-4 text-primary flex-shrink-0" />
                   Conversión WebP ilimitada
                 </li>
                 <li className="flex items-center gap-2">
-                  <span className="text-primary font-bold">✓</span>
+                  <Check className="h-4 w-4 text-primary flex-shrink-0" />
                   50 renombrados con IA/mes
                 </li>
                 <li className="flex items-center gap-2">
-                  <span className="text-primary font-bold">✓</span>
+                  <Check className="h-4 w-4 text-primary flex-shrink-0" />
                   Hasta 5 imágenes por lote
                 </li>
                 <li className="flex items-center gap-2 text-muted-foreground">
-                  <span className="font-bold">✗</span>
+                  <X className="h-4 w-4 text-muted-foreground flex-shrink-0" />
                   Soporte prioritario
                 </li>
               </ul>
@@ -321,19 +323,19 @@ export default function LandingPage() {
               </p>
               <ul className="space-y-3 text-sm mb-8 flex-grow">
                 <li className="flex items-center gap-2">
-                  <span className="text-primary font-bold">✓</span>
+                  <Check className="h-4 w-4 text-primary flex-shrink-0" />
                   Conversión WebP ilimitada
                 </li>
                 <li className="flex items-center gap-2">
-                  <span className="text-primary font-bold">✓</span>
+                  <Check className="h-4 w-4 text-primary flex-shrink-0" />
                   3,000 renombrados con IA/mes
                 </li>
                 <li className="flex items-center gap-2">
-                  <span className="text-primary font-bold">✓</span>
+                  <Check className="h-4 w-4 text-primary flex-shrink-0" />
                   Hasta 50 imágenes por lote
                 </li>
                 <li className="flex items-center gap-2">
-                  <span className="text-primary font-bold">✓</span>
+                  <Check className="h-4 w-4 text-primary flex-shrink-0" />
                   Soporte prioritario
                 </li>
               </ul>
@@ -372,19 +374,19 @@ export default function LandingPage() {
               </p>
               <ul className="space-y-3 text-sm mb-8 flex-grow">
                 <li className="flex items-center gap-2">
-                  <span className="text-primary font-bold">✓</span>
+                  <Check className="h-4 w-4 text-primary flex-shrink-0" />
                   Conversión WebP ilimitada
                 </li>
                 <li className="flex items-center gap-2">
-                  <span className="text-primary font-bold">✓</span>
+                  <Check className="h-4 w-4 text-primary flex-shrink-0" />
                   20,000 renombrados con IA/mes
                 </li>
                 <li className="flex items-center gap-2">
-                  <span className="text-primary font-bold">✓</span>
+                  <Check className="h-4 w-4 text-primary flex-shrink-0" />
                   Hasta 100 imágenes por lote
                 </li>
                 <li className="flex items-center gap-2">
-                  <span className="text-primary font-bold">✓</span>
+                  <Check className="h-4 w-4 text-primary flex-shrink-0" />
                   Soporte prioritario
                 </li>
               </ul>

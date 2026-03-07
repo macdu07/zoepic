@@ -1,4 +1,5 @@
 import { Label } from "@/components/ui/label";
+import { SpainFlag, USAFlag } from "@/components/ui/flag-icons";
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
 import { Slider } from "@/components/ui/slider";
@@ -92,8 +93,18 @@ export function ConversionControls({
               <SelectValue placeholder="Select language" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="spanish">🇪🇸 Español</SelectItem>
-              <SelectItem value="english">🇺🇸 English</SelectItem>
+              <SelectItem value="spanish">
+                <span className="flex items-center gap-2">
+                  <SpainFlag className="h-3.5 w-5 rounded-[2px] flex-shrink-0" />{" "}
+                  Español
+                </span>
+              </SelectItem>
+              <SelectItem value="english">
+                <span className="flex items-center gap-2">
+                  <USAFlag className="h-3.5 w-5 rounded-[2px] flex-shrink-0" />{" "}
+                  English
+                </span>
+              </SelectItem>
             </SelectContent>
           </Select>
         </div>
