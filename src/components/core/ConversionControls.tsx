@@ -17,6 +17,8 @@ interface ConversionControlsProps {
   setUseAiForName: (value: boolean) => void;
   prefix: string;
   setPrefix: (value: string) => void;
+  useSuffix: boolean;
+  setUseSuffix: (value: boolean) => void;
   language: "spanish" | "english";
   setLanguage: (value: "spanish" | "english") => void;
   compressionQuality: number;
@@ -33,6 +35,8 @@ export function ConversionControls({
   setUseAiForName,
   prefix,
   setPrefix,
+  useSuffix,
+  setUseSuffix,
   language,
   setLanguage,
   compressionQuality,
@@ -117,6 +121,17 @@ export function ConversionControls({
         <p className="text-xs text-muted-foreground mt-1">
           Lower values mean smaller files but lower quality.
         </p>
+      </div>
+
+      <div className="flex items-center space-x-2">
+        <Switch
+          id="use-suffix"
+          checked={useSuffix}
+          onCheckedChange={setUseSuffix}
+        />
+        <Label htmlFor="use-suffix" className="text-sm font-medium">
+          Add date suffix to file name
+        </Label>
       </div>
 
       <div className="flex gap-4">

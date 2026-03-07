@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { PayPalScriptProvider, PayPalButtons } from "@paypal/react-paypal-js";
 import { useUser } from "@insforge/nextjs";
 import { useToast } from "@/hooks/use-toast";
@@ -25,37 +25,43 @@ export default function PayPalSubscribeButton({
 
   const clientId = process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID || "";
 
-  // Fetch the PayPal plan ID on first render
-  const fetchPlanId = useCallback(async () => {
+  // Fetch the PayPal plan ID on mount
+  useEffect(() => {
     if (paypalPlanId) return;
+
+    let cancelled = false;
     setLoading(true);
-    try {
-      const res = await fetch(`/api/paypal/plan-id?plan=${planKey}`);
-      const data = await res.json();
-      if (data.planId) {
-        setPaypalPlanId(data.planId);
-      } else {
+
+    (async () => {
+      try {
+        const res = await fetch(`/api/paypal/plan-id?plan=${planKey}`);
+        const data = await res.json();
+        if (cancelled) return;
+        if (data.planId) {
+          setPaypalPlanId(data.planId);
+        } else {
+          toast({
+            title: "Error",
+            description: "No se pudo obtener el plan de PayPal.",
+            variant: "destructive",
+          });
+        }
+      } catch {
+        if (cancelled) return;
         toast({
           title: "Error",
-          description: "No se pudo obtener el plan de PayPal.",
+          description: "Error al conectar con PayPal.",
           variant: "destructive",
         });
+      } finally {
+        if (!cancelled) setLoading(false);
       }
-    } catch {
-      toast({
-        title: "Error",
-        description: "Error al conectar con PayPal.",
-        variant: "destructive",
-      });
-    } finally {
-      setLoading(false);
-    }
-  }, [planKey, paypalPlanId, toast]);
+    })();
 
-  // Fetch on mount
-  useState(() => {
-    fetchPlanId();
-  });
+    return () => {
+      cancelled = true;
+    };
+  }, [planKey]); // eslint-disable-line react-hooks/exhaustive-deps
 
   if (!clientId) {
     return <p className="text-sm text-destructive">PayPal no configurado</p>;

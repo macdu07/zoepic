@@ -40,6 +40,7 @@ export default function ConversionPage() {
   const [compressionQuality, setCompressionQuality] = useState(90);
   const [language, setLanguage] = useState<"spanish" | "english">("spanish");
   const [useAiForName, setUseAiForName] = useState(true);
+  const [useSuffix, setUseSuffix] = useState(true);
   const [maxBatchSize, setMaxBatchSize] = useState(5);
   const { toast } = useToast();
 
@@ -66,7 +67,7 @@ export default function ConversionPage() {
 
   const processImage = async (
     file: File,
-    itemId: string
+    itemId: string,
   ): Promise<Partial<ConversionItem>> => {
     try {
       const metadata = await getImageMetadata(file);
@@ -75,8 +76,8 @@ export default function ConversionPage() {
         prev.map((item) =>
           item.id === itemId
             ? { ...item, originalMetadata: metadata, status: "processing" }
-            : item
-        )
+            : item,
+        ),
       );
 
       const webpResult = await convertToWebP(metadata, {
@@ -131,13 +132,18 @@ export default function ConversionPage() {
         }
       }
 
-      const now = new Date();
-      const datePart = `${String(now.getFullYear()).slice(-2)}${String(now.getMonth() + 1).padStart(2, "0")}${String(now.getDate()).padStart(2, "0")}`;
-      const randomPart = String(Math.floor(Math.random() * 100000)).padStart(
-        5,
-        "0"
-      );
-      const finalName = `${finalBaseName}-${datePart}-${randomPart}.webp`;
+      let finalName: string;
+      if (useSuffix) {
+        const now = new Date();
+        const datePart = `${String(now.getFullYear()).slice(-2)}${String(now.getMonth() + 1).padStart(2, "0")}${String(now.getDate()).padStart(2, "0")}`;
+        const randomPart = String(Math.floor(Math.random() * 100000)).padStart(
+          5,
+          "0",
+        );
+        finalName = `${finalBaseName}-${datePart}-${randomPart}.webp`;
+      } else {
+        finalName = `${finalBaseName}.webp`;
+      }
 
       return {
         originalMetadata: metadata,
@@ -170,7 +176,7 @@ export default function ConversionPage() {
       const usageCheck = await checkUsageLimit(
         user.id,
         selectedFiles.length,
-        true
+        true,
       );
       if (!usageCheck.allowed) {
         toast({
@@ -197,14 +203,14 @@ export default function ConversionPage() {
     for (const item of initialItems) {
       setConversionItems((prev) =>
         prev.map((i) =>
-          i.id === item.id ? { ...i, status: "processing" } : i
-        )
+          i.id === item.id ? { ...i, status: "processing" } : i,
+        ),
       );
 
       const result = await processImage(item.originalFile, item.id);
 
       setConversionItems((prev) =>
-        prev.map((i) => (i.id === item.id ? { ...i, ...result } : i))
+        prev.map((i) => (i.id === item.id ? { ...i, ...result } : i)),
       );
     }
 
@@ -228,6 +234,7 @@ export default function ConversionPage() {
     setCompressionQuality(90);
     setLanguage("spanish");
     setUseAiForName(true);
+    setUseSuffix(true);
     toast({
       title: "Formulario Limpiado",
       description: "Puedes subir nuevas imágenes.",
@@ -265,6 +272,8 @@ export default function ConversionPage() {
               setUseAiForName={setUseAiForName}
               prefix={prefix}
               setPrefix={setPrefix}
+              useSuffix={useSuffix}
+              setUseSuffix={setUseSuffix}
               language={language}
               setLanguage={setLanguage}
               compressionQuality={compressionQuality}
