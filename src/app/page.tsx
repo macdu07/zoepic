@@ -315,7 +315,7 @@ export default function LandingPage() {
             <CardContent className="p-6 flex flex-col flex-grow">
               <h3 className="text-xl font-bold mb-1">Pro</h3>
               <div className="flex items-baseline gap-1 mb-4">
-                <span className="text-4xl font-extrabold">$7</span>
+                <span className="text-4xl font-extrabold">$6.99</span>
                 <span className="text-muted-foreground text-sm">/mes</span>
               </div>
               <p className="text-sm text-muted-foreground mb-6">
@@ -366,7 +366,7 @@ export default function LandingPage() {
             <CardContent className="p-6 flex flex-col flex-grow">
               <h3 className="text-xl font-bold mb-1">Agency</h3>
               <div className="flex items-baseline gap-1 mb-4">
-                <span className="text-4xl font-extrabold">$24</span>
+                <span className="text-4xl font-extrabold">$23.99</span>
                 <span className="text-muted-foreground text-sm">/mes</span>
               </div>
               <p className="text-sm text-muted-foreground mb-6">

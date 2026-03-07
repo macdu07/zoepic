@@ -18,7 +18,7 @@ export async function POST() {
     const proPlanId = await createPayPalBillingPlan(
       productId,
       "ZoePic Pro",
-      "7.00",
+      "6.99",
       "3,000 renombrados con IA/mes, hasta 50 imágenes por lote, soporte prioritario",
     );
 
@@ -26,7 +26,7 @@ export async function POST() {
     const agencyPlanId = await createPayPalBillingPlan(
       productId,
       "ZoePic Agency",
-      "24.00",
+      "23.99",
       "20,000 renombrados con IA/mes, hasta 100 imágenes por lote, soporte prioritario",
     );
 

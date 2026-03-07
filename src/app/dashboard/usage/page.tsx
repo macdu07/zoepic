@@ -248,7 +248,7 @@ export default function UsagePage() {
             <CardHeader className="pb-3">
               <CardTitle className="text-lg font-semibold flex items-center gap-2">
                 <Sparkles className="h-5 w-5 text-primary" />
-                Plan Pro — $7/mes
+                Plan Pro — $6.99/mes
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -281,7 +281,7 @@ export default function UsagePage() {
             <CardHeader className="pb-3">
               <CardTitle className="text-lg font-semibold flex items-center gap-2">
                 <Crown className="h-5 w-5 text-accent" />
-                Plan Agency — $24/mes
+                Plan Agency — $23.99/mes
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">

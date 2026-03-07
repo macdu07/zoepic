@@ -10,13 +10,13 @@ export const PLANS = {
   },
   pro: {
     name: "Pro",
-    price: 7,
+    price: 6.99,
     aiConversionsLimit: 3000,
     maxBatchSize: 50,
   },
   agency: {
     name: "Agency",
-    price: 24,
+    price: 23.99,
     aiConversionsLimit: 20000,
     maxBatchSize: 100,
   },

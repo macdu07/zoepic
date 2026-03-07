@@ -1,7 +1,7 @@
 // ─── PayPal Configuration ─────────────────────────────────────────────
 // Works with PayPal REST API v1/v2 (sandbox + production)
 
-const PAYPAL_BASE_URL = "https://api-m.sandbox.paypal.com";
+const PAYPAL_BASE_URL = "https://api-m.paypal.com";
 
 /**
  * Get an OAuth2 access token from PayPal using client credentials.
@@ -44,13 +44,13 @@ export const PAYPAL_PLANS: Record<
 > = {
   pro: {
     name: "ZoePic Pro",
-    price: "7.00",
+    price: "6.99",
     description:
       "3,000 renombrados con IA/mes, hasta 50 imágenes por lote, soporte prioritario",
   },
   agency: {
     name: "ZoePic Agency",
-    price: "24.00",
+    price: "23.99",
     description:
       "20,000 renombrados con IA/mes, hasta 100 imágenes por lote, soporte prioritario",
   },
