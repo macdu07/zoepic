@@ -4,130 +4,229 @@ globs: *
 alwaysApply: true
 ---
 
-# InsForge SDK Documentation - Overview
+# Zoe Convert - Agent Guidelines
 
-## What is InsForge?
+## Project Overview
 
-Backend-as-a-service (BaaS) platform providing:
+Zoe Convert es una aplicación web desarrollada con Next.js (App Router) para convertir imágenes (JPG, JPEG, PNG) al formato WebP con IA. Usa InsForge como BaaS para autenticación y base de datos.
 
-- **Database**: PostgreSQL with PostgREST API
-- **Authentication**: Email/password + OAuth (Google, GitHub)
-- **Storage**: File upload/download
-- **AI**: Chat completions and image generation (OpenAI-compatible)
-- **Functions**: Serverless function deployment
-- **Realtime**: WebSocket pub/sub (database + client events)
+---
 
-## Installation
+## Commands
 
-The following is a step-by-step guide to installing and using the InsForge TypeScript SDK for Web applications. If you are building other types of applications, please refer to:
-- [Swift SDK documentation](/sdks/swift/overview) for iOS, macOS, tvOS, and watchOS applications.
-- [Kotlin SDK documentation](/sdks/kotlin/overview) for Android applications.
-- [REST API documentation](/sdks/rest/overview) for direct HTTP API access.
-
-### 🚨 CRITICAL: Follow these steps in order
-
-### Step 1: Download Template
-
-Use the `download-template` MCP tool to create a new project with your backend URL and anon key pre-configured.
-
-### Step 2: Install SDK
-
+### Development
 ```bash
-npm install @insforge/sdk@latest
+npm run dev              # Start dev server on port 9002
+npm run build            # Production build
+npm run start            # Start production server
+npm run lint             # Run ESLint
+npm run typecheck        # Run TypeScript type checking
 ```
 
-### Step 3: Create SDK Client
+### Genkit (AI Flows)
+```bash
+npm run genkit:dev       # Start Genkit dev server
+npm run genkit:watch     # Watch mode for AI flows
+```
 
-You must create a client instance using `createClient()` with your base URL and anon key:
+---
 
-```javascript
+## Code Style Guidelines
+
+### General Rules
+- Use TypeScript with strict mode enabled
+- Use functional components with hooks (no class components)
+- Use `"use client"` directive for client-side code
+- Prefer `async/await` over `.then()` chains
+- Use early returns to avoid nested conditionals
+- Keep functions small and focused (single responsibility)
+
+### Imports
+```typescript
+// React hooks first
+import { useState, useCallback, useEffect } from "react";
+
+// External libraries
+import { Button } from "@/components/ui/button";
+import { useToast } from "@/hooks/use-toast";
+import { Sparkles } from "lucide-react";
+import { useUser } from "@insforge/nextjs";
+
+// Internal modules - use @/ alias
+import { generateImageName, type GenerateImageNameInput } from "@/ai/flows/generate-image-name";
+import { getImageMetadata, convertToWebP, type ImageMetadata } from "@/lib/imageUtils";
+
+// Local components (relative import)
+import { ImageUploader } from "./ImageUploader";
+```
+
+- Group imports: React hooks → external libs → @/ modules → local components
+- Use type-only imports when appropriate: `import { type Foo } from ...`
+- Use barrel exports from `index.ts` files when available
+
+### Naming Conventions
+- **Components**: PascalCase (`ConversionPage`, `ImageUploader`)
+- **Hooks**: camelCase with `use` prefix (`useToast`, `useMobile`)
+- **Functions**: camelCase (`getImageMetadata`, `convertToWebP`)
+- **Interfaces/Types**: PascalCase (`ImageMetadata`, `WebPConversionResult`)
+- **Files**: kebab-case for utilities (`image-utils.ts`), PascalCase for components
+- **Constants**: SCREAMING_SNAKE_CASE for config values
+
+### Types
+- Always define return types for functions, especially async ones
+- Use interfaces for object shapes, types for unions/intersections
+- Avoid `any`, use `unknown` when type is truly unknown
+- Export types that are used across modules
+
+```typescript
+// Good
+export interface ImageMetadata {
+  dataUrl: string;
+  sizeBytes: number;
+  type: string;
+  name: string;
+  width: number;
+  height: number;
+}
+
+export async function getImageMetadata(file: File): Promise<ImageMetadata> {
+  // ...
+}
+```
+
+### Error Handling
+- Use try/catch with specific error messages
+- Provide fallback values when errors are non-critical
+- Log errors appropriately (console.error for unexpected errors)
+- Show user-friendly error messages via toast/UI
+
+```typescript
+// Good pattern
+try {
+  const result = await riskyOperation();
+  return result;
+} catch (e) {
+  const errorMsg = e instanceof Error ? e.message : "Error desconocido";
+  console.error("Operation failed:", e);
+  return fallbackValue;
+}
+```
+
+### UI Components (ShadCN/Tailwind)
+- Use existing UI components from `@/components/ui/`
+- Follow component prop patterns (variant, size, etc.)
+- Use Tailwind utility classes for styling
+- Use semantic HTML elements
+
+```typescript
+<Card className="shadow-lg bg-card text-card-foreground">
+  <CardHeader>
+    <CardTitle className="text-xl font-semibold">
+      Title
+    </CardTitle>
+  </CardHeader>
+  <CardContent className="space-y-6">
+    {children}
+  </CardContent>
+</Card>
+```
+
+### State Management
+- Use `useState` for local component state
+- Use `useCallback` for event handlers passed to children
+- Use `useEffect` for side effects (data fetching, subscriptions)
+- Use InsForge SDK for server state (user, database)
+
+### API Routes (Next.js App Router)
+- Use Route Handlers (`route.ts`) with named exports: `GET`, `POST`, etc.
+- Return `NextResponse` objects
+- Handle errors and return appropriate status codes
+- Validate request bodies with Zod
+
+---
+
+## InsForge SDK Guidelines
+
+### Critical: Always Fetch Latest Docs
+Before writing InsForge integration code, use the `fetch-docs` or `fetch-sdk-docs` MCP tool to get up-to-date implementation patterns.
+
+### SDK Usage
+- Create client in `@/lib/insforge.ts`:
+```typescript
 import { createClient } from '@insforge/sdk';
 
-const client = createClient({
-  baseUrl: 'https://your-app.region.insforge.app',  // Your InsForge backend URL
-  anonKey: 'your-anon-key-here'       // Get this from backend metadata
+export const client = createClient({
+  baseUrl: process.env.NEXT_PUBLIC_INSFORGE_BASE_URL!,
+  anonKey: process.env.NEXT_PUBLIC_INSFORGE_ANON_KEY!,
 });
-
 ```
 
-**API BASE URL**: Your API base URL is `https://your-app.region.insforge.app`.
-
-## Getting Detailed Documentation
-
-### 🚨 CRITICAL: Always Fetch Documentation Before Writing Code
-
-InsForge provides official SDKs and REST APIs, use them to interact with InsForge services from your application code.
-
-- [TypeScript SDK](/sdks/typescript/overview) - JavaScript/TypeScript
-- [Swift SDK](/sdks/swift/overview) - iOS, macOS, tvOS, and watchOS
-- [Kotlin SDK](/sdks/kotlin/overview) - Android and Kotlin Multiplatform
-- [REST API](/sdks/rest/overview) - Direct HTTP API access
-
-Before writing or editing any InsForge integration code, you **MUST** call the `fetch-docs` or `fetch-sdk-docs` MCP tool to get the latest SDK documentation. This ensures you have accurate, up-to-date implementation patterns.
-
-### Use the InsForge `fetch-docs` MCP tool to get specific SDK documentation:
-
-Available documentation types:
-
-- `"instructions"` - Essential backend setup (START HERE)
-- `"real-time"` - Real-time pub/sub (database + client events) via WebSockets
-- `"db-sdk-typescript"` - Database operations with TypeScript SDK
-- **Authentication** - Choose based on implementation:
-  - `"auth-sdk-typescript"` - TypeScript SDK methods for custom auth flows
-  - `"auth-components-react"` - Pre-built auth UI for React+Vite (singlepage App)
-  - `"auth-components-react-router"` - Pre-built auth UI for React(Vite+React Router) (Multipage App)
-  - `"auth-components-nextjs"` - Pre-built auth UI for Nextjs (SSR App)
-- `"storage-sdk"` - File storage operations
-- `"functions-sdk"` - Serverless functions invocation
-- `"ai-integration-sdk"` - AI chat and image generation
-- `"real-time"` - Real-time pub/sub (database + client events) via WebSockets
-- `"deployment"` - Deploy frontend applications via MCP tool
-
-These documentations are mostly for TypeScript SDK. For other languages, you can also use `fetch-sdk-docs` mcp tool to get specific documentation.
-
-### Use the InsForge `fetch-sdk-docs` MCP tool to get specific SDK documentation
-
-You can fetch sdk documentation using the `fetch-sdk-docs` MCP tool with specific feature type and language.
-
-Available feature types:
-- db - Database operations
-- storage - File storage operations
-- functions - Serverless functions invocation
-- auth - User authentication
-- ai - AI chat and image generation
-- realtime - Real-time pub/sub (database + client events) via WebSockets
-
-Available languages:
-- typescript - JavaScript/TypeScript SDK
-- swift - Swift SDK (for iOS, macOS, tvOS, and watchOS)
-- kotlin - Kotlin SDK (for Android and JVM applications)
-- rest-api - REST API
-
-## When to Use SDK vs MCP Tools
-
-### Always SDK for Application Logic:
-
-- Authentication (register, login, logout, profiles)
-- Database CRUD (select, insert, update, delete)
-- Storage operations (upload, download files)
-- AI operations (chat, image generation)
-- Serverless function invocation
-
-### Use MCP Tools for Infrastructure:
-
-- Project scaffolding (`download-template`) - Download starter templates with InsForge integration
-- Backend setup and metadata (`get-backend-metadata`)
-- Database schema management (`run-raw-sql`, `get-table-schema`)
-- Storage bucket creation (`create-bucket`, `list-buckets`, `delete-bucket`)
-- Serverless function deployment (`create-function`, `update-function`, `delete-function`)
-- Frontend deployment (`create-deployment`) - Deploy frontend apps to InsForge hosting
-
-## Important Notes
-
-- For auth: use `auth-sdk` for custom UI, or framework-specific components for pre-built UI
 - SDK returns `{data, error}` structure for all operations
 - Database inserts require array format: `[{...}]`
-- Serverless functions have single endpoint (no subpaths)
-- Storage: Upload files to buckets, store URLs in database
-- AI operations are OpenAI-compatible
-- **EXTRA IMPORTANT**: Use Tailwind CSS 3.4 (do not upgrade to v4). Lock these dependencies in `package.json`
+- Use `@insforge/nextjs` for Next.js authentication hooks
+
+### Important Notes
+- Use Tailwind CSS 3.4 (do NOT upgrade to v4)
+- Use `@insforge/nextjs` for authentication (not custom JWT implementation)
+- Store sensitive values in `.env`, access via `process.env`
+
+---
+
+## File Structure
+
+```
+src/
+├── app/                    # Next.js App Router pages
+│   ├── api/               # API routes
+│   ├── dashboard/         # Protected dashboard pages
+│   ├── login/            # Login page
+│   ├── page.tsx          # Home/conversion page
+│   └── layout.tsx        # Root layout
+├── components/
+│   ├── core/             # Feature components
+│   └── ui/               # ShadCN UI components
+├── lib/                  # Utilities and helpers
+├── hooks/                # Custom React hooks
+└── ai/                   # Genkit AI flows
+```
+
+---
+
+## Common Patterns
+
+### Client Component with Form
+```typescript
+"use client";
+
+import { useState, useCallback } from "react";
+import { useToast } from "@/hooks/use-toast";
+
+export default function Component() {
+  const [loading, setLoading] = useState(false);
+  const { toast } = useToast();
+
+  const handleSubmit = useCallback(async () => {
+    setLoading(true);
+    try {
+      // async logic
+    } catch (e) {
+      toast({ title: "Error", description: "...", variant: "destructive" });
+    } finally {
+      setLoading(false);
+    }
+  }, []); // deps
+
+  return <Button onClick={handleSubmit} disabled={loading}>Submit</Button>;
+}
+```
+
+### Loading Data with useEffect
+```typescript
+useEffect(() => {
+  if (!isReady) return;
+  
+  fetchData().then((data) => {
+    setData(data);
+  });
+}, [isReady]); // minimal deps
+```
