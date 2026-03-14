@@ -326,8 +326,8 @@ export default function AccountPage() {
                             <div>
                                 <p className="font-semibold">{planInfo.name}</p>
                                 <p className="text-sm text-muted-foreground">
-                                    {planInfo.price === 0 ? "Gratis" : `$${planInfo.price}/mes`} —{" "}
-                                    {planInfo.aiConversionsLimit.toLocaleString()} conversiones IA/mes
+                                    {planInfo.price === 0 && planInfo.name !== "Unlimited" ? "Gratis" : planInfo.name === "Unlimited" ? "Plan Ilimitado" : `$${planInfo.price}/mes`} —{" "}
+                                    {planInfo.aiConversionsLimit >= 1000000 ? "Ilimitadas conversiones IA/mes" : `${planInfo.aiConversionsLimit.toLocaleString()} conversiones IA/mes`}
                                 </p>
                             </div>
                         </div>

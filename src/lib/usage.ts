@@ -20,6 +20,12 @@ export const PLANS = {
     aiConversionsLimit: 20000,
     maxBatchSize: 100,
   },
+  unlimited: {
+    name: "Unlimited",
+    price: 0,
+    aiConversionsLimit: 1000000,
+    maxBatchSize: 1000,
+  },
 } as const;
 
 export type PlanKey = keyof typeof PLANS;

@@ -164,8 +164,9 @@ export default function UsagePage() {
             <ul className="text-sm space-y-1.5 text-muted-foreground">
               <li className="flex items-center gap-2">
                 <Sparkles className="h-3.5 w-3.5 text-primary" />
-                {planInfo.aiConversionsLimit.toLocaleString()} renombrados
-                IA/mes
+                {planInfo.aiConversionsLimit >= 1000000
+                  ? "Ilimitados renombrados IA/mes"
+                  : `${planInfo.aiConversionsLimit.toLocaleString()} renombrados IA/mes`}
               </li>
               <li className="flex items-center gap-2">
                 <ImageIcon className="h-3.5 w-3.5 text-primary" />
@@ -224,19 +225,33 @@ export default function UsagePage() {
               <span className="text-4xl font-extrabold text-primary">
                 {profile.ai_conversions_used}
               </span>
-              <span className="text-muted-foreground text-lg">
-                {" "}
-                / {profile.ai_conversions_limit.toLocaleString()}
-              </span>
+              {profile.ai_conversions_limit >= 1000000 ? (
+                <span className="text-muted-foreground text-lg"> / ∞</span>
+              ) : (
+                <span className="text-muted-foreground text-lg">
+                  {" "}
+                  / {profile.ai_conversions_limit.toLocaleString()}
+                </span>
+              )}
             </div>
-            <Progress value={usagePercent} className="h-3" />
-            <p className="text-xs text-center text-muted-foreground">
-              {usagePercent}% utilizado — te quedan{" "}
-              {(
-                profile.ai_conversions_limit - profile.ai_conversions_used
-              ).toLocaleString()}{" "}
-              conversiones AI
-            </p>
+            {profile.ai_conversions_limit >= 1000000 ? (
+              <div className="flex items-center justify-center pt-2">
+                <p className="text-sm font-medium text-emerald-500 bg-emerald-500/10 px-3 py-1 rounded-full">
+                  Plan Ilimitado Activo
+                </p>
+              </div>
+            ) : (
+              <>
+                <Progress value={usagePercent} className="h-3" />
+                <p className="text-xs text-center text-muted-foreground">
+                  {usagePercent}% utilizado — te quedan{" "}
+                  {(
+                    profile.ai_conversions_limit - profile.ai_conversions_used
+                  ).toLocaleString()}{" "}
+                  conversiones AI
+                </p>
+              </>
+            )}
           </CardContent>
         </Card>
       </div>
