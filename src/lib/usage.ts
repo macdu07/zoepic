@@ -141,7 +141,7 @@ export async function checkUsageLimit(
     (now.getTime() - periodStart.getTime()) / (1000 * 60 * 60 * 24),
   );
 
-  if (daysSincePeriodStart >= 30) {
+  if (daysSincePeriodStart >= 30 && profile.plan !== "unlimited") {
     // Reset the period
     await insforge.database
       .from("user_profiles")

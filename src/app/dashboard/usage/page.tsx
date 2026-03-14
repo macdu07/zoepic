@@ -174,8 +174,9 @@ export default function UsagePage() {
               </li>
               <li className="flex items-center gap-2">
                 <Calendar className="h-3.5 w-3.5 text-primary" />
-                Periodo: {periodStart.toLocaleDateString()} —{" "}
-                {periodEnd.toLocaleDateString()}
+                {profile.plan === "unlimited"
+                  ? "Periodo: De por vida (LTD)"
+                  : `Periodo: ${periodStart.toLocaleDateString()} — ${periodEnd.toLocaleDateString()}`}
               </li>
             </ul>
 
