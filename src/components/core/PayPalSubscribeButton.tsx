@@ -96,7 +96,7 @@ export default function PayPalSubscribeButton({
       <PayPalButtons
         style={{
           shape: "rect",
-          color: "blue",
+          color: "gold",
           layout: "vertical",
           label: "subscribe",
         }}
