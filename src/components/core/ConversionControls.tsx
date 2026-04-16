@@ -25,7 +25,7 @@ interface ConversionControlsProps {
   compressionQuality: number;
   setCompressionQuality: (value: number) => void;
   onConvert: () => void;
-  onClear: () => void;
+  onClearFiles: () => void;
   isLoading: boolean;
   hasFile: boolean;
   hasResult: boolean;
@@ -43,7 +43,7 @@ export function ConversionControls({
   compressionQuality,
   setCompressionQuality,
   onConvert,
-  onClear,
+  onClearFiles,
   isLoading,
   hasFile,
   hasResult,
@@ -57,7 +57,7 @@ export function ConversionControls({
           onCheckedChange={setUseAiForName}
         />
         <Label htmlFor="use-ai-name" className="text-sm font-medium">
-          Use AI for file name
+          Usar IA para el nombre del archivo
         </Label>
       </div>
 
@@ -67,30 +67,30 @@ export function ConversionControls({
           className="text-xs font-medium text-muted-foreground"
         >
           {useAiForName
-            ? "Optional file name prefix"
-            : "Manual file name prefix"}
+            ? "Prefijo opcional para el nombre"
+            : "Nombre manual del archivo"}
         </Label>
         <Input
           id="prefix"
           type="text"
           value={prefix}
           onChange={(e) => setPrefix(e.target.value)}
-          placeholder={useAiForName ? "e.g., product-image-" : "your-file-name"}
+          placeholder={useAiForName ? "ej. imagen-producto-" : "nombre-del-archivo"}
           className="mt-1 bg-input text-foreground border-border focus:bg-background placeholder:text-muted-foreground/70"
         />
       </div>
 
       {useAiForName && (
         <div>
-          <Label className="text-xs font-medium text-muted-foreground">
-            AI filename language
+          <Label htmlFor="ai-language" className="text-xs font-medium text-muted-foreground">
+            Idioma del nombre generado por IA
           </Label>
           <Select
             value={language}
             onValueChange={(value: "spanish" | "english") => setLanguage(value)}
           >
-            <SelectTrigger className="mt-1 bg-input text-foreground border-border focus:bg-background">
-              <SelectValue placeholder="Select language" />
+            <SelectTrigger id="ai-language" className="mt-1 bg-input text-foreground border-border focus:bg-background">
+              <SelectValue placeholder="Selecciona idioma" />
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="spanish">
@@ -112,10 +112,10 @@ export function ConversionControls({
 
       <div>
         <div className="flex justify-between items-center mb-1">
-          <Label className="text-xs font-medium text-muted-foreground">
-            WebP Quality Level
+          <Label htmlFor="compressionQuality" className="text-xs font-medium text-muted-foreground">
+            Calidad WebP
           </Label>
-          <span className="text-sm font-semibold text-primary">
+          <span className="text-sm font-semibold text-primary" aria-live="polite">
             {compressionQuality}%
           </span>
         </div>
@@ -127,10 +127,11 @@ export function ConversionControls({
           value={[compressionQuality]}
           onValueChange={(value) => setCompressionQuality(value[0])}
           className="w-full [&>span:last-child]:bg-primary [&>span:last-child]:border-primary-foreground"
-          aria-label="WebP compression quality"
+          aria-label="Calidad de compresión WebP"
+          aria-valuetext={`${compressionQuality}%`}
         />
         <p className="text-xs text-muted-foreground mt-1">
-          Lower values mean smaller files but lower quality.
+          Valores más bajos generan archivos más pequeños con menor calidad.
         </p>
       </div>
 
@@ -141,7 +142,7 @@ export function ConversionControls({
           onCheckedChange={setUseSuffix}
         />
         <Label htmlFor="use-suffix" className="text-sm font-medium">
-          Add date suffix to file name
+          Agregar sufijo de fecha al nombre
         </Label>
       </div>
 
@@ -152,20 +153,21 @@ export function ConversionControls({
           className="flex-grow font-semibold py-3 text-base"
         >
           {isLoading ? (
-            <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+            <Loader2 className="mr-2 h-5 w-5 animate-spin" aria-hidden="true" />
           ) : (
-            <Sparkles className="mr-2 h-5 w-5" />
+            <Sparkles className="mr-2 h-5 w-5" aria-hidden="true" />
           )}
-          {isLoading ? "Processing..." : "Convert and Analyze"}
+          {isLoading ? "Procesando..." : "Convertir y Analizar"}
         </Button>
         <Button
-          onClick={onClear}
+          onClick={onClearFiles}
           variant="outline"
           className="font-semibold py-3 text-base"
           disabled={!hasFile && !hasResult}
+          aria-label="Limpiar archivos seleccionados"
         >
-          <Trash2 className="mr-2 h-5 w-5" />
-          Clear
+          <Trash2 className="mr-2 h-5 w-5" aria-hidden="true" />
+          Limpiar
         </Button>
       </div>
     </div>

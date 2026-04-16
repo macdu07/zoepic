@@ -84,7 +84,7 @@ export default function DashboardLayout({
               {user?.profile?.avatar_url ? (
                 <img
                   src={user.profile.avatar_url}
-                  alt="Avatar"
+                  alt={user?.profile?.name ?? "Foto de perfil"}
                   className="w-full h-full object-cover"
                 />
               ) : (

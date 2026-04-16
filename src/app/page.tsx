@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -14,12 +15,50 @@ import {
   ChevronDown,
   Check,
   X,
+  ChevronRight,
 } from "lucide-react";
 import { SignedIn, SignedOut, useUser } from "@insforge/nextjs";
 import PayPalSubscribeButton from "@/components/core/PayPalSubscribeButton";
 
+const ANNUAL_DISCOUNT = 0.25; // 25% descuento anual
+
+const FAQ_ITEMS = [
+  {
+    question: "¿Mis imágenes se suben a un servidor?",
+    answer:
+      "No. La conversión a WebP se realiza completamente en tu navegador. Tus imágenes nunca abandonan tu dispositivo, lo que garantiza privacidad total.",
+  },
+  {
+    question: "¿Qué formatos de imagen acepta ZoePic?",
+    answer:
+      "Actualmente soportamos JPG, JPEG y PNG. Estamos trabajando para añadir soporte para más formatos próximamente.",
+  },
+  {
+    question: "¿Cómo funciona el renombrado con IA?",
+    answer:
+      "Nuestra IA analiza el contenido visual de cada imagen y genera un nombre descriptivo y optimizado para SEO. Por ejemplo, 'IMG_2041.jpg' puede convertirse en 'zapatos-deportivos-rojos-running.webp'.",
+  },
+  {
+    question: "¿Qué pasa cuando llego al límite de renombrados IA?",
+    answer:
+      "Puedes seguir convirtiendo imágenes a WebP de forma ilimitada. Simplemente el renombrado automático con IA se desactiva hasta que renueves tu periodo o actualices tu plan.",
+  },
+  {
+    question: "¿Puedo cancelar mi suscripción en cualquier momento?",
+    answer:
+      "Sí, puedes cancelar desde tu dashboard en cualquier momento. No hay permanencia ni penalizaciones.",
+  },
+  {
+    question: "¿El plan anual se puede cambiar a mensual?",
+    answer:
+      "Actualmente los planes disponibles son mensuales. El descuento anual refleja el ahorro al comprometerte con un año completo de suscripción.",
+  },
+];
+
 export default function LandingPage() {
   const { user } = useUser();
+  const [billingAnnual, setBillingAnnual] = useState(false);
+  const [openFaq, setOpenFaq] = useState<number | null>(null);
 
   const initial =
     user?.profile?.name?.charAt(0)?.toUpperCase() ??
@@ -71,7 +110,7 @@ export default function LandingPage() {
                   {user?.profile?.avatar_url ? (
                     <img
                       src={user.profile.avatar_url}
-                      alt="Avatar"
+                      alt={user?.profile?.name ?? "Foto de perfil"}
                       className="w-full h-full object-cover"
                     />
                   ) : (
@@ -251,14 +290,48 @@ export default function LandingPage() {
 
       {/* Pricing Section */}
       <section id="pricing" className="max-w-5xl mx-auto px-6 py-24">
-        <div className="text-center mb-16">
+        <div className="text-center mb-10">
           <h2 className="text-3xl md:text-4xl font-bold mb-4">
             Planes y Precios
           </h2>
-          <p className="text-muted-foreground text-lg max-w-xl mx-auto">
+          <p className="text-muted-foreground text-lg max-w-xl mx-auto mb-8">
             Elige el plan que mejor se adapte a tus necesidades.
           </p>
+
+          {/* Billing toggle */}
+          <div className="inline-flex items-center gap-3 bg-card/60 border border-border/50 rounded-full px-4 py-2">
+            <button
+              onClick={() => setBillingAnnual(false)}
+              className={`text-sm font-medium px-3 py-1 rounded-full transition-colors ${
+                !billingAnnual
+                  ? "bg-primary text-primary-foreground"
+                  : "text-muted-foreground hover:text-foreground"
+              }`}
+            >
+              Mensual
+            </button>
+            <button
+              onClick={() => setBillingAnnual(true)}
+              className={`text-sm font-medium px-3 py-1 rounded-full transition-colors flex items-center gap-1.5 ${
+                billingAnnual
+                  ? "bg-primary text-primary-foreground"
+                  : "text-muted-foreground hover:text-foreground"
+              }`}
+            >
+              Anual
+              <span
+                className={`text-xs font-bold px-1.5 py-0.5 rounded-full ${
+                  billingAnnual
+                    ? "bg-primary-foreground/20 text-primary-foreground"
+                    : "bg-primary/15 text-primary"
+                }`}
+              >
+                -25%
+              </span>
+            </button>
+          </div>
         </div>
+
         <div className="grid md:grid-cols-3 gap-6">
           {/* Starter Plan */}
           <Card className="relative border-border/50 bg-card/50 backdrop-blur-sm hover:border-primary/30 hover:shadow-lg transition-all duration-300 flex flex-col">
@@ -314,11 +387,18 @@ export default function LandingPage() {
             </div>
             <CardContent className="p-6 flex flex-col flex-grow">
               <h3 className="text-xl font-bold mb-1">Pro</h3>
-              <div className="flex items-baseline gap-1 mb-4">
-                <span className="text-4xl font-extrabold">$6.99</span>
+              <div className="flex items-baseline gap-1 mb-1">
+                <span className="text-4xl font-extrabold">
+                  ${billingAnnual ? (6.99 * (1 - ANNUAL_DISCOUNT)).toFixed(2) : "6.99"}
+                </span>
                 <span className="text-muted-foreground text-sm">/mes</span>
               </div>
-              <p className="text-sm text-muted-foreground mb-6">
+              {billingAnnual && (
+                <p className="text-xs text-primary font-medium mb-3">
+                  Facturado anualmente — ${(6.99 * 12 * (1 - ANNUAL_DISCOUNT)).toFixed(2)}/año
+                </p>
+              )}
+              <p className={`text-sm text-muted-foreground mb-6 ${!billingAnnual ? "mt-4" : ""}`}>
                 Ideal para creadores de contenido.
               </p>
               <ul className="space-y-3 text-sm mb-8 flex-grow">
@@ -365,11 +445,18 @@ export default function LandingPage() {
             </div>
             <CardContent className="p-6 flex flex-col flex-grow">
               <h3 className="text-xl font-bold mb-1">Agency</h3>
-              <div className="flex items-baseline gap-1 mb-4">
-                <span className="text-4xl font-extrabold">$23.99</span>
+              <div className="flex items-baseline gap-1 mb-1">
+                <span className="text-4xl font-extrabold">
+                  ${billingAnnual ? (23.99 * (1 - ANNUAL_DISCOUNT)).toFixed(2) : "23.99"}
+                </span>
                 <span className="text-muted-foreground text-sm">/mes</span>
               </div>
-              <p className="text-sm text-muted-foreground mb-6">
+              {billingAnnual && (
+                <p className="text-xs text-primary font-medium mb-3">
+                  Facturado anualmente — ${(23.99 * 12 * (1 - ANNUAL_DISCOUNT)).toFixed(2)}/año
+                </p>
+              )}
+              <p className={`text-sm text-muted-foreground mb-6 ${!billingAnnual ? "mt-4" : ""}`}>
                 Para agencias y equipos grandes.
               </p>
               <ul className="space-y-3 text-sm mb-8 flex-grow">
@@ -406,6 +493,47 @@ export default function LandingPage() {
               </SignedOut>
             </CardContent>
           </Card>
+        </div>
+      </section>
+
+      {/* FAQ Section */}
+      <section className="max-w-3xl mx-auto px-6 pb-24">
+        <div className="text-center mb-12">
+          <h2 className="text-3xl md:text-4xl font-bold mb-4">
+            Preguntas Frecuentes
+          </h2>
+          <p className="text-muted-foreground text-lg max-w-xl mx-auto">
+            Todo lo que necesitas saber sobre ZoePic.
+          </p>
+        </div>
+        <div className="space-y-3">
+          {FAQ_ITEMS.map((faq, index) => (
+            <div
+              key={index}
+              className="border border-border/50 rounded-xl bg-card/40 backdrop-blur-sm overflow-hidden"
+            >
+              <button
+                onClick={() => setOpenFaq(openFaq === index ? null : index)}
+                className="w-full flex items-center justify-between px-6 py-4 text-left hover:bg-primary/5 transition-colors"
+                aria-expanded={openFaq === index}
+              >
+                <span className="text-sm font-semibold pr-4">{faq.question}</span>
+                <ChevronRight
+                  className={`h-4 w-4 flex-shrink-0 text-muted-foreground transition-transform duration-200 ${
+                    openFaq === index ? "rotate-90" : ""
+                  }`}
+                  aria-hidden="true"
+                />
+              </button>
+              {openFaq === index && (
+                <div className="px-6 pb-4">
+                  <p className="text-sm text-muted-foreground leading-relaxed">
+                    {faq.answer}
+                  </p>
+                </div>
+              )}
+            </div>
+          ))}
         </div>
       </section>
 

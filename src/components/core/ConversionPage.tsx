@@ -31,6 +31,9 @@ import {
   type ConversionItem,
 } from "./ConversionResultList";
 
+// Number of images to process concurrently
+const CONCURRENCY_LIMIT = 4;
+
 export default function ConversionPage() {
   const { user, isLoaded } = useUser();
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
@@ -68,6 +71,11 @@ export default function ConversionPage() {
   const processImage = async (
     file: File,
     itemId: string,
+    currentPrefix: string,
+    currentQuality: number,
+    currentLanguage: "spanish" | "english",
+    currentUseAi: boolean,
+    currentUseSuffix: boolean,
   ): Promise<Partial<ConversionItem>> => {
     try {
       const metadata = await getImageMetadata(file);
@@ -81,12 +89,12 @@ export default function ConversionPage() {
       );
 
       const webpResult = await convertToWebP(metadata, {
-        quality: compressionQuality / 100,
+        quality: currentQuality / 100,
       });
 
-      let finalBaseName = "converted-image";
+      let finalBaseName = "imagen-convertida";
 
-      if (useAiForName) {
+      if (currentUseAi) {
         try {
           const smallImage = await convertToWebP(metadata, {
             targetWidth: 512,
@@ -94,12 +102,12 @@ export default function ConversionPage() {
           });
           const aiInput: GenerateImageNameInput = {
             photoDataUri: smallImage.dataUrl,
-            language,
+            language: currentLanguage,
           };
           const aiOutput = await generateImageName(aiInput);
           let generatedName = aiOutput.filename;
-          if (prefix.trim()) {
-            generatedName = `${prefix
+          if (currentPrefix.trim()) {
+            generatedName = `${currentPrefix
               .trim()
               .toLowerCase()
               .replace(/\s+/g, "-")}-${generatedName}`;
@@ -112,15 +120,15 @@ export default function ConversionPage() {
             .substring(0, lastDotIndex)
             .toLowerCase()
             .replace(/\s+/g, "-");
-          if (prefix.trim()) {
-            finalBaseName = `${prefix
+          if (currentPrefix.trim()) {
+            finalBaseName = `${currentPrefix
               .trim()
               .toLowerCase()
               .replace(/\s+/g, "-")}-${finalBaseName}`;
           }
         }
       } else {
-        const trimmedPrefix = prefix.trim().toLowerCase().replace(/\s+/g, "-");
+        const trimmedPrefix = currentPrefix.trim().toLowerCase().replace(/\s+/g, "-");
         if (trimmedPrefix) {
           finalBaseName = trimmedPrefix;
         } else {
@@ -133,7 +141,7 @@ export default function ConversionPage() {
       }
 
       let finalName: string;
-      if (useSuffix) {
+      if (currentUseSuffix) {
         const now = new Date();
         const datePart = `${String(now.getFullYear()).slice(-2)}${String(now.getMonth() + 1).padStart(2, "0")}${String(now.getDate()).padStart(2, "0")}`;
         const randomPart = String(Math.floor(Math.random() * 100000)).padStart(
@@ -164,7 +172,7 @@ export default function ConversionPage() {
   const handleConvert = async () => {
     if (selectedFiles.length === 0) {
       toast({
-        title: "No hay imágenes",
+        title: "Sin imágenes",
         description: "Por favor, sube al menos una imagen.",
         variant: "destructive",
       });
@@ -190,6 +198,13 @@ export default function ConversionPage() {
 
     setIsLoading(true);
 
+    // Capture settings at the moment of conversion
+    const snapshotPrefix = prefix;
+    const snapshotQuality = compressionQuality;
+    const snapshotLanguage = language;
+    const snapshotUseAi = useAiForName;
+    const snapshotUseSuffix = useSuffix;
+
     const initialItems: ConversionItem[] = selectedFiles.map((file, index) => ({
       id: `${file.name}-${index}-${Date.now()}`,
       originalFile: file,
@@ -200,19 +215,52 @@ export default function ConversionPage() {
     }));
     setConversionItems(initialItems);
 
-    for (const item of initialItems) {
-      setConversionItems((prev) =>
-        prev.map((i) =>
-          i.id === item.id ? { ...i, status: "processing" } : i,
-        ),
-      );
+    // Process images in parallel batches
+    const processWithConcurrency = async (items: ConversionItem[]) => {
+      const results: Array<{ id: string; result: Partial<ConversionItem> }> = [];
 
-      const result = await processImage(item.originalFile, item.id);
+      for (let i = 0; i < items.length; i += CONCURRENCY_LIMIT) {
+        const batch = items.slice(i, i + CONCURRENCY_LIMIT);
 
-      setConversionItems((prev) =>
-        prev.map((i) => (i.id === item.id ? { ...i, ...result } : i)),
-      );
-    }
+        // Mark batch as processing
+        setConversionItems((prev) =>
+          prev.map((item) =>
+            batch.some((b) => b.id === item.id)
+              ? { ...item, status: "processing" }
+              : item,
+          ),
+        );
+
+        const batchResults = await Promise.all(
+          batch.map(async (item) => ({
+            id: item.id,
+            result: await processImage(
+              item.originalFile,
+              item.id,
+              snapshotPrefix,
+              snapshotQuality,
+              snapshotLanguage,
+              snapshotUseAi,
+              snapshotUseSuffix,
+            ),
+          })),
+        );
+
+        // Apply batch results
+        setConversionItems((prev) =>
+          prev.map((item) => {
+            const found = batchResults.find((r) => r.id === item.id);
+            return found ? { ...item, ...found.result } : item;
+          }),
+        );
+
+        results.push(...batchResults);
+      }
+
+      return results;
+    };
+
+    await processWithConcurrency(initialItems);
 
     setIsLoading(false);
 
@@ -227,17 +275,13 @@ export default function ConversionPage() {
     });
   };
 
-  const handleClear = () => {
+  // Only clears files and results — preserves user settings
+  const handleClearFiles = () => {
     setSelectedFiles([]);
     setConversionItems([]);
-    setPrefix("");
-    setCompressionQuality(90);
-    setLanguage("spanish");
-    setUseAiForName(true);
-    setUseSuffix(true);
     toast({
-      title: "Formulario Limpiado",
-      description: "Puedes subir nuevas imágenes.",
+      title: "Archivos Eliminados",
+      description: "Puedes subir nuevas imágenes. Tu configuración se mantiene.",
     });
   };
 
@@ -263,7 +307,7 @@ export default function ConversionPage() {
                   variant: "destructive",
                 });
               }}
-              onClear={handleClear}
+              onClear={handleClearFiles}
               maxFiles={maxBatchSize}
             />
 
@@ -279,7 +323,7 @@ export default function ConversionPage() {
               compressionQuality={compressionQuality}
               setCompressionQuality={setCompressionQuality}
               onConvert={handleConvert}
-              onClear={handleClear}
+              onClearFiles={handleClearFiles}
               isLoading={isLoading}
               hasFile={selectedFiles.length > 0}
               hasResult={conversionItems.length > 0}

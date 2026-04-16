@@ -1,4 +1,4 @@
-import { useRef, useEffect, useMemo, type ChangeEvent, type DragEvent, useState } from "react";
+import { useRef, useEffect, useMemo, type ChangeEvent, type DragEvent, type KeyboardEvent, useState } from "react";
 import { Input } from "@/components/ui/input";
 import { UploadCloud, X } from "lucide-react";
 
@@ -84,26 +84,42 @@ export function ImageUploader({
     fileInputRef.current?.click();
   };
 
+  const handleKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
+    if (event.key === "Enter" || event.key === " ") {
+      event.preventDefault();
+      triggerFileInput();
+    }
+  };
+
   return (
     <div className="space-y-2">
       <div
+        role="button"
+        tabIndex={0}
+        aria-label={
+          selectedFiles.length > 0
+            ? `${selectedFiles.length} imagen(es) seleccionada(s). Haz clic para cambiar.`
+            : `Subir imágenes. Haz clic o arrastra archivos JPG, JPEG o PNG. Máximo ${maxFiles} archivos.`
+        }
         onClick={triggerFileInput}
+        onKeyDown={handleKeyDown}
         onDragOver={handleDragOver}
         onDragLeave={handleDragLeave}
         onDrop={handleDrop}
-        className={`mt-1 flex flex-col items-center justify-center p-8 rounded-md border-2 border-dashed cursor-pointer bg-background/30 transition-colors ${isDragging
+        className={`mt-1 flex flex-col items-center justify-center p-8 rounded-md border-2 border-dashed cursor-pointer bg-background/30 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 ${
+          isDragging
             ? "border-primary bg-primary/10"
             : "border-primary/40 hover:border-primary"
-          }`}
+        }`}
       >
-        <UploadCloud className="h-12 w-12 text-muted-foreground mb-2" />
+        <UploadCloud className="h-12 w-12 text-muted-foreground mb-2" aria-hidden="true" />
         <p className="text-sm font-medium text-card-foreground">
           {selectedFiles.length > 0
             ? `${selectedFiles.length} imagen(es) seleccionada(s)`
-            : "Click to upload or drag and drop"}
+            : "Haz clic o arrastra y suelta"}
         </p>
         <p className="text-xs text-muted-foreground">
-          JPG, JPEG, or PNG (máx. {maxFiles} archivos)
+          JPG, JPEG o PNG (máx. {maxFiles} archivos)
         </p>
         <Input
           id="file-upload"
@@ -113,6 +129,8 @@ export function ImageUploader({
           accept=".jpg,.jpeg,.png"
           multiple
           className="hidden"
+          aria-hidden="true"
+          tabIndex={-1}
         />
       </div>
       {selectedFiles.length > 0 && (
@@ -133,10 +151,10 @@ export function ImageUploader({
                   e.stopPropagation();
                   onRemoveFile(index);
                 }}
-                className="absolute top-0.5 right-0.5 w-5 h-5 rounded-full bg-destructive/90 text-destructive-foreground flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer hover:bg-destructive shadow-md"
-                title={`Quitar ${file.name}`}
+                aria-label={`Quitar ${file.name}`}
+                className="absolute top-0.5 right-0.5 w-6 h-6 rounded-full bg-destructive/90 text-destructive-foreground flex items-center justify-center opacity-0 group-hover:opacity-100 focus:opacity-100 transition-opacity cursor-pointer hover:bg-destructive shadow-md focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
               >
-                <X className="h-3 w-3" />
+                <X className="h-3.5 w-3.5" aria-hidden="true" />
               </button>
               <div className="absolute bottom-0 left-0 right-0 bg-black/60 px-1 py-0.5 opacity-0 group-hover:opacity-100 transition-opacity">
                 <p className="text-[10px] text-white truncate">{file.name}</p>
