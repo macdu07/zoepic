@@ -16,6 +16,7 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import { ImagePlay, Mail, KeyRound, Loader2, Eye, EyeOff } from "lucide-react";
 import { signIn } from "@/lib/auth-client";
+import { BrandLogo } from "@/components/icons/BrandLogo";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -37,8 +38,7 @@ export default function LoginPage() {
     if (error) {
       toast({
         title: "Error de acceso",
-        description:
-          error.message || "No se pudo iniciar sesión.",
+        description: error.message || "No se pudo iniciar sesión.",
         variant: "destructive",
       });
       setIsLoading(false);
@@ -58,10 +58,10 @@ export default function LoginPage() {
     <div className="flex flex-col items-center justify-center min-h-screen p-4 bg-background text-foreground">
       <Card className="w-full max-w-md shadow-xl bg-card text-card-foreground">
         <CardHeader className="text-center">
-          <div className="mx-auto mb-4 text-primary">
-            <ImagePlay className="h-12 w-12" />
+          <div className="mx-auto mb-4 flex justify-center">
+            <BrandLogo className="h-9 w-auto text-foreground" />
           </div>
-          <CardTitle className="text-3xl font-bold">Iniciar Sesión</CardTitle>
+          <CardTitle className="text-xl font-bold">Iniciar Sesión</CardTitle>
           <CardDescription className="text-muted-foreground">
             Ingresa tus credenciales para acceder a ZoePic.
           </CardDescription>

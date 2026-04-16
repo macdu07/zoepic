@@ -19,6 +19,7 @@ import {
 } from "lucide-react";
 import { useSession } from "@/lib/auth-client";
 import PayPalSubscribeButton from "@/components/core/PayPalSubscribeButton";
+import { BrandLogo } from "@/components/icons/BrandLogo";
 
 const ANNUAL_DISCOUNT = 0.25; // 25% descuento anual
 
@@ -72,12 +73,7 @@ export default function LandingPage() {
       <nav className="sticky top-0 z-50 backdrop-blur-md bg-background/80 border-b border-border/50">
         <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-2.5">
-            <div className="w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center">
-              <ImagePlay className="h-5 w-5 text-primary" />
-            </div>
-            <span className="text-xl font-bold tracking-tight">
-              Zoe<span className="text-primary">Pic</span>
-            </span>
+            <BrandLogo className="h-7 w-auto text-foreground" />
           </div>
           <div className="flex items-center gap-3">
             {!user && !isPending && (
@@ -394,16 +390,22 @@ export default function LandingPage() {
               <h3 className="text-xl font-bold mb-1">Pro</h3>
               <div className="flex items-baseline gap-1 mb-1">
                 <span className="text-4xl font-extrabold">
-                  ${billingAnnual ? (6.99 * (1 - ANNUAL_DISCOUNT)).toFixed(2) : "6.99"}
+                  $
+                  {billingAnnual
+                    ? (6.99 * (1 - ANNUAL_DISCOUNT)).toFixed(2)
+                    : "6.99"}
                 </span>
                 <span className="text-muted-foreground text-sm">/mes</span>
               </div>
               {billingAnnual && (
                 <p className="text-xs text-primary font-medium mb-3">
-                  Facturado anualmente — ${(6.99 * 12 * (1 - ANNUAL_DISCOUNT)).toFixed(2)}/año
+                  Facturado anualmente — $
+                  {(6.99 * 12 * (1 - ANNUAL_DISCOUNT)).toFixed(2)}/año
                 </p>
               )}
-              <p className={`text-sm text-muted-foreground mb-6 ${!billingAnnual ? "mt-4" : ""}`}>
+              <p
+                className={`text-sm text-muted-foreground mb-6 ${!billingAnnual ? "mt-4" : ""}`}
+              >
                 Ideal para creadores de contenido.
               </p>
               <ul className="space-y-3 text-sm mb-8 flex-grow">
@@ -452,16 +454,22 @@ export default function LandingPage() {
               <h3 className="text-xl font-bold mb-1">Agency</h3>
               <div className="flex items-baseline gap-1 mb-1">
                 <span className="text-4xl font-extrabold">
-                  ${billingAnnual ? (23.99 * (1 - ANNUAL_DISCOUNT)).toFixed(2) : "23.99"}
+                  $
+                  {billingAnnual
+                    ? (23.99 * (1 - ANNUAL_DISCOUNT)).toFixed(2)
+                    : "23.99"}
                 </span>
                 <span className="text-muted-foreground text-sm">/mes</span>
               </div>
               {billingAnnual && (
                 <p className="text-xs text-primary font-medium mb-3">
-                  Facturado anualmente — ${(23.99 * 12 * (1 - ANNUAL_DISCOUNT)).toFixed(2)}/año
+                  Facturado anualmente — $
+                  {(23.99 * 12 * (1 - ANNUAL_DISCOUNT)).toFixed(2)}/año
                 </p>
               )}
-              <p className={`text-sm text-muted-foreground mb-6 ${!billingAnnual ? "mt-4" : ""}`}>
+              <p
+                className={`text-sm text-muted-foreground mb-6 ${!billingAnnual ? "mt-4" : ""}`}
+              >
                 Para agencias y equipos grandes.
               </p>
               <ul className="space-y-3 text-sm mb-8 flex-grow">
@@ -522,7 +530,9 @@ export default function LandingPage() {
                 className="w-full flex items-center justify-between px-6 py-4 text-left hover:bg-primary/5 transition-colors"
                 aria-expanded={openFaq === index}
               >
-                <span className="text-sm font-semibold pr-4">{faq.question}</span>
+                <span className="text-sm font-semibold pr-4">
+                  {faq.question}
+                </span>
                 <ChevronRight
                   className={`h-4 w-4 flex-shrink-0 text-muted-foreground transition-transform duration-200 ${
                     openFaq === index ? "rotate-90" : ""
@@ -583,8 +593,7 @@ export default function LandingPage() {
       <footer className="border-t border-border/50 bg-card/20">
         <div className="max-w-6xl mx-auto px-6 py-8 flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-2">
-            <ImagePlay className="h-4 w-4 text-primary" />
-            <span className="text-sm font-medium">ZoePic</span>
+            <BrandLogo className="h-6 w-auto text-foreground" />
           </div>
           <p className="text-sm text-muted-foreground">
             &copy; {new Date().getFullYear()} ZoePic. Todos los derechos

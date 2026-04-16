@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { ImagePlay, BarChart3, Sparkles, UserCog } from "lucide-react";
 import { useSession } from "@/lib/auth-client";
 import { Button } from "@/components/ui/button";
+import { BrandLogo } from "@/components/icons/BrandLogo";
 
 export default function DashboardLayout({
   children,
@@ -47,12 +48,7 @@ export default function DashboardLayout({
         <div className="container mx-auto px-4 py-3 flex items-center justify-between">
           <div className="flex items-center gap-6">
             <Link href="/" className="flex items-center gap-2.5">
-              <div className="w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center">
-                <ImagePlay className="h-5 w-5 text-primary" />
-              </div>
-              <span className="text-xl font-bold tracking-tight">
-                Zoe<span className="text-primary">Pic</span>
-              </span>
+              <BrandLogo className="h-7 w-auto text-foreground" />
             </Link>
             <nav className="hidden sm:flex items-center gap-1">
               {navItems.map((item) => (
