@@ -161,15 +161,23 @@ export function ConversionControls({
         </p>
       </div>
 
-      <div className="flex items-center space-x-2">
-        <Switch
-          id="use-suffix"
-          checked={useSuffix}
-          onCheckedChange={setUseSuffix}
-        />
-        <Label htmlFor="use-suffix" className="text-sm font-medium">
-          Agregar sufijo de fecha al nombre
-        </Label>
+      <div className="space-y-1">
+        <div className="flex items-center space-x-2">
+          <Switch
+            id="use-suffix"
+            checked={useSuffix}
+            onCheckedChange={setUseSuffix}
+          />
+          <Label htmlFor="use-suffix" className="text-sm font-medium">
+            Agregar sufijo de fecha al nombre
+          </Label>
+        </div>
+        <p className="text-xs text-muted-foreground pl-[3.25rem]">
+          ej.{" "}
+          <span className="font-mono">
+            nombre-imagen<span className="text-primary">-260416-12345</span>.webp
+          </span>
+        </p>
       </div>
 
       <div className="flex gap-4">

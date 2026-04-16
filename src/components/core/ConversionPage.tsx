@@ -44,7 +44,7 @@ export default function ConversionPage() {
   const [language, setLanguage] = useState<"spanish" | "english">("spanish");
   const [useAiForName, setUseAiForName] = useState(true);
   const [brandPrompt, setBrandPrompt] = useState("");
-  const [useSuffix, setUseSuffix] = useState(true);
+  const [useSuffix, setUseSuffix] = useState(false);
   const [maxBatchSize, setMaxBatchSize] = useState(5);
   const { toast } = useToast();
 
