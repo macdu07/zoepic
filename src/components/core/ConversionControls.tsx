@@ -1,6 +1,7 @@
 import { Label } from "@/components/ui/label";
 import { SpainFlag, USAFlag } from "@/components/ui/flag-icons";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { Slider } from "@/components/ui/slider";
 import {
@@ -18,6 +19,8 @@ interface ConversionControlsProps {
   setUseAiForName: (value: boolean) => void;
   prefix: string;
   setPrefix: (value: string) => void;
+  brandPrompt: string;
+  setBrandPrompt: (value: string) => void;
   useSuffix: boolean;
   setUseSuffix: (value: boolean) => void;
   language: "spanish" | "english";
@@ -36,6 +39,8 @@ export function ConversionControls({
   setUseAiForName,
   prefix,
   setPrefix,
+  brandPrompt,
+  setBrandPrompt,
   useSuffix,
   setUseSuffix,
   language,
@@ -81,33 +86,54 @@ export function ConversionControls({
       </div>
 
       {useAiForName && (
-        <div>
-          <Label htmlFor="ai-language" className="text-xs font-medium text-muted-foreground">
-            Idioma del nombre generado por IA
-          </Label>
-          <Select
-            value={language}
-            onValueChange={(value: "spanish" | "english") => setLanguage(value)}
-          >
-            <SelectTrigger id="ai-language" className="mt-1 bg-input text-foreground border-border focus:bg-background">
-              <SelectValue placeholder="Selecciona idioma" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="spanish">
-                <span className="flex items-center gap-2">
-                  <SpainFlag className="h-3.5 w-5 rounded-[2px] flex-shrink-0" />{" "}
-                  Español
-                </span>
-              </SelectItem>
-              <SelectItem value="english">
-                <span className="flex items-center gap-2">
-                  <USAFlag className="h-3.5 w-5 rounded-[2px] flex-shrink-0" />{" "}
-                  English
-                </span>
-              </SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
+        <>
+          <div>
+            <Label htmlFor="ai-language" className="text-xs font-medium text-muted-foreground">
+              Idioma del nombre generado por IA
+            </Label>
+            <Select
+              value={language}
+              onValueChange={(value: "spanish" | "english") => setLanguage(value)}
+            >
+              <SelectTrigger id="ai-language" className="mt-1 bg-input text-foreground border-border focus:bg-background">
+                <SelectValue placeholder="Selecciona idioma" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="spanish">
+                  <span className="flex items-center gap-2">
+                    <SpainFlag className="h-3.5 w-5 rounded-[2px] flex-shrink-0" />{" "}
+                    Español
+                  </span>
+                </SelectItem>
+                <SelectItem value="english">
+                  <span className="flex items-center gap-2">
+                    <USAFlag className="h-3.5 w-5 rounded-[2px] flex-shrink-0" />{" "}
+                    English
+                  </span>
+                </SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div>
+            <Label htmlFor="brand-prompt" className="text-xs font-medium text-muted-foreground">
+              Contexto de marca o sitio web{" "}
+              <span className="text-muted-foreground/60">(opcional)</span>
+            </Label>
+            <Textarea
+              id="brand-prompt"
+              value={brandPrompt}
+              onChange={(e) => setBrandPrompt(e.target.value)}
+              placeholder="ej. Tienda de ropa deportiva para mujeres, enfocada en yoga y fitness. Palabras clave: activewear, ropa deportiva, yoga."
+              className="mt-1 bg-input text-foreground border-border focus:bg-background placeholder:text-muted-foreground/70 resize-none text-sm"
+              rows={3}
+              maxLength={500}
+            />
+            <p className="text-xs text-muted-foreground mt-1">
+              La IA usará este contexto para generar nombres más relevantes y SEO-friendly para tu marca.
+            </p>
+          </div>
+        </>
       )}
 
       <div>

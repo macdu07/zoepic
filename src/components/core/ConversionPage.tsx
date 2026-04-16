@@ -43,6 +43,7 @@ export default function ConversionPage() {
   const [compressionQuality, setCompressionQuality] = useState(90);
   const [language, setLanguage] = useState<"spanish" | "english">("spanish");
   const [useAiForName, setUseAiForName] = useState(true);
+  const [brandPrompt, setBrandPrompt] = useState("");
   const [useSuffix, setUseSuffix] = useState(true);
   const [maxBatchSize, setMaxBatchSize] = useState(5);
   const { toast } = useToast();
@@ -76,6 +77,7 @@ export default function ConversionPage() {
     currentLanguage: "spanish" | "english",
     currentUseAi: boolean,
     currentUseSuffix: boolean,
+    currentBrandPrompt: string,
   ): Promise<Partial<ConversionItem>> => {
     try {
       const metadata = await getImageMetadata(file);
@@ -103,6 +105,7 @@ export default function ConversionPage() {
           const aiInput: GenerateImageNameInput = {
             photoDataUri: smallImage.dataUrl,
             language: currentLanguage,
+            ...(currentBrandPrompt.trim() && { brandPrompt: currentBrandPrompt.trim() }),
           };
           const aiOutput = await generateImageName(aiInput);
           let generatedName = aiOutput.filename;
@@ -204,6 +207,7 @@ export default function ConversionPage() {
     const snapshotLanguage = language;
     const snapshotUseAi = useAiForName;
     const snapshotUseSuffix = useSuffix;
+    const snapshotBrandPrompt = brandPrompt;
 
     const initialItems: ConversionItem[] = selectedFiles.map((file, index) => ({
       id: `${file.name}-${index}-${Date.now()}`,
@@ -242,6 +246,7 @@ export default function ConversionPage() {
               snapshotLanguage,
               snapshotUseAi,
               snapshotUseSuffix,
+              snapshotBrandPrompt,
             ),
           })),
         );
@@ -316,6 +321,8 @@ export default function ConversionPage() {
               setUseAiForName={setUseAiForName}
               prefix={prefix}
               setPrefix={setPrefix}
+              brandPrompt={brandPrompt}
+              setBrandPrompt={setBrandPrompt}
               useSuffix={useSuffix}
               setUseSuffix={setUseSuffix}
               language={language}

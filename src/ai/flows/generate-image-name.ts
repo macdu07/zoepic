@@ -21,7 +21,11 @@ const GenerateImageNameInputSchema = z.object({
   language: z
     .enum(['spanish', 'english'])
     .default('spanish')
-    .describe('The language for generating the descriptive filename.')
+    .describe('The language for generating the descriptive filename.'),
+  brandPrompt: z
+    .string()
+    .optional()
+    .describe('Optional brand/website context to guide SEO-friendly filename generation.'),
 });
 export type GenerateImageNameInput = z.infer<typeof GenerateImageNameInputSchema>;
 
@@ -38,15 +42,21 @@ const generateImageNamePrompt = ai.definePrompt({
   name: 'generateImageNamePrompt',
   input: {schema: GenerateImageNameInputSchema},
   output: {schema: GenerateImageNameOutputSchema},
-  prompt: `You are an expert in generating descriptive filenames for images.
+  prompt: `You are an expert in generating SEO-friendly, descriptive filenames for images.
 
   Given the content of the image, generate a descriptive filename that is lowercase and hyphenated.
 
   Language: {{language}}
 
+  {{#if brandPrompt}}
+  Brand/Website context: {{brandPrompt}}
+  Use this context to make the filename more relevant to the brand or website. Incorporate brand keywords, product categories, or niche terms naturally while still describing the image accurately.
+  {{/if}}
+
   Instructions:
   - If language is "spanish": Generate the filename in Spanish. For example, if the image contains a plant in a white pot on a table, the filename should be "planta-en-maceta-blanca-sobre-mesa".
   - If language is "english": Generate the filename in English. For example, if the image contains a plant in a white pot on a table, the filename should be "plant-in-white-pot-on-table".
+  - Output ONLY the filename, no extension, no extra text.
 
   Image: {{media url=photoDataUri}}`,
 });
