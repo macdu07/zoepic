@@ -15,7 +15,7 @@ import {
 } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { ImagePlay, Mail, KeyRound, Loader2, Eye, EyeOff } from "lucide-react";
-import { insforge } from "@/lib/insforge";
+import { signIn } from "@/lib/auth-client";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -29,7 +29,7 @@ export default function LoginPage() {
     e.preventDefault();
     setIsLoading(true);
 
-    const { data, error } = await insforge.auth.signInWithPassword({
+    const { data, error } = await signIn.email({
       email,
       password,
     });
@@ -38,9 +38,7 @@ export default function LoginPage() {
       toast({
         title: "Error de acceso",
         description:
-          error.message === "Invalid login credentials"
-            ? "Email o contraseña incorrectos."
-            : error.message || "No se pudo iniciar sesión.",
+          error.message || "No se pudo iniciar sesión.",
         variant: "destructive",
       });
       setIsLoading(false);
@@ -48,30 +46,10 @@ export default function LoginPage() {
     }
 
     if (data) {
-      // Sync the token to the server cookie before navigating
-      try {
-        await fetch("/api/auth", {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${data.accessToken}`,
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            action: "sync-token",
-            user: data.user,
-          }),
-        });
-      } catch (e) {
-        // Cookie sync failed, but we can still try to navigate
-        console.warn("Cookie sync failed:", e);
-      }
-
       toast({
         title: "¡Bienvenido!",
         description: "Iniciaste sesión correctamente.",
       });
-      // Full page navigation so the InsforgeBrowserProvider re-initialises
-      // and picks up the new session (UserButton, SignedIn, etc.)
       window.location.href = "/dashboard";
     }
   };

@@ -1,12 +1,45 @@
-import { InsforgeMiddleware } from '@insforge/nextjs/middleware';
+import { NextResponse, type NextRequest } from "next/server";
+import { betterFetch } from "@better-fetch/fetch";
+import type { Session } from "better-auth/types";
 
-export default InsforgeMiddleware({
-  baseUrl: process.env.NEXT_PUBLIC_INSFORGE_BASE_URL || 'https://zoepicapi.maurouix.com',
-  publicRoutes: ['/', '/login', '/signup'],
-  signInUrl: '/login',
-  afterSignInUrl: '/dashboard',
-  useBuiltInAuth: false,
-});
+export async function middleware(request: NextRequest) {
+  const { pathname } = request.nextUrl;
+
+  // Protected routes start with /dashboard
+  if (pathname.startsWith("/dashboard")) {
+    const { data: session } = await betterFetch<Session>(
+      "/api/auth/get-session",
+      {
+        baseURL: process.env.BETTER_AUTH_URL || request.nextUrl.origin,
+        headers: {
+          cookie: request.headers.get("cookie") || "",
+        },
+      }
+    );
+
+    if (!session) {
+      return NextResponse.redirect(new URL("/login", request.url));
+    }
+  }
+
+  // Redirect to dashboard if logged in users access /login or /signup
+  if (pathname === "/login" || pathname === "/signup") {
+    const { data: session } = await betterFetch<Session>(
+      "/api/auth/get-session",
+      {
+        baseURL: process.env.BETTER_AUTH_URL || request.nextUrl.origin,
+        headers: {
+          cookie: request.headers.get("cookie") || "",
+        },
+      }
+    );
+    if (session) {
+      return NextResponse.redirect(new URL("/dashboard", request.url));
+    }
+  }
+
+  return NextResponse.next();
+}
 
 export const config = {
   matcher: [

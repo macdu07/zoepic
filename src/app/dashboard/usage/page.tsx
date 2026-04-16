@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useUser } from "@insforge/nextjs";
+import { useSession } from "@/lib/auth-client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
@@ -16,19 +16,15 @@ import {
   CheckCircle,
   Check,
 } from "lucide-react";
-import {
-  getUserProfile,
-  getConversionHistory,
-  PLANS,
-  type UserProfile,
-  type ConversionLog,
-  type PlanKey,
-} from "@/lib/usage";
+import { getUserProfile, getConversionHistory } from "@/lib/usage";
+import { PLANS, type UserProfile, type ConversionLog, type PlanKey } from "@/lib/usage-types";
 import PayPalSubscribeButton from "@/components/core/PayPalSubscribeButton";
 import { useToast } from "@/hooks/use-toast";
 
 export default function UsagePage() {
-  const { user, isLoaded } = useUser();
+  const { data: sessionData, isPending } = useSession();
+  const user = sessionData?.user as any;
+  const isLoaded = !isPending;
   const { toast } = useToast();
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [history, setHistory] = useState<ConversionLog[]>([]);
@@ -115,17 +111,17 @@ export default function UsagePage() {
 
   const usagePercent = Math.min(
     Math.round(
-      (profile.ai_conversions_used / profile.ai_conversions_limit) * 100,
+      (profile.aiConversionsUsed / profile.aiConversionsLimit) * 100,
     ),
     100,
   );
   const planInfo = PLANS[profile.plan as PlanKey] ?? PLANS.starter;
-  const periodStart = new Date(profile.period_start);
+  const periodStart = new Date(profile.periodStart);
   const periodEnd = new Date(periodStart);
   periodEnd.setDate(periodEnd.getDate() + 30);
 
   const hasActiveSubscription =
-    profile.subscription_status === "active" && profile.paypal_subscription_id;
+    profile.subscriptionStatus === "active" && profile.paypalSubscriptionId;
 
   return (
     <div className="container mx-auto px-4 py-8 max-w-4xl">
@@ -224,18 +220,18 @@ export default function UsagePage() {
           <CardContent className="space-y-4">
             <div className="text-center">
               <span className="text-4xl font-extrabold text-primary">
-                {profile.ai_conversions_used}
+                {profile.aiConversionsUsed}
               </span>
-              {profile.ai_conversions_limit >= 1000000 ? (
+              {profile.aiConversionsLimit >= 1000000 ? (
                 <span className="text-muted-foreground text-lg"> / ∞</span>
               ) : (
                 <span className="text-muted-foreground text-lg">
                   {" "}
-                  / {profile.ai_conversions_limit.toLocaleString()}
+                  / {profile.aiConversionsLimit.toLocaleString()}
                 </span>
               )}
             </div>
-            {profile.ai_conversions_limit >= 1000000 ? (
+            {profile.aiConversionsLimit >= 1000000 ? (
               <div className="flex items-center justify-center pt-2">
                 <p className="text-sm font-medium text-emerald-500 bg-emerald-500/10 px-3 py-1 rounded-full">
                   Plan Ilimitado Activo
@@ -247,7 +243,7 @@ export default function UsagePage() {
                 <p className="text-xs text-center text-muted-foreground">
                   {usagePercent}% utilizado — te quedan{" "}
                   {(
-                    profile.ai_conversions_limit - profile.ai_conversions_used
+                    profile.aiConversionsLimit - profile.aiConversionsUsed
                   ).toLocaleString()}{" "}
                   conversiones AI
                 </p>
@@ -367,7 +363,7 @@ export default function UsagePage() {
                       className="border-b border-border/50 last:border-0"
                     >
                       <td className="py-2.5">
-                        {new Date(log.created_at).toLocaleString("es-ES", {
+                        {new Date(log.createdAt).toLocaleString("es-ES", {
                           day: "2-digit",
                           month: "short",
                           year: "numeric",
@@ -375,9 +371,9 @@ export default function UsagePage() {
                           minute: "2-digit",
                         })}
                       </td>
-                      <td className="py-2.5">{log.file_count}</td>
+                      <td className="py-2.5">{log.fileCount}</td>
                       <td className="py-2.5">
-                        {log.ai_used ? (
+                        {log.aiUsed ? (
                           <span className="inline-flex items-center gap-1 text-primary font-medium">
                             <Sparkles className="h-3 w-3" />
                             Sí

@@ -1,7 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getPayPalAccessToken, getPayPalSubscription } from "@/lib/paypal";
-import { insforge } from "@/lib/insforge";
-import { PLANS, type PlanKey } from "@/lib/usage";
+import { PLANS, type PlanKey } from "@/lib/usage-types";
+import { db } from "@/db/db";
+import { userProfiles } from "@/db/schema";
+import { eq } from "drizzle-orm";
 
 /**
  * POST /api/paypal/activate
@@ -40,20 +42,19 @@ export async function POST(request: NextRequest) {
 
     // Update the user's profile
     const plan = PLANS[planKey as PlanKey];
-    const { error } = await insforge.database
-      .from("user_profiles")
-      .update({
-        plan: planKey,
-        ai_conversions_limit: plan.aiConversionsLimit,
-        max_batch_size: plan.maxBatchSize,
-        ai_conversions_used: 0,
-        period_start: new Date().toISOString(),
-        paypal_subscription_id: subscriptionId,
-        subscription_status: "active",
-      })
-      .eq("user_id", userId);
-
-    if (error) {
+    try {
+      await db.update(userProfiles)
+        .set({
+          plan: planKey,
+          aiConversionsLimit: plan.aiConversionsLimit,
+          maxBatchSize: plan.maxBatchSize,
+          aiConversionsUsed: 0,
+          periodStart: new Date(),
+          paypalSubscriptionId: subscriptionId,
+          subscriptionStatus: "active",
+        })
+        .where(eq(userProfiles.userId, userId));
+    } catch (error) {
       console.error("DB update error:", error);
       return NextResponse.json(
         { error: "Failed to update user profile" },

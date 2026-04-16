@@ -23,7 +23,7 @@ import {
     Eye,
     EyeOff,
 } from "lucide-react";
-import { insforge } from "@/lib/insforge";
+import { signUp } from "@/lib/auth-client";
 
 export default function SignUpPage() {
     const [name, setName] = useState("");
@@ -58,10 +58,10 @@ export default function SignUpPage() {
 
         setIsLoading(true);
 
-        const { data, error } = await insforge.auth.signUp({
+        const { data, error } = await signUp.email({
             email,
             password,
-            name: name || undefined,
+            name: name || email.split("@")[0],
         });
 
         if (error) {
@@ -74,21 +74,13 @@ export default function SignUpPage() {
             return;
         }
 
-        if (data?.requireEmailVerification) {
-            toast({
-                title: "Verifica tu correo",
-                description:
-                    "Te hemos enviado un correo de verificación. Revisa tu bandeja de entrada.",
-            });
-            router.push("/login");
-        } else if (data?.accessToken) {
-            toast({
-                title: "¡Cuenta creada!",
-                description: "Te has registrado exitosamente.",
-            });
-            router.push("/dashboard");
-            router.refresh();
-        }
+        toast({
+            title: "¡Cuenta creada!",
+            description: "Te has registrado exitosamente.",
+        });
+        
+        router.push("/dashboard");
+        router.refresh();
     };
 
     return (

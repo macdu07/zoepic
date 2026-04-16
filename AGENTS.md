@@ -8,7 +8,7 @@ alwaysApply: true
 
 ## Project Overview
 
-Zoe Convert es una aplicación web desarrollada con Next.js (App Router) para convertir imágenes (JPG, JPEG, PNG) al formato WebP con IA. Usa InsForge como BaaS para autenticación y base de datos.
+Zoe Convert es una aplicación web desarrollada con Next.js (App Router) para convertir imágenes (JPG, JPEG, PNG) al formato WebP con IA. Usa Neon Database con Drizzle ORM y Better Auth para manejar autenticación y persistencia de cuentas.
 
 ---
 
@@ -50,7 +50,7 @@ import { useState, useCallback, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { Sparkles } from "lucide-react";
-import { useUser } from "@insforge/nextjs";
+import { useSession } from "@/lib/auth-client";
 
 // Internal modules - use @/ alias
 import { generateImageName, type GenerateImageNameInput } from "@/ai/flows/generate-image-name";
@@ -135,7 +135,7 @@ try {
 - Use `useState` for local component state
 - Use `useCallback` for event handlers passed to children
 - Use `useEffect` for side effects (data fetching, subscriptions)
-- Use InsForge SDK for server state (user, database)
+- Use Better Auth and Drizzle ORM for server state (user, database)
 
 ### API Routes (Next.js App Router)
 - Use Route Handlers (`route.ts`) with named exports: `GET`, `POST`, etc.
@@ -145,32 +145,7 @@ try {
 
 ---
 
-## InsForge SDK Guidelines
 
-### Critical: Always Fetch Latest Docs
-Before writing InsForge integration code, use the `fetch-docs` or `fetch-sdk-docs` MCP tool to get up-to-date implementation patterns.
-
-### SDK Usage
-- Create client in `@/lib/insforge.ts`:
-```typescript
-import { createClient } from '@insforge/sdk';
-
-export const client = createClient({
-  baseUrl: process.env.NEXT_PUBLIC_INSFORGE_BASE_URL!,
-  anonKey: process.env.NEXT_PUBLIC_INSFORGE_ANON_KEY!,
-});
-```
-
-- SDK returns `{data, error}` structure for all operations
-- Database inserts require array format: `[{...}]`
-- Use `@insforge/nextjs` for Next.js authentication hooks
-
-### Important Notes
-- Use Tailwind CSS 3.4 (do NOT upgrade to v4)
-- Use `@insforge/nextjs` for authentication (not custom JWT implementation)
-- Store sensitive values in `.env`, access via `process.env`
-
----
 
 ## File Structure
 

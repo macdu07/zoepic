@@ -2,14 +2,9 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { useUser } from "@insforge/nextjs";
-import { insforge } from "@/lib/insforge";
-import {
-    getUserProfile,
-    PLANS,
-    type UserProfile,
-    type PlanKey,
-} from "@/lib/usage";
+import { useSession, signOut, authClient } from "@/lib/auth-client";
+import { getUserProfile } from "@/lib/usage";
+import { PLANS, type UserProfile, type PlanKey } from "@/lib/usage-types";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -28,7 +23,9 @@ import {
 } from "lucide-react";
 
 export default function AccountPage() {
-    const { user, isLoaded } = useUser();
+    const { data: sessionData, isPending } = useSession();
+    const user = sessionData?.user as any;
+    const isLoaded = !isPending;
     const router = useRouter();
     const { toast } = useToast();
 
@@ -51,8 +48,8 @@ export default function AccountPage() {
 
     useEffect(() => {
         if (isLoaded && user) {
-            setName(user.profile?.name ?? "");
-            setAvatarUrl(user.profile?.avatar_url ?? "");
+            setName(user.name ?? "");
+            setAvatarUrl(user.image ?? "");
             getUserProfile(user.id).then((p) => {
                 setAppProfile(p);
                 setLoading(false);
@@ -76,9 +73,9 @@ export default function AccountPage() {
     const handleSaveProfile = async () => {
         setSavingProfile(true);
         try {
-            const { error } = await insforge.auth.setProfile({
+            const { error } = await authClient.updateUser({
                 name: name.trim(),
-                avatar_url: avatarUrl.trim() || undefined,
+                image: avatarUrl.trim() || undefined,
             });
             if (error) throw error;
             toast({ title: "Perfil actualizado", description: "Tus cambios se han guardado." });
@@ -90,20 +87,11 @@ export default function AccountPage() {
     };
 
     const handleSendResetCode = async () => {
-        setSendingReset(true);
-        try {
-            const { data, error } = await insforge.auth.sendResetPasswordEmail({ email: user.email });
-            if (error) throw error;
-            setResetStep("enter_code");
-            toast({ title: "Código enviado", description: `Se envió un código de verificación a ${user.email}.` });
-        } catch (err: any) {
-            toast({ title: "Error", description: err?.message ?? "No se pudo enviar el código.", variant: "destructive" });
-        } finally {
-            setSendingReset(false);
-        }
+        // Obsoleto en la nueva implementacion por Better Auth Change Password
     };
 
     const handleResetPassword = async () => {
+        // Mejor soporte para "Change Password" (password change para usuario logueado en BetterAuth)
         if (newPassword !== confirmPassword) {
             toast({ title: "Error", description: "Las contraseñas no coinciden.", variant: "destructive" });
             return;
@@ -115,19 +103,12 @@ export default function AccountPage() {
 
         setResettingPassword(true);
         try {
-            // Step 1: Exchange code for token
-            const { data: tokenData, error: tokenErr } = await insforge.auth.exchangeResetPasswordToken({
-                email: user.email,
-                code: resetCode,
-            });
-            if (tokenErr) throw tokenErr;
-
-            // Step 2: Reset password with token
-            const { error: resetErr } = await insforge.auth.resetPassword({
+            const { error } = await authClient.changePassword({
                 newPassword,
-                otp: tokenData!.token,
+                currentPassword: resetCode, // Utilizaremos este campo para la actual
+                revokeOtherSessions: true
             });
-            if (resetErr) throw resetErr;
+            if (error) throw error;
 
             toast({ title: "Contraseña actualizada", description: "Tu contraseña se ha cambiado exitosamente." });
             setResetStep("idle");
@@ -142,7 +123,7 @@ export default function AccountPage() {
     };
 
     const handleSignOut = async () => {
-        await insforge.auth.signOut();
+        await signOut();
         window.location.href = "/";
     };
 
@@ -240,16 +221,13 @@ export default function AccountPage() {
                         {resetStep === "idle" && (
                             <>
                                 <p className="text-sm text-muted-foreground">
-                                    Para cambiar tu contraseña, enviaremos un código de verificación a tu correo.
+                                    Puedes cambiar tu contraseña utilizando tu contraseña actual.
                                 </p>
                                 <Button
-                                    onClick={handleSendResetCode}
-                                    disabled={sendingReset}
-                                    variant="outline"
-                                    className="font-semibold"
+                                    onClick={() => setResetStep("enter_code")}
+                                    className="font-semibold mt-2"
                                 >
-                                    {sendingReset ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Send className="mr-2 h-4 w-4" />}
-                                    Enviar Código de Verificación
+                                    Cambiar Contraseña
                                 </Button>
                             </>
                         )}
@@ -257,14 +235,14 @@ export default function AccountPage() {
                         {resetStep === "enter_code" && (
                             <>
                                 <div>
-                                    <Label htmlFor="reset-code" className="text-xs text-muted-foreground">Código de verificación</Label>
+                                    <Label htmlFor="current-pass" className="text-xs text-muted-foreground">Contraseña Actual</Label>
                                     <Input
-                                        id="reset-code"
+                                        id="current-pass"
+                                        type="password"
                                         value={resetCode}
                                         onChange={(e) => setResetCode(e.target.value)}
-                                        placeholder="123456"
-                                        maxLength={6}
-                                        className="mt-1 bg-input font-mono text-center text-lg tracking-widest"
+                                        placeholder="Tu contraseña actual"
+                                        className="mt-1 bg-input"
                                     />
                                 </div>
                                 <div className="grid gap-4 sm:grid-cols-2">

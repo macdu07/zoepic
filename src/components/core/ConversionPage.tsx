@@ -5,7 +5,6 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { Sparkles } from "lucide-react";
-import { useUser } from "@insforge/nextjs";
 import {
   generateImageName,
   type GenerateImageNameInput,
@@ -17,25 +16,24 @@ import {
   type ImageMetadata,
   type WebPConversionResult,
 } from "@/lib/imageUtils";
-import {
-  checkUsageLimit,
-  logConversion,
-  getUserProfile,
-  type UsageCheck,
-} from "@/lib/usage";
-
+import { checkUsageLimit, logConversion, getUserProfile } from "@/lib/usage";
+import { type UsageCheck } from "@/lib/usage-types";
 import { ImageUploader } from "./ImageUploader";
 import { ConversionControls } from "./ConversionControls";
 import {
   ConversionResultList,
   type ConversionItem,
 } from "./ConversionResultList";
+import { useSession } from "@/lib/auth-client";
 
 // Number of images to process concurrently
 const CONCURRENCY_LIMIT = 4;
 
 export default function ConversionPage() {
-  const { user, isLoaded } = useUser();
+  const { data: sessionData, isPending: isLoadedResponse } = useSession();
+  const user = sessionData?.user as any;
+  const isLoaded = !isLoadedResponse;
+  
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [conversionItems, setConversionItems] = useState<ConversionItem[]>([]);
   const [prefix, setPrefix] = useState("");

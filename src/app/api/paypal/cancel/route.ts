@@ -1,7 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { cancelPayPalSubscription } from "@/lib/paypal";
-import { insforge } from "@/lib/insforge";
-import { PLANS } from "@/lib/usage";
+import { PLANS } from "@/lib/usage-types";
+import { db } from "@/db/db";
+import { userProfiles } from "@/db/schema";
+import { eq } from "drizzle-orm";
 
 /**
  * POST /api/paypal/cancel
@@ -17,22 +19,22 @@ export async function POST(request: NextRequest) {
     }
 
     // Get the user's current subscription
-    const { data: profiles, error: fetchErr } = await insforge.database
-      .from("user_profiles")
-      .select("*")
-      .eq("user_id", userId)
+    const profileRecords = await db
+      .select()
+      .from(userProfiles)
+      .where(eq(userProfiles.userId, userId))
       .limit(1);
 
-    if (fetchErr || !profiles || profiles.length === 0) {
+    if (!profileRecords || profileRecords.length === 0) {
       return NextResponse.json(
         { error: "User profile not found" },
         { status: 404 },
       );
     }
 
-    const profile = profiles[0];
+    const profile = profileRecords[0];
 
-    if (!profile.paypal_subscription_id) {
+    if (!profile.paypalSubscriptionId) {
       return NextResponse.json(
         { error: "No active subscription to cancel" },
         { status: 400 },
@@ -41,24 +43,23 @@ export async function POST(request: NextRequest) {
 
     // Cancel with PayPal
     await cancelPayPalSubscription(
-      profile.paypal_subscription_id,
+      profile.paypalSubscriptionId,
       "Usuario solicitó cancelación",
     );
 
     // Downgrade to Starter
     const starter = PLANS.starter;
-    const { error: updateErr } = await insforge.database
-      .from("user_profiles")
-      .update({
-        plan: "starter",
-        ai_conversions_limit: starter.aiConversionsLimit,
-        max_batch_size: starter.maxBatchSize,
-        paypal_subscription_id: null,
-        subscription_status: "cancelled",
-      })
-      .eq("user_id", userId);
-
-    if (updateErr) {
+    try {
+      await db.update(userProfiles)
+        .set({
+          plan: "starter",
+          aiConversionsLimit: starter.aiConversionsLimit,
+          maxBatchSize: starter.maxBatchSize,
+          paypalSubscriptionId: null,
+          subscriptionStatus: "cancelled",
+        })
+        .where(eq(userProfiles.userId, userId));
+    } catch (updateErr) {
       console.error("DB update error:", updateErr);
       return NextResponse.json(
         { error: "Failed to update user profile" },

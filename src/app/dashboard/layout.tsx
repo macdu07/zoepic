@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { ImagePlay, BarChart3, Sparkles, UserCog } from "lucide-react";
-import { useUser } from "@insforge/nextjs";
+import { useSession } from "@/lib/auth-client";
 import { Button } from "@/components/ui/button";
 
 export default function DashboardLayout({
@@ -12,7 +12,8 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
-  const { user } = useUser();
+  const { data: sessionData } = useSession();
+  const user = sessionData?.user as any;
 
   const navItems = [
     {
@@ -36,7 +37,7 @@ export default function DashboardLayout({
   ];
 
   const initial =
-    user?.profile?.name?.charAt(0)?.toUpperCase() ??
+    user?.name?.charAt(0)?.toUpperCase() ??
     user?.email?.charAt(0)?.toUpperCase() ??
     "U";
 
@@ -81,10 +82,10 @@ export default function DashboardLayout({
                   : "bg-primary/10 text-primary hover:bg-primary/20"
               }`}
             >
-              {user?.profile?.avatar_url ? (
+              {user?.image ? (
                 <img
-                  src={user.profile.avatar_url}
-                  alt={user?.profile?.name ?? "Foto de perfil"}
+                  src={user.image}
+                  alt={user?.name ?? "Foto de perfil"}
                   className="w-full h-full object-cover"
                 />
               ) : (

@@ -17,7 +17,7 @@ import {
   X,
   ChevronRight,
 } from "lucide-react";
-import { SignedIn, SignedOut, useUser } from "@insforge/nextjs";
+import { useSession } from "@/lib/auth-client";
 import PayPalSubscribeButton from "@/components/core/PayPalSubscribeButton";
 
 const ANNUAL_DISCOUNT = 0.25; // 25% descuento anual
@@ -56,12 +56,13 @@ const FAQ_ITEMS = [
 ];
 
 export default function LandingPage() {
-  const { user } = useUser();
+  const { data: sessionData, isPending } = useSession();
+  const user = sessionData?.user as any;
   const [billingAnnual, setBillingAnnual] = useState(false);
   const [openFaq, setOpenFaq] = useState<number | null>(null);
 
   const initial =
-    user?.profile?.name?.charAt(0)?.toUpperCase() ??
+    user?.name?.charAt(0)?.toUpperCase() ??
     user?.email?.charAt(0)?.toUpperCase() ??
     "U";
 
@@ -79,46 +80,50 @@ export default function LandingPage() {
             </span>
           </div>
           <div className="flex items-center gap-3">
-            <SignedOut>
-              <Link href="/login">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="text-sm font-medium"
-                >
-                  Iniciar Sesión
-                </Button>
-              </Link>
-              <Link href="/signup">
-                <Button size="sm" className="text-sm font-semibold">
-                  Crear Cuenta
-                </Button>
-              </Link>
-            </SignedOut>
-            <SignedIn>
-              <Link href="/dashboard">
-                <Button
-                  size="sm"
-                  variant="outline"
-                  className="text-sm font-medium"
-                >
-                  Ir al Dashboard
-                </Button>
-              </Link>
-              <Link href="/dashboard/account">
-                <div className="w-9 h-9 rounded-full bg-primary/10 flex items-center justify-center text-sm font-bold text-primary hover:bg-primary/20 transition-colors cursor-pointer overflow-hidden flex-shrink-0">
-                  {user?.profile?.avatar_url ? (
-                    <img
-                      src={user.profile.avatar_url}
-                      alt={user?.profile?.name ?? "Foto de perfil"}
-                      className="w-full h-full object-cover"
-                    />
-                  ) : (
-                    initial
-                  )}
-                </div>
-              </Link>
-            </SignedIn>
+            {!user && !isPending && (
+              <>
+                <Link href="/login">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="text-sm font-medium"
+                  >
+                    Iniciar Sesión
+                  </Button>
+                </Link>
+                <Link href="/signup">
+                  <Button size="sm" className="text-sm font-semibold">
+                    Crear Cuenta
+                  </Button>
+                </Link>
+              </>
+            )}
+            {user && (
+              <>
+                <Link href="/dashboard">
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="text-sm font-medium"
+                  >
+                    Ir al Dashboard
+                  </Button>
+                </Link>
+                <Link href="/dashboard/account">
+                  <div className="w-9 h-9 rounded-full bg-primary/10 flex items-center justify-center text-sm font-bold text-primary hover:bg-primary/20 transition-colors cursor-pointer overflow-hidden flex-shrink-0">
+                    {user?.image ? (
+                      <img
+                        src={user.image}
+                        alt={user?.name ?? "Foto de perfil"}
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      initial
+                    )}
+                  </div>
+                </Link>
+              </>
+            )}
           </div>
         </div>
       </nav>
@@ -147,7 +152,7 @@ export default function LandingPage() {
             para mejorar tu SEO y organización.
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-            <SignedOut>
+            {!user && !isPending && (
               <Link href="/signup">
                 <Button
                   size="lg"
@@ -157,8 +162,8 @@ export default function LandingPage() {
                   <ArrowRight className="ml-2 h-4 w-4" />
                 </Button>
               </Link>
-            </SignedOut>
-            <SignedIn>
+            )}
+            {user && (
               <Link href="/dashboard">
                 <Button
                   size="lg"
@@ -168,7 +173,7 @@ export default function LandingPage() {
                   <ArrowRight className="ml-2 h-4 w-4" />
                 </Button>
               </Link>
-            </SignedIn>
+            )}
             <a href="#features">
               <Button
                 variant="outline"
@@ -361,20 +366,20 @@ export default function LandingPage() {
                   Soporte prioritario
                 </li>
               </ul>
-              <SignedOut>
+              {!user && !isPending && (
                 <Link href="/signup">
                   <Button variant="outline" className="w-full font-semibold">
                     Comenzar Gratis
                   </Button>
                 </Link>
-              </SignedOut>
-              <SignedIn>
+              )}
+              {user && (
                 <Link href="/dashboard">
                   <Button variant="outline" className="w-full font-semibold">
                     Ir al Dashboard
                   </Button>
                 </Link>
-              </SignedIn>
+              )}
             </CardContent>
           </Card>
 
@@ -419,20 +424,20 @@ export default function LandingPage() {
                   Soporte prioritario
                 </li>
               </ul>
-              <SignedIn>
+              {user && (
                 <PayPalSubscribeButton
                   planKey="pro"
                   planLabel="Pro"
                   onSuccess={() => (window.location.href = "/dashboard/usage")}
                 />
-              </SignedIn>
-              <SignedOut>
+              )}
+              {!user && !isPending && (
                 <Link href="/signup">
                   <Button className="w-full font-semibold shadow-md">
                     Crear Cuenta para Suscribirte
                   </Button>
                 </Link>
-              </SignedOut>
+              )}
             </CardContent>
           </Card>
 
@@ -477,20 +482,20 @@ export default function LandingPage() {
                   Soporte prioritario
                 </li>
               </ul>
-              <SignedIn>
+              {user && (
                 <PayPalSubscribeButton
                   planKey="agency"
                   planLabel="Agency"
                   onSuccess={() => (window.location.href = "/dashboard/usage")}
                 />
-              </SignedIn>
-              <SignedOut>
+              )}
+              {!user && !isPending && (
                 <Link href="/signup">
                   <Button className="w-full font-semibold shadow-md">
                     Crear Cuenta para Suscribirte
                   </Button>
                 </Link>
-              </SignedOut>
+              )}
             </CardContent>
           </Card>
         </div>
@@ -548,7 +553,7 @@ export default function LandingPage() {
               Crea tu cuenta gratuita y comienza a convertir imágenes a WebP en
               segundos.
             </p>
-            <SignedOut>
+            {!user && !isPending && (
               <Link href="/signup">
                 <Button
                   size="lg"
@@ -558,8 +563,8 @@ export default function LandingPage() {
                   <ArrowRight className="ml-2 h-4 w-4" />
                 </Button>
               </Link>
-            </SignedOut>
-            <SignedIn>
+            )}
+            {user && (
               <Link href="/dashboard">
                 <Button
                   size="lg"
@@ -569,7 +574,7 @@ export default function LandingPage() {
                   <ArrowRight className="ml-2 h-4 w-4" />
                 </Button>
               </Link>
-            </SignedIn>
+            )}
           </div>
         </div>
       </section>

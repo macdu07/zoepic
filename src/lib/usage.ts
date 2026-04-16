@@ -1,120 +1,53 @@
-import { insforge } from "./insforge";
+"use server";
 
-// ─── Plan Definitions ────────────────────────────────────────────────
-export const PLANS = {
-  starter: {
-    name: "Starter",
-    price: 0,
-    aiConversionsLimit: 50,
-    maxBatchSize: 5,
-  },
-  pro: {
-    name: "Pro",
-    price: 6.99,
-    aiConversionsLimit: 3000,
-    maxBatchSize: 50,
-  },
-  agency: {
-    name: "Agency",
-    price: 23.99,
-    aiConversionsLimit: 20000,
-    maxBatchSize: 100,
-  },
-  unlimited: {
-    name: "Unlimited",
-    price: 0,
-    aiConversionsLimit: 1000000,
-    maxBatchSize: 1000,
-  },
-} as const;
+import { db } from "@/db/db";
+import { userProfiles, conversionLogs } from "@/db/schema";
+import { eq, desc } from "drizzle-orm";
 
-export type PlanKey = keyof typeof PLANS;
-
-export interface UserProfile {
-  id: string;
-  user_id: string;
-  plan: PlanKey;
-  ai_conversions_used: number;
-  ai_conversions_limit: number;
-  max_batch_size: number;
-  period_start: string;
-  created_at: string;
-  paypal_subscription_id: string | null;
-  subscription_status: string;
-}
-
-export interface ConversionLog {
-  id: string;
-  user_id: string;
-  file_count: number;
-  ai_used: boolean;
-  created_at: string;
-}
+import { PLANS, type UserProfile, type PlanKey, type ConversionLog, type UsageCheck } from "./usage-types";
 
 // ─── Get or create user profile ──────────────────────────────────────
 export async function getUserProfile(
   userId: string,
 ): Promise<UserProfile | null> {
   // Try to fetch existing profile
-  const { data, error } = await insforge.database
-    .from("user_profiles")
-    .select("*")
-    .eq("user_id", userId)
-    .limit(1);
-
-  if (error) {
-    console.error("Error fetching user profile:", error);
-  }
+  const existingProfiles = await db.select().from(userProfiles).where(eq(userProfiles.userId, userId)).limit(1);
 
   // Return existing profile if found
-  if (data && Array.isArray(data) && data.length > 0) {
-    return data[0] as UserProfile;
+  if (existingProfiles.length > 0) {
+    return existingProfiles[0] as unknown as UserProfile;
   }
 
   // Auto-create a starter profile if not found
   const plan = PLANS.starter;
-  const { data: newProfile, error: insertErr } = await insforge.database
-    .from("user_profiles")
-    .insert({
-      user_id: userId,
+  try {
+    const newProfile = await db.insert(userProfiles).values({
+      userId: userId,
       plan: "starter",
-      ai_conversions_used: 0,
-      ai_conversions_limit: plan.aiConversionsLimit,
-      max_batch_size: plan.maxBatchSize,
-      period_start: new Date().toISOString(),
-    })
-    .select();
+      aiConversionsUsed: 0,
+      aiConversionsLimit: plan.aiConversionsLimit,
+      maxBatchSize: plan.maxBatchSize,
+      periodStart: new Date(),
+    }).returning();
 
-  if (insertErr) {
+    if (newProfile.length > 0) {
+      return newProfile[0] as unknown as UserProfile;
+    }
+  } catch (insertErr) {
     console.error("Error creating user profile:", insertErr);
     // Likely a unique constraint violation (race condition) — fetch again
-    const { data: retryData } = await insforge.database
-      .from("user_profiles")
-      .select("*")
-      .eq("user_id", userId)
-      .limit(1);
-    if (retryData && Array.isArray(retryData) && retryData.length > 0) {
-      return retryData[0] as UserProfile;
+    const retryData = await db.select().from(userProfiles).where(eq(userProfiles.userId, userId)).limit(1);
+    
+    if (retryData.length > 0) {
+      return retryData[0] as unknown as UserProfile;
     }
-    return null;
-  }
-
-  if (newProfile && Array.isArray(newProfile) && newProfile.length > 0) {
-    return newProfile[0] as UserProfile;
   }
 
   return null;
 }
 
 // ─── Check usage limits ──────────────────────────────────────────────
-export interface UsageCheck {
-  allowed: boolean;
-  remaining: number;
-  limit: number;
-  used: number;
-  maxBatchSize: number;
-  plan: PlanKey;
-}
+
 
 export async function checkUsageLimit(
   userId: string,
@@ -135,7 +68,7 @@ export async function checkUsageLimit(
   }
 
   // Check if the period needs to be reset (monthly)
-  const periodStart = new Date(profile.period_start);
+  const periodStart = new Date(profile.periodStart);
   const now = new Date();
   const daysSincePeriodStart = Math.floor(
     (now.getTime() - periodStart.getTime()) / (1000 * 60 * 60 * 24),
@@ -143,40 +76,37 @@ export async function checkUsageLimit(
 
   if (daysSincePeriodStart >= 30 && profile.plan !== "unlimited") {
     // Reset the period
-    await insforge.database
-      .from("user_profiles")
-      .update({
-        ai_conversions_used: 0,
-        period_start: now.toISOString(),
-      })
-      .eq("user_id", userId);
+    await db.update(userProfiles).set({
+      aiConversionsUsed: 0,
+      periodStart: now,
+    }).where(eq(userProfiles.userId, userId));
 
-    profile.ai_conversions_used = 0;
-    profile.period_start = now.toISOString();
+    profile.aiConversionsUsed = 0;
+    profile.periodStart = now;
   }
 
   // If not using AI, always allow (WebP conversion is free)
   if (!useAi) {
     return {
       allowed: true,
-      remaining: profile.ai_conversions_limit - profile.ai_conversions_used,
-      limit: profile.ai_conversions_limit,
-      used: profile.ai_conversions_used,
-      maxBatchSize: profile.max_batch_size,
-      plan: profile.plan,
+      remaining: profile.aiConversionsLimit - profile.aiConversionsUsed,
+      limit: profile.aiConversionsLimit,
+      used: profile.aiConversionsUsed,
+      maxBatchSize: profile.maxBatchSize,
+      plan: profile.plan as PlanKey,
     };
   }
 
-  const remaining = profile.ai_conversions_limit - profile.ai_conversions_used;
+  const remaining = profile.aiConversionsLimit - profile.aiConversionsUsed;
   const allowed = remaining >= fileCount;
 
   return {
     allowed,
     remaining,
-    limit: profile.ai_conversions_limit,
-    used: profile.ai_conversions_used,
-    maxBatchSize: profile.max_batch_size,
-    plan: profile.plan,
+    limit: profile.aiConversionsLimit,
+    used: profile.aiConversionsUsed,
+    maxBatchSize: profile.maxBatchSize,
+    plan: profile.plan as PlanKey,
   };
 }
 
@@ -187,22 +117,19 @@ export async function logConversion(
   aiUsed: boolean,
 ): Promise<void> {
   // Insert the conversion log
-  await insforge.database.from("conversion_logs").insert({
-    user_id: userId,
-    file_count: fileCount,
-    ai_used: aiUsed,
+  await db.insert(conversionLogs).values({
+    userId,
+    fileCount,
+    aiUsed,
   });
 
   // If AI was used, increment the counter
   if (aiUsed) {
     const profile = await getUserProfile(userId);
     if (profile) {
-      await insforge.database
-        .from("user_profiles")
-        .update({
-          ai_conversions_used: profile.ai_conversions_used + fileCount,
-        })
-        .eq("user_id", userId);
+      await db.update(userProfiles).set({
+        aiConversionsUsed: profile.aiConversionsUsed + fileCount,
+      }).where(eq(userProfiles.userId, userId));
     }
   }
 }
@@ -212,17 +139,16 @@ export async function getConversionHistory(
   userId: string,
   limit = 20,
 ): Promise<ConversionLog[]> {
-  const { data, error } = await insforge.database
-    .from("conversion_logs")
-    .select("*")
-    .eq("user_id", userId)
-    .order("created_at", { ascending: false })
-    .limit(limit);
-
-  if (error) {
-    console.error("Error fetching conversion history:", error);
-    return [];
-  }
-
-  return (data as ConversionLog[]) ?? [];
+   try {
+    const logs = await db.select()
+      .from(conversionLogs)
+      .where(eq(conversionLogs.userId, userId))
+      .orderBy(desc(conversionLogs.createdAt))
+      .limit(limit);
+      
+    return logs as unknown as ConversionLog[];
+   } catch (error) {
+     console.error("Error fetching conversion history:", error);
+     return [];
+   }
 }
