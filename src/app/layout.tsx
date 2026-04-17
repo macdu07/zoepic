@@ -3,6 +3,7 @@ import { Figtree } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "@/components/ui/toaster";
 import { InsforgeProvider } from "./providers";
+import SmoothScroll from "@/components/core/SmoothScroll";
 
 const figtree = Figtree({
   subsets: ["latin"],
@@ -25,8 +26,10 @@ export default function RootLayout({
     <html lang="es">
       <body className={`${figtree.variable} antialiased font-sans`}>
         <InsforgeProvider>
-          {children}
-          <Toaster />
+          <SmoothScroll>
+            {children}
+            <Toaster />
+          </SmoothScroll>
         </InsforgeProvider>
       </body>
     </html>
