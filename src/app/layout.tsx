@@ -12,6 +12,7 @@ const figtree = Figtree({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || "https://zepic.online"),
   title: "ZoePic",
   description:
     "Conversión Inteligente de Imágenes a WebP — optimiza tus imágenes automáticamente con calidad profesional.",
