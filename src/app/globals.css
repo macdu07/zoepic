@@ -2,6 +2,17 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Responsive base font-size: 16px mobile, 18px desktop */
+html {
+  font-size: 16px;
+}
+
+@media (min-width: 768px) {
+  html {
+    font-size: 18px;
+  }
+}
+
 body {
   font-family: var(--font-figtree), Arial, Helvetica, sans-serif;
 }
