@@ -89,33 +89,35 @@ export default function LandingPage() {
           <div className="flex items-center gap-3">
             {!user && !isPending && (
               <>
-                <Link href="/login">
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="text-sm font-medium"
-                  >
+                <Button
+                  asChild
+                  variant="ghost"
+                  size="sm"
+                  className="text-sm font-medium"
+                >
+                  <Link href="/login">
                     Iniciar Sesión
-                  </Button>
-                </Link>
-                <Link href="/signup">
-                  <Button size="sm" className="text-sm font-semibold">
+                  </Link>
+                </Button>
+                <Button asChild size="sm" className="text-sm font-semibold">
+                  <Link href="/signup">
                     Crear Cuenta
-                  </Button>
-                </Link>
+                  </Link>
+                </Button>
               </>
             )}
             {user && (
               <>
-                <Link href="/dashboard">
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    className="text-sm font-medium"
-                  >
+                <Button
+                  asChild
+                  size="sm"
+                  variant="outline"
+                  className="text-sm font-medium"
+                >
+                  <Link href="/dashboard">
                     Ir al Dashboard
-                  </Button>
-                </Link>
+                  </Link>
+                </Button>
                 <Link href="/dashboard/account">
                   <div className="w-9 h-9 rounded-full bg-primary/10 flex items-center justify-center text-sm font-bold text-primary hover:bg-primary/20 transition-colors cursor-pointer overflow-hidden flex-shrink-0">
                     {user?.image ? (
@@ -170,37 +172,40 @@ export default function LandingPage() {
           <AnimatedSection variant="fadeUp" delay={0.46}>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
               {!user && !isPending && (
-                <Link href="/signup">
-                  <Button
-                    size="lg"
-                    className="h-12 px-8 text-base font-semibold shadow-lg shadow-primary/25 hover:shadow-primary/40 transition-shadow"
-                  >
+                <Button
+                  asChild
+                  size="lg"
+                  className="h-12 px-8 text-base font-semibold shadow-lg shadow-primary/25 hover:shadow-primary/40 transition-shadow"
+                >
+                  <Link href="/signup">
                     Comenzar Gratis
                     <ArrowRight className="ml-2 h-4 w-4" />
-                  </Button>
-                </Link>
+                  </Link>
+                </Button>
               )}
               {user && (
-                <Link href="/dashboard">
-                  <Button
-                    size="lg"
-                    className="h-12 px-8 text-base font-semibold shadow-lg shadow-primary/25 hover:shadow-primary/40 transition-shadow"
-                  >
+                <Button
+                  asChild
+                  size="lg"
+                  className="h-12 px-8 text-base font-semibold shadow-lg shadow-primary/25 hover:shadow-primary/40 transition-shadow"
+                >
+                  <Link href="/dashboard">
                     Ir al Dashboard
                     <ArrowRight className="ml-2 h-4 w-4" />
-                  </Button>
-                </Link>
+                  </Link>
+                </Button>
               )}
-              <a href="#features">
-                <Button
-                  variant="outline"
-                  size="lg"
-                  className="h-12 px-8 text-base font-medium"
-                >
+              <Button
+                asChild
+                variant="outline"
+                size="lg"
+                className="h-12 px-8 text-base font-medium"
+              >
+                <a href="#features">
                   Saber más
                   <ChevronDown className="ml-2 h-4 w-4" />
-                </Button>
-              </a>
+                </a>
+              </Button>
             </div>
           </AnimatedSection>
         </div>
@@ -389,18 +394,18 @@ export default function LandingPage() {
                   </li>
                 </ul>
                 {!user && !isPending && (
-                  <Link href="/signup">
-                    <Button variant="outline" className="w-full font-semibold">
+                  <Button asChild variant="outline" className="w-full font-semibold">
+                    <Link href="/signup">
                       Comenzar Gratis
-                    </Button>
-                  </Link>
+                    </Link>
+                  </Button>
                 )}
                 {user && (
-                  <Link href="/dashboard">
-                    <Button variant="outline" className="w-full font-semibold">
+                  <Button asChild variant="outline" className="w-full font-semibold">
+                    <Link href="/dashboard">
                       Ir al Dashboard
-                    </Button>
-                  </Link>
+                    </Link>
+                  </Button>
                 )}
               </CardContent>
             </Card>
@@ -462,11 +467,11 @@ export default function LandingPage() {
                   />
                 )}
                 {!user && !isPending && (
-                  <Link href="/signup">
-                    <Button className="w-full font-semibold shadow-md">
+                  <Button asChild className="w-full font-semibold shadow-md">
+                    <Link href="/signup">
                       Crear Cuenta para Suscribirte
-                    </Button>
-                  </Link>
+                    </Link>
+                  </Button>
                 )}
               </CardContent>
             </Card>
@@ -528,11 +533,11 @@ export default function LandingPage() {
                   />
                 )}
                 {!user && !isPending && (
-                  <Link href="/signup">
-                    <Button className="w-full font-semibold shadow-md">
+                  <Button asChild className="w-full font-semibold shadow-md">
+                    <Link href="/signup">
                       Crear Cuenta para Suscribirte
-                    </Button>
-                  </Link>
+                    </Link>
+                  </Button>
                 )}
               </CardContent>
             </Card>
@@ -604,26 +609,28 @@ export default function LandingPage() {
                 segundos.
               </p>
               {!user && !isPending && (
-                <Link href="/signup">
-                  <Button
-                    size="lg"
-                    className="h-12 px-8 text-base font-semibold shadow-lg"
-                  >
+                <Button
+                  asChild
+                  size="lg"
+                  className="h-12 px-8 text-base font-semibold shadow-lg"
+                >
+                  <Link href="/signup">
                     Empezar Ahora
                     <ArrowRight className="ml-2 h-4 w-4" />
-                  </Button>
-                </Link>
+                  </Link>
+                </Button>
               )}
               {user && (
-                <Link href="/dashboard">
-                  <Button
-                    size="lg"
-                    className="h-12 px-8 text-base font-semibold shadow-lg"
-                  >
+                <Button
+                  asChild
+                  size="lg"
+                  className="h-12 px-8 text-base font-semibold shadow-lg"
+                >
+                  <Link href="/dashboard">
                     Ir al Dashboard
                     <ArrowRight className="ml-2 h-4 w-4" />
-                  </Button>
-                </Link>
+                  </Link>
+                </Button>
               )}
             </div>
           </div>
