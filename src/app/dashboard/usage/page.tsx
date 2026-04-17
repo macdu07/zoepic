@@ -20,6 +20,7 @@ import { getUserProfile, getConversionHistory } from "@/lib/usage";
 import { PLANS, type UserProfile, type ConversionLog, type PlanKey } from "@/lib/usage-types";
 import PayPalSubscribeButton from "@/components/core/PayPalSubscribeButton";
 import { useToast } from "@/hooks/use-toast";
+import { AnimatedSection, StaggerContainer, StaggerItem } from "@/components/core/AnimatedSection";
 
 export default function UsagePage() {
   const { data: sessionData, isPending } = useSession();
@@ -125,11 +126,14 @@ export default function UsagePage() {
 
   return (
     <div className="container mx-auto px-4 py-8 max-w-4xl">
-      <h2 className="text-2xl font-bold mb-6">Uso & Plan</h2>
+      <AnimatedSection variant="fadeUp" delay={0.1}>
+        <h2 className="text-2xl font-bold mb-6">Uso & Plan</h2>
+      </AnimatedSection>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+      <StaggerContainer className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8" staggerDelay={0.1} delay={0.15}>
         {/* Current Plan */}
-        <Card className="shadow-lg bg-card">
+        <StaggerItem variant="fadeUp">
+          <Card className="shadow-lg bg-card h-full">
           <CardHeader className="pb-3">
             <CardTitle className="text-lg font-semibold flex items-center gap-2">
               <Crown className="h-5 w-5 text-primary" />
@@ -208,9 +212,11 @@ export default function UsagePage() {
             )}
           </CardContent>
         </Card>
+        </StaggerItem>
 
         {/* Usage Meter */}
-        <Card className="shadow-lg bg-card">
+        <StaggerItem variant="fadeUp">
+        <Card className="shadow-lg bg-card h-full">
           <CardHeader className="pb-3">
             <CardTitle className="text-lg font-semibold flex items-center gap-2">
               <BarChart3 className="h-5 w-5 text-primary" />
@@ -251,12 +257,14 @@ export default function UsagePage() {
             )}
           </CardContent>
         </Card>
-      </div>
+        </StaggerItem>
+      </StaggerContainer>
 
       {/* Upgrade Section */}
       {showUpgrade && profile.plan === "starter" && (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-          <Card className="shadow-lg bg-card border-primary/30 ring-1 ring-primary/20">
+        <AnimatedSection variant="scale" amount={0.1}>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+            <Card className="shadow-lg bg-card border-primary/30 ring-1 ring-primary/20">
             <CardHeader className="pb-3">
               <CardTitle className="text-lg font-semibold flex items-center gap-2">
                 <Sparkles className="h-5 w-5 text-primary" />
@@ -330,13 +338,15 @@ export default function UsagePage() {
             >
               Cancelar
             </Button>
+            </div>
           </div>
-        </div>
+        </AnimatedSection>
       )}
 
       {/* Conversion History */}
-      <Card className="shadow-lg bg-card">
-        <CardHeader>
+      <AnimatedSection variant="fadeUp" delay={0.25} amount={0.1}>
+        <Card className="shadow-lg bg-card">
+          <CardHeader>
           <CardTitle className="text-lg font-semibold">
             Historial de Conversiones
           </CardTitle>
@@ -390,6 +400,7 @@ export default function UsagePage() {
           )}
         </CardContent>
       </Card>
+      </AnimatedSection>
     </div>
   );
 }

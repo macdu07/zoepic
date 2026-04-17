@@ -17,6 +17,7 @@ import { useToast } from "@/hooks/use-toast";
 import { ImagePlay, Mail, KeyRound, Loader2, Eye, EyeOff } from "lucide-react";
 import { signIn } from "@/lib/auth-client";
 import { BrandLogo } from "@/components/icons/BrandLogo";
+import { AnimatedSection } from "@/components/core/AnimatedSection";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -56,8 +57,9 @@ export default function LoginPage() {
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen p-4 bg-background text-foreground">
-      <Card className="w-full max-w-md shadow-xl bg-card text-card-foreground">
-        <CardHeader className="text-center">
+      <AnimatedSection variant="scale" amount={0.2} duration={0.4} className="w-full max-w-md">
+        <Card className="w-full shadow-xl bg-card text-card-foreground">
+          <CardHeader className="text-center">
           <div className="mx-auto mb-4 flex justify-center">
             <BrandLogo className="h-9 w-auto text-foreground" />
           </div>
@@ -149,12 +151,15 @@ export default function LoginPage() {
             </Link>
           </div>
         </CardContent>
-      </Card>
-      <footer className="mt-8 text-center text-sm text-muted-foreground">
-        <Link href="/" className="hover:text-foreground transition-colors">
-          ← Volver al inicio
-        </Link>
-      </footer>
+        </Card>
+      </AnimatedSection>
+      <AnimatedSection variant="fadeUp" delay={0.2}>
+        <footer className="mt-8 text-center text-sm text-muted-foreground">
+          <Link href="/" className="hover:text-foreground transition-colors">
+            ← Volver al inicio
+          </Link>
+        </footer>
+      </AnimatedSection>
     </div>
   );
 }

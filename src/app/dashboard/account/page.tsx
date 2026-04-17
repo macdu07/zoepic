@@ -21,6 +21,7 @@ import {
     Save,
     Send,
 } from "lucide-react";
+import { AnimatedSection, StaggerContainer, StaggerItem } from "@/components/core/AnimatedSection";
 
 export default function AccountPage() {
     const { data: sessionData, isPending } = useSession();
@@ -130,10 +131,13 @@ export default function AccountPage() {
     // ── Render ────────────────────────────────────────────────────────
     return (
         <div className="container mx-auto px-4 py-8 max-w-3xl">
-            <h2 className="text-2xl font-bold mb-6">Mi Cuenta</h2>
+            <AnimatedSection variant="fadeUp" delay={0.1}>
+                <h2 className="text-2xl font-bold mb-6">Mi Cuenta</h2>
+            </AnimatedSection>
 
-            <div className="space-y-6">
+            <StaggerContainer className="space-y-6" staggerDelay={0.1} delay={0.15}>
                 {/* ── Profile Section ───────────────────────────────────── */}
+                <StaggerItem variant="fadeUp">
                 <Card className="shadow-lg bg-card">
                     <CardHeader className="pb-3">
                         <CardTitle className="text-lg font-semibold flex items-center gap-2">
@@ -189,8 +193,10 @@ export default function AccountPage() {
                         </Button>
                     </CardContent>
                 </Card>
+                </StaggerItem>
 
                 {/* ── Email Section ─────────────────────────────────────── */}
+                <StaggerItem variant="fadeUp">
                 <Card className="shadow-lg bg-card">
                     <CardHeader className="pb-3">
                         <CardTitle className="text-lg font-semibold flex items-center gap-2">
@@ -208,8 +214,10 @@ export default function AccountPage() {
                         </p>
                     </CardContent>
                 </Card>
+                </StaggerItem>
 
                 {/* ── Password Section ──────────────────────────────────── */}
+                <StaggerItem variant="fadeUp">
                 <Card className="shadow-lg bg-card">
                     <CardHeader className="pb-3">
                         <CardTitle className="text-lg font-semibold flex items-center gap-2">
@@ -289,8 +297,10 @@ export default function AccountPage() {
                         )}
                     </CardContent>
                 </Card>
+                </StaggerItem>
 
                 {/* ── Plan & Payment Section ────────────────────────────── */}
+                <StaggerItem variant="fadeUp">
                 <Card className="shadow-lg bg-card">
                     <CardHeader className="pb-3">
                         <CardTitle className="text-lg font-semibold flex items-center gap-2">
@@ -322,8 +332,10 @@ export default function AccountPage() {
                         </Button>
                     </CardContent>
                 </Card>
+                </StaggerItem>
 
                 {/* ── Danger Zone ───────────────────────────────────────── */}
+                <StaggerItem variant="fadeUp">
                 <Card className="shadow-lg bg-card border-destructive/30">
                     <CardHeader className="pb-3">
                         <CardTitle className="text-lg font-semibold flex items-center gap-2 text-destructive">
@@ -345,7 +357,8 @@ export default function AccountPage() {
                         </Button>
                     </CardContent>
                 </Card>
-            </div>
+                </StaggerItem>
+            </StaggerContainer>
         </div>
     );
 }

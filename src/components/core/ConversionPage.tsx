@@ -25,6 +25,7 @@ import {
   type ConversionItem,
 } from "./ConversionResultList";
 import { useSession } from "@/lib/auth-client";
+import { AnimatedSection } from "@/components/core/AnimatedSection";
 
 // Number of images to process concurrently
 const CONCURRENCY_LIMIT = 4;
@@ -295,12 +296,13 @@ export default function ConversionPage() {
     <div className="container mx-auto px-4 py-8">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
         {/* Left Column: Controls & Info */}
-        <Card className="shadow-lg bg-card text-card-foreground">
-          <CardHeader>
-            <CardTitle className="text-xl font-semibold">
-              Convierte tus imágenes a WebP
-            </CardTitle>
-          </CardHeader>
+        <AnimatedSection variant="fadeRight" delay={0.1}>
+          <Card className="shadow-lg bg-card text-card-foreground">
+            <CardHeader>
+              <CardTitle className="text-xl font-semibold">
+                Convierte tus imágenes a WebP
+              </CardTitle>
+            </CardHeader>
           <CardContent className="space-y-6">
             <ImageUploader
               selectedFiles={selectedFiles}
@@ -338,13 +340,16 @@ export default function ConversionPage() {
             />
           </CardContent>
         </Card>
+      </AnimatedSection>
 
         {/* Right Column: Results List */}
-        <ConversionResultList
-          items={conversionItems}
-          compressionQuality={compressionQuality}
-          useAiForName={useAiForName}
-        />
+        <AnimatedSection variant="fadeLeft" delay={0.2}>
+          <ConversionResultList
+            items={conversionItems}
+            compressionQuality={compressionQuality}
+            useAiForName={useAiForName}
+          />
+        </AnimatedSection>
       </div>
     </div>
   );

@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { BrandLogo } from "@/components/icons/BrandLogo";
+import { AnimatedSection, StaggerContainer, StaggerItem } from "@/components/core/AnimatedSection";
 
 const LAST_UPDATED = "16 de abril de 2026";
 
@@ -25,17 +26,20 @@ export default function PrivacyPolicyContent() {
 
       {/* Content */}
       <main className="max-w-3xl mx-auto px-6 py-16">
-        <div className="mb-12">
-          <h1 className="text-3xl md:text-4xl font-bold mb-4">
-            Política de Privacidad
-          </h1>
-          <p className="text-sm text-muted-foreground">
-            Última actualización: {LAST_UPDATED}
-          </p>
-        </div>
+        <AnimatedSection variant="fadeUp" delay={0.1}>
+          <div className="mb-12">
+            <h1 className="text-3xl md:text-4xl font-bold mb-4">
+              Política de Privacidad
+            </h1>
+            <p className="text-sm text-muted-foreground">
+              Última actualización: {LAST_UPDATED}
+            </p>
+          </div>
+        </AnimatedSection>
 
-        <div className="space-y-10 text-[0.9375rem] leading-relaxed text-foreground/90">
-          <Section title="1. Responsable del tratamiento">
+        <StaggerContainer className="space-y-10 text-[0.9375rem] leading-relaxed text-foreground/90" staggerDelay={0.05} delay={0.15}>
+          <StaggerItem variant="fadeUp">
+            <Section title="1. Responsable del tratamiento">
             <p>
               El responsable del tratamiento de los datos personales recogidos a
               través de ZoePic es <strong>ZoePic</strong>. Para cualquier
@@ -49,7 +53,9 @@ export default function PrivacyPolicyContent() {
               .
             </p>
           </Section>
+          </StaggerItem>
 
+          <StaggerItem variant="fadeUp">
           <Section title="2. Datos que recopilamos">
             <p>Recopilamos los siguientes datos personales:</p>
             <ul className="list-disc pl-6 space-y-2 mt-3">
@@ -75,7 +81,9 @@ export default function PrivacyPolicyContent() {
               </li>
             </ul>
           </Section>
+          </StaggerItem>
 
+          <StaggerItem variant="fadeUp">
           <Section title="3. Procesamiento de imágenes">
             <p>
               ZoePic aplica dos tratamientos distintos sobre tus imágenes, con
@@ -120,7 +128,9 @@ export default function PrivacyPolicyContent() {
               </div>
             </div>
           </Section>
+          </StaggerItem>
 
+          <StaggerItem variant="fadeUp">
           <Section title="4. Finalidad del tratamiento">
             <p>Utilizamos tus datos para:</p>
             <ul className="list-disc pl-6 space-y-2 mt-3">
@@ -142,7 +152,9 @@ export default function PrivacyPolicyContent() {
               </li>
             </ul>
           </Section>
+          </StaggerItem>
 
+          <StaggerItem variant="fadeUp">
           <Section title="5. Base legal del tratamiento">
             <ul className="list-disc pl-6 space-y-2">
               <li>
@@ -161,7 +173,9 @@ export default function PrivacyPolicyContent() {
               </li>
             </ul>
           </Section>
+          </StaggerItem>
 
+          <StaggerItem variant="fadeUp">
           <Section title="6. Compartición de datos con terceros">
             <p>
               ZoePic no vende ni cede tus datos personales a terceros con fines
@@ -179,7 +193,9 @@ export default function PrivacyPolicyContent() {
               </li>
             </ul>
           </Section>
+          </StaggerItem>
 
+          <StaggerItem variant="fadeUp">
           <Section title="7. Conservación de los datos">
             <p>
               Conservamos tus datos personales mientras tu cuenta esté activa.
@@ -188,7 +204,9 @@ export default function PrivacyPolicyContent() {
               (p. ej., registros de facturación).
             </p>
           </Section>
+          </StaggerItem>
 
+          <StaggerItem variant="fadeUp">
           <Section title="8. Tus derechos">
             <p>
               De acuerdo con la normativa de protección de datos aplicable,
@@ -227,7 +245,9 @@ export default function PrivacyPolicyContent() {
               .
             </p>
           </Section>
+          </StaggerItem>
 
+          <StaggerItem variant="fadeUp">
           <Section title="9. Cookies">
             <p>
               ZoePic utiliza únicamente cookies técnicas estrictamente necesarias
@@ -236,7 +256,9 @@ export default function PrivacyPolicyContent() {
               terceros.
             </p>
           </Section>
+          </StaggerItem>
 
+          <StaggerItem variant="fadeUp">
           <Section title="10. Seguridad">
             <p>
               Aplicamos medidas técnicas y organizativas razonables para proteger
@@ -245,7 +267,9 @@ export default function PrivacyPolicyContent() {
               contraseñas.
             </p>
           </Section>
+          </StaggerItem>
 
+          <StaggerItem variant="fadeUp">
           <Section title="11. Cambios en esta política">
             <p>
               Podemos actualizar esta política periódicamente. En caso de cambios
@@ -253,7 +277,9 @@ export default function PrivacyPolicyContent() {
               un aviso destacado en la aplicación antes de que entren en vigor.
             </p>
           </Section>
+          </StaggerItem>
 
+          <StaggerItem variant="fadeUp">
           <Section title="12. Contacto">
             <p>
               Si tienes preguntas, dudas o deseas ejercer tus derechos,
@@ -267,10 +293,12 @@ export default function PrivacyPolicyContent() {
               .
             </p>
           </Section>
-        </div>
+          </StaggerItem>
+        </StaggerContainer>
       </main>
 
       {/* Footer */}
+      <AnimatedSection variant="fadeUp" delay={0.2}>
       <footer className="border-t border-border/50 bg-card/20 mt-16">
         <div className="max-w-6xl mx-auto px-6 py-8 flex flex-col sm:flex-row items-center justify-between gap-4">
           <Link href="/" className="flex items-center gap-2">
@@ -282,6 +310,7 @@ export default function PrivacyPolicyContent() {
           </p>
         </div>
       </footer>
+      </AnimatedSection>
     </div>
   );
 }

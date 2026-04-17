@@ -24,6 +24,7 @@ import {
     EyeOff,
 } from "lucide-react";
 import { signUp } from "@/lib/auth-client";
+import { AnimatedSection } from "@/components/core/AnimatedSection";
 
 export default function SignUpPage() {
     const [name, setName] = useState("");
@@ -85,8 +86,9 @@ export default function SignUpPage() {
 
     return (
         <div className="flex flex-col items-center justify-center min-h-screen p-4 bg-background text-foreground">
-            <Card className="w-full max-w-md shadow-xl bg-card text-card-foreground">
-                <CardHeader className="text-center">
+            <AnimatedSection variant="scale" amount={0.2} duration={0.4} className="w-full max-w-md">
+                <Card className="w-full shadow-xl bg-card text-card-foreground">
+                    <CardHeader className="text-center">
                     <div className="mx-auto mb-4 text-primary">
                         <UserPlus className="h-12 w-12" />
                     </div>
@@ -215,12 +217,15 @@ export default function SignUpPage() {
                         </Link>
                     </div>
                 </CardContent>
-            </Card>
-            <footer className="mt-8 text-center text-sm text-muted-foreground">
-                <Link href="/" className="hover:text-foreground transition-colors">
-                    ← Volver al inicio
-                </Link>
-            </footer>
+                </Card>
+            </AnimatedSection>
+            <AnimatedSection variant="fadeUp" delay={0.2}>
+                <footer className="mt-8 text-center text-sm text-muted-foreground">
+                    <Link href="/" className="hover:text-foreground transition-colors">
+                        ← Volver al inicio
+                    </Link>
+                </footer>
+            </AnimatedSection>
         </div>
     );
 }
