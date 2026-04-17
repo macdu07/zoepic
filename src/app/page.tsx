@@ -637,10 +637,18 @@ export default function LandingPage() {
             <div className="flex items-center gap-2">
               <BrandLogo className="h-6 w-auto text-foreground" />
             </div>
-            <p className="text-sm text-muted-foreground">
-              &copy; {new Date().getFullYear()} ZoePic. Todos los derechos
-              reservados.
-            </p>
+            <div className="flex items-center gap-4">
+              <Link
+                href="/politica-de-privacidad"
+                className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+              >
+                Política de Privacidad
+              </Link>
+              <p className="text-sm text-muted-foreground">
+                &copy; {new Date().getFullYear()} ZoePic. Todos los derechos
+                reservados.
+              </p>
+            </div>
           </div>
         </footer>
       </AnimatedSection>
