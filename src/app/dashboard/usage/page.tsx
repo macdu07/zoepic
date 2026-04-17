@@ -15,8 +15,9 @@ import {
   AlertTriangle,
   CheckCircle,
   Check,
+  FileImage,
 } from "lucide-react";
-import { getUserProfile, getConversionHistory } from "@/lib/usage";
+import { getUserProfile, getConversionHistory, getWebpUsage } from "@/lib/usage";
 import { PLANS, type UserProfile, type ConversionLog, type PlanKey } from "@/lib/usage-types";
 import PayPalSubscribeButton from "@/components/core/PayPalSubscribeButton";
 import { useToast } from "@/hooks/use-toast";
@@ -29,6 +30,7 @@ export default function UsagePage() {
   const { toast } = useToast();
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [history, setHistory] = useState<ConversionLog[]>([]);
+  const [webpUsed, setWebpUsed] = useState(0);
   const [loading, setLoading] = useState(true);
   const [cancelLoading, setCancelLoading] = useState(false);
   const [showUpgrade, setShowUpgrade] = useState(false);
@@ -42,6 +44,10 @@ export default function UsagePage() {
     ]);
     setProfile(p);
     setHistory(h);
+    if (p) {
+      const wu = await getWebpUsage(user.id, new Date(p.periodStart));
+      setWebpUsed(wu);
+    }
     setLoading(false);
   };
 
@@ -130,7 +136,7 @@ export default function UsagePage() {
         <h2 className="text-2xl font-bold mb-6">Uso & Plan</h2>
       </AnimatedSection>
 
-      <StaggerContainer className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8" staggerDelay={0.1} delay={0.15}>
+      <StaggerContainer className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 mb-8" staggerDelay={0.1} delay={0.15}>
         {/* Current Plan */}
         <StaggerItem variant="fadeUp">
           <Card className="shadow-lg bg-card h-full">
@@ -258,6 +264,38 @@ export default function UsagePage() {
           </CardContent>
         </Card>
         </StaggerItem>
+
+        {/* WebP Usage — solo starter */}
+        {planInfo.webpConversionsLimit !== null && (
+          <StaggerItem variant="fadeUp">
+            <Card className="shadow-lg bg-card h-full">
+              <CardHeader className="pb-3">
+                <CardTitle className="text-lg font-semibold flex items-center gap-2">
+                  <FileImage className="h-5 w-5 text-primary" />
+                  Conversiones WebP este periodo
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="text-center">
+                  <span className="text-4xl font-extrabold text-primary">
+                    {webpUsed}
+                  </span>
+                  <span className="text-muted-foreground text-lg">
+                    {" "}/ {planInfo.webpConversionsLimit.toLocaleString()}
+                  </span>
+                </div>
+                <Progress
+                  value={Math.min(Math.round((webpUsed / planInfo.webpConversionsLimit) * 100), 100)}
+                  className="h-3"
+                />
+                <p className="text-xs text-center text-muted-foreground">
+                  {Math.min(Math.round((webpUsed / planInfo.webpConversionsLimit) * 100), 100)}% utilizado — te quedan{" "}
+                  {Math.max(planInfo.webpConversionsLimit - webpUsed, 0).toLocaleString()} conversiones WebP
+                </p>
+              </CardContent>
+            </Card>
+          </StaggerItem>
+        )}
       </StaggerContainer>
 
       {/* Upgrade Section */}

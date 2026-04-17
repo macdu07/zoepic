@@ -160,6 +160,28 @@ export async function logConversion(
   }
 }
 
+// ─── Get WebP conversions used this period ───────────────────────────
+export async function getWebpUsage(
+  userId: string,
+  periodStart: Date,
+): Promise<number> {
+  try {
+    const [{ value }] = await db
+      .select({ value: count() })
+      .from(conversionLogs)
+      .where(
+        and(
+          eq(conversionLogs.userId, userId),
+          eq(conversionLogs.aiUsed, false),
+          gte(conversionLogs.createdAt, periodStart),
+        ),
+      );
+    return value;
+  } catch {
+    return 0;
+  }
+}
+
 // ─── Get conversion history ──────────────────────────────────────────
 export async function getConversionHistory(
   userId: string,
