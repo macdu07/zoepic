@@ -2,7 +2,7 @@
 
 import { db } from "@/db/db";
 import { userProfiles, conversionLogs } from "@/db/schema";
-import { eq, desc } from "drizzle-orm";
+import { eq, desc, and, gte, count } from "drizzle-orm";
 
 import { PLANS, type UserProfile, type PlanKey, type ConversionLog, type UsageCheck } from "./usage-types";
 
@@ -85,15 +85,41 @@ export async function checkUsageLimit(
     profile.periodStart = now;
   }
 
-  // If not using AI, always allow (WebP conversion is free)
+  // If not using AI, check WebP-only limit (only enforced for starter plan)
   if (!useAi) {
+    const planKey = profile.plan as PlanKey;
+    const webpLimit = PLANS[planKey]?.webpConversionsLimit ?? null;
+
+    if (webpLimit === null) {
+      return {
+        allowed: true,
+        remaining: -1,
+        limit: -1,
+        used: 0,
+        maxBatchSize: profile.maxBatchSize,
+        plan: planKey,
+      };
+    }
+
+    const [{ value: webpUsed }] = await db
+      .select({ value: count() })
+      .from(conversionLogs)
+      .where(
+        and(
+          eq(conversionLogs.userId, userId),
+          eq(conversionLogs.aiUsed, false),
+          gte(conversionLogs.createdAt, new Date(profile.periodStart)),
+        ),
+      );
+
+    const remaining = webpLimit - webpUsed;
     return {
-      allowed: true,
-      remaining: profile.aiConversionsLimit - profile.aiConversionsUsed,
-      limit: profile.aiConversionsLimit,
-      used: profile.aiConversionsUsed,
+      allowed: remaining >= fileCount,
+      remaining,
+      limit: webpLimit,
+      used: webpUsed,
       maxBatchSize: profile.maxBatchSize,
-      plan: profile.plan as PlanKey,
+      plan: planKey,
     };
   }
 

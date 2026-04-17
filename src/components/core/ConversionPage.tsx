@@ -180,17 +180,20 @@ export default function ConversionPage() {
       return;
     }
 
-    // Check usage limits if user is authenticated and AI is being used
-    if (user && useAiForName) {
+    // Check usage limits if user is authenticated
+    if (user) {
       const usageCheck = await checkUsageLimit(
         user.id,
         selectedFiles.length,
-        true,
+        useAiForName,
       );
       if (!usageCheck.allowed) {
+        const description = useAiForName
+          ? `Has usado ${usageCheck.used} de ${usageCheck.limit} conversiones IA este mes. Te quedan ${usageCheck.remaining}. Desactiva la IA o actualiza tu plan.`
+          : `Has usado ${usageCheck.used} de ${usageCheck.limit} conversiones WebP este mes en el plan gratuito. Te quedan ${usageCheck.remaining}. Actualiza tu plan para conversiones ilimitadas.`;
         toast({
           title: "Límite alcanzado",
-          description: `Has usado ${usageCheck.used} de ${usageCheck.limit} conversiones IA este mes. Te quedan ${usageCheck.remaining}. Desactiva la IA o actualiza tu plan.`,
+          description,
           variant: "destructive",
         });
         return;

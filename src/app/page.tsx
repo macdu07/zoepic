@@ -42,7 +42,7 @@ const FAQ_ITEMS = [
   {
     question: "¿Qué pasa cuando llego al límite de renombrados IA?",
     answer:
-      "Puedes seguir convirtiendo imágenes a WebP de forma ilimitada. Simplemente el renombrado automático con IA se desactiva hasta que renueves tu periodo o actualices tu plan.",
+      "En el plan gratuito puedes convertir hasta 100 imágenes a WebP por mes. Simplemente el renombrado automático con IA se desactiva hasta que renueves tu periodo o actualices tu plan.",
   },
   {
     question: "¿Puedo cancelar mi suscripción en cualquier momento?",
@@ -347,7 +347,7 @@ export default function LandingPage() {
               <ul className="space-y-3 text-sm mb-8 flex-grow">
                 <li className="flex items-center gap-2">
                   <Check className="h-4 w-4 text-primary flex-shrink-0" />
-                  Conversión WebP ilimitada
+                  100 conversiones WebP/mes
                 </li>
                 <li className="flex items-center gap-2">
                   <Check className="h-4 w-4 text-primary flex-shrink-0" />
