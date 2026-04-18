@@ -20,6 +20,7 @@ import {
     LogOut,
     Save,
     Send,
+    AlertTriangle,
 } from "lucide-react";
 import { AnimatedSection, StaggerContainer, StaggerItem } from "@/components/core/AnimatedSection";
 
@@ -34,6 +35,7 @@ export default function AccountPage() {
     const [name, setName] = useState("");
     const [avatarUrl, setAvatarUrl] = useState("");
     const [savingProfile, setSavingProfile] = useState(false);
+    const [deletingAccount, setDeletingAccount] = useState(false);
 
     // Password reset state
     const [resetStep, setResetStep] = useState<"idle" | "code_sent" | "enter_code">("idle");
@@ -126,6 +128,32 @@ export default function AccountPage() {
     const handleSignOut = async () => {
         await signOut();
         window.location.href = "/";
+    };
+
+    const handleDeleteAccount = async () => {
+        const confirmText = prompt("Escribe 'ELIMINAR' para confirmar que deseas eliminar tu cuenta permanentemente. Esta acción cancelará tu suscripción activa (si la hay) y no se puede deshacer.");
+        if (confirmText !== "ELIMINAR") {
+            if (confirmText !== null) {
+                toast({ title: "Acción cancelada", description: "La palabra de confirmación no coincide." });
+            }
+            return;
+        }
+
+        setDeletingAccount(true);
+        try {
+            const res = await fetch("/api/user", { method: "DELETE" });
+            const data = await res.json();
+            
+            if (!res.ok) throw new Error(data.error || "No se pudo eliminar la cuenta");
+
+            toast({ title: "Cuenta eliminada", description: "Tu cuenta ha sido eliminada exitosamente." });
+            
+            await signOut();
+            window.location.href = "/";
+        } catch (err: any) {
+            toast({ title: "Error", description: err?.message || "Hubo un error al eliminar tu cuenta.", variant: "destructive" });
+            setDeletingAccount(false);
+        }
     };
 
     // ── Render ────────────────────────────────────────────────────────
@@ -382,22 +410,45 @@ export default function AccountPage() {
                 <Card className="shadow-lg bg-card border-destructive/30">
                     <CardHeader className="pb-3">
                         <CardTitle className="text-lg font-semibold flex items-center gap-2 text-destructive">
-                            <LogOut className="h-5 w-5" />
-                            Sesión
+                            <AlertTriangle className="h-5 w-5" />
+                            Zona de Peligro
                         </CardTitle>
                     </CardHeader>
-                    <CardContent>
-                        <p className="text-sm text-muted-foreground mb-4">
-                            Cierra tu sesión en este dispositivo.
-                        </p>
-                        <Button
-                            onClick={handleSignOut}
-                            variant="destructive"
-                            className="font-semibold"
-                        >
-                            <LogOut className="mr-2 h-4 w-4" />
-                            Cerrar Sesión
-                        </Button>
+                    <CardContent className="space-y-5">
+                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                            <div>
+                                <h4 className="font-medium text-foreground">Cerrar Sesión</h4>
+                                <p className="text-sm text-muted-foreground">
+                                    Cierra tu sesión en este dispositivo temporalmente.
+                                </p>
+                            </div>
+                            <Button
+                                onClick={handleSignOut}
+                                variant="outline"
+                                className="font-semibold w-full sm:w-auto"
+                            >
+                                <LogOut className="mr-2 h-4 w-4" />
+                                Cerrar Sesión
+                            </Button>
+                        </div>
+
+                        <div className="pt-5 border-t border-destructive/10 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                            <div>
+                                <h4 className="font-medium text-destructive">Eliminar Cuenta Permanente</h4>
+                                <p className="text-sm text-muted-foreground mr-4">
+                                    Esta acción eliminará todos tus datos, perfiles y conversiones. No se puede deshacer.
+                                </p>
+                            </div>
+                            <Button
+                                onClick={handleDeleteAccount}
+                                disabled={deletingAccount}
+                                variant="destructive"
+                                className="font-semibold w-full sm:w-auto flex-shrink-0"
+                            >
+                                {deletingAccount ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <AlertTriangle className="mr-2 h-4 w-4" />}
+                                Eliminar Cuenta
+                            </Button>
+                        </div>
                     </CardContent>
                 </Card>
                 </StaggerItem>
