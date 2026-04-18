@@ -1,4 +1,4 @@
-# Zoe Convert
+# ZoePic
 
 Aplicación web desarrollada con **Next.js (App Router)** para convertir imágenes (JPG, JPEG, PNG) al formato WebP con asistencia de **Inteligencia Artificial**. Utiliza **Neon Serverless Postgres y Better Auth** para autenticación y base de datos, **Genkit con Gemini de Google AI** para generar nombres de archivo optimizados para SEO, y **PayPal Subscriptions API** para la gestión de planes de suscripción.
 

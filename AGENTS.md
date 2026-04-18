@@ -4,11 +4,11 @@ globs: *
 alwaysApply: true
 ---
 
-# Zoe Convert - Agent Guidelines
+# ZoePic - Agent Guidelines
 
 ## Project Overview
 
-Zoe Convert es una aplicación web desarrollada con Next.js (App Router) para convertir imágenes (JPG, JPEG, PNG) al formato WebP con IA. Usa Neon Database con Drizzle ORM y Better Auth para manejar autenticación y persistencia de cuentas.
+ZoePic es una aplicación web desarrollada con Next.js (App Router) para convertir imágenes (JPG, JPEG, PNG) al formato WebP con IA. Usa Neon Database con Drizzle ORM y Better Auth para manejar autenticación y persistencia de cuentas.
 
 ---
 
