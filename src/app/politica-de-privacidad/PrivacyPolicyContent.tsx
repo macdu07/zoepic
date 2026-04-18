@@ -45,10 +45,10 @@ export default function PrivacyPolicyContent() {
               través de ZoePic es <strong>ZoePic</strong>. Para cualquier
               consulta relacionada con esta política puedes contactarnos en{" "}
               <a
-                href="mailto:privacy@zoepic.app"
+                href="mailto:privacy@zoepic.online"
                 className="text-primary underline underline-offset-4 hover:opacity-80"
               >
-                privacy@zoepic.app
+                privacy@zoepic.online
               </a>
               .
             </p>
@@ -237,10 +237,10 @@ export default function PrivacyPolicyContent() {
             <p className="mt-4">
               Para ejercer cualquiera de estos derechos, escríbenos a{" "}
               <a
-                href="mailto:privacy@zoepic.app"
+                href="mailto:privacy@zoepic.online"
                 className="text-primary underline underline-offset-4 hover:opacity-80"
               >
-                privacy@zoepic.app
+                privacy@zoepic.online
               </a>
               .
             </p>
@@ -285,10 +285,10 @@ export default function PrivacyPolicyContent() {
               Si tienes preguntas, dudas o deseas ejercer tus derechos,
               contáctanos en{" "}
               <a
-                href="mailto:privacy@zoepic.app"
+                href="mailto:privacy@zoepic.online"
                 className="text-primary underline underline-offset-4 hover:opacity-80"
               >
-                privacy@zoepic.app
+                privacy@zoepic.online
               </a>
               .
             </p>
