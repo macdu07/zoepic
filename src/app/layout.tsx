@@ -28,7 +28,7 @@ export const metadata: Metadata = {
       "Convierte imágenes a WebP y renómbralas con IA para mejorar tu SEO. Gratis para empezar.",
     images: [
       {
-        url: "/opengraph-image",
+        url: "/og-image.jpg",
         width: 1200,
         height: 630,
         alt: "ZoePic — Convierte imágenes a WebP con IA",
@@ -39,7 +39,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "ZoePic | Convertidor WebP con IA",
     description: "Convierte imágenes a WebP y renómbralas con IA. Gratis.",
-    images: ["/opengraph-image"],
+    images: ["/og-image.jpg"],
   },
 };
 
