@@ -87,6 +87,9 @@ export default function LandingPage() {
             <BrandLogo className="h-7 w-auto text-foreground" />
           </div>
           <div className="flex items-center gap-3">
+            <Button asChild variant="ghost" size="sm" className="text-sm font-medium">
+              <a href="#pricing">Precios</a>
+            </Button>
             {!user && !isPending && (
               <>
                 <Button
