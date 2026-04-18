@@ -5,6 +5,7 @@ import { db } from "@/db/db";
 import { userProfiles } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import { requireSession } from "@/lib/auth-server";
+import { sendEmail, emailWrapper } from "@/lib/email";
 
 /**
  * POST /api/paypal/cancel
@@ -67,6 +68,23 @@ export async function POST() {
         { status: 500 },
       );
     }
+
+    sendEmail(
+      session.user.email,
+      "Tu suscripción de ZoePic ha sido cancelada",
+      emailWrapper(`
+        <h2 style="color:#668f3d">Suscripción cancelada</h2>
+        <p>Tu suscripción en <strong>ZoePic</strong> ha sido cancelada exitosamente. Has vuelto al plan Starter.</p>
+        <div style="background:#f0f5e8;border-radius:8px;padding:24px;margin:24px 0">
+          <p style="margin:8px 0"><strong>Plan actual:</strong> Starter (gratuito)</p>
+          <p style="margin:8px 0"><strong>Conversiones IA / mes:</strong> ${starter.aiConversionsLimit}</p>
+          <p style="margin:8px 0"><strong>Conversiones WebP / mes:</strong> ${starter.webpConversionsLimit}</p>
+          <p style="margin:8px 0"><strong>Tamaño máximo de lote:</strong> ${starter.maxBatchSize} imágenes</p>
+        </div>
+        <p>Si cambias de opinión, puedes reactivar tu plan en cualquier momento desde tu <a href="https://zoepic.online/dashboard/plan" style="color:#668f3d">panel de plan</a>.</p>
+        <p style="color:#666;font-size:13px">Gracias por haber usado ZoePic.</p>
+      `)
+    ).catch(err => console.error("Error enviando email de cancelación:", err));
 
     return NextResponse.json({
       success: true,

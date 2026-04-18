@@ -2,18 +2,7 @@ import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { emailOTP } from "better-auth/plugins";
 import { db } from "../db/db";
-import nodemailer from "nodemailer";
-
-// Reusar el transporter para toda la vida del proceso
-const transporter = nodemailer.createTransport({
-    host: process.env.SMTP_HOST,
-    port: Number(process.env.SMTP_PORT ?? 587),
-    secure: Number(process.env.SMTP_PORT ?? 587) === 465,
-    auth: {
-        user: process.env.SMTP_USER,
-        pass: process.env.SMTP_PASS,
-    },
-});
+import { sendEmail } from "./email";
 
 export const auth = betterAuth({
     database: drizzleAdapter(db, {
@@ -65,12 +54,11 @@ export const auth = betterAuth({
                     `,
                 };
 
-                await transporter.sendMail({
-                    from: process.env.SMTP_FROM ?? "ZoePic <noreply@zepic.online>",
-                    to: email,
-                    subject: subjects[type] ?? "Tu código de verificación",
-                    html: bodies[type] ?? `<p>Tu código: <strong>${otp}</strong></p>`,
-                });
+                await sendEmail(
+                    email,
+                    subjects[type] ?? "Tu código de verificación",
+                    bodies[type] ?? `<p>Tu código: <strong>${otp}</strong></p>`,
+                );
             },
         }),
     ],

@@ -6,6 +6,7 @@ import { db } from "@/db/db";
 import { userProfiles } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import { requireSession } from "@/lib/auth-server";
+import { sendEmail, emailWrapper } from "@/lib/email";
 
 const ActivateSchema = z.object({
   subscriptionId: z.string().min(1, "subscriptionId requerido"),
@@ -80,6 +81,23 @@ export async function POST(request: NextRequest) {
         { status: 500 },
       );
     }
+
+    sendEmail(
+      session.user.email,
+      `¡Tu plan ${plan.name} está activo en ZoePic!`,
+      emailWrapper(`
+        <h2 style="color:#668f3d">¡Bienvenido al plan ${plan.name}!</h2>
+        <p>Tu suscripción en <strong>ZoePic</strong> ya está activa. Estos son tus nuevos límites:</p>
+        <div style="background:#f0f5e8;border-radius:8px;padding:24px;margin:24px 0">
+          <p style="margin:8px 0"><strong>Plan:</strong> ${plan.name}</p>
+          <p style="margin:8px 0"><strong>Conversiones IA / mes:</strong> ${plan.aiConversionsLimit.toLocaleString()}</p>
+          <p style="margin:8px 0"><strong>Tamaño máximo de lote:</strong> ${plan.maxBatchSize} imágenes</p>
+          <p style="margin:8px 0"><strong>Conversiones WebP:</strong> Ilimitadas</p>
+        </div>
+        <p>Puedes gestionar tu suscripción en cualquier momento desde tu <a href="https://zoepic.online/dashboard/plan" style="color:#668f3d">panel de plan</a>.</p>
+        <p style="color:#666;font-size:13px">Gracias por confiar en ZoePic.</p>
+      `)
+    ).catch(err => console.error("Error enviando email de activación:", err));
 
     return NextResponse.json({
       success: true,
