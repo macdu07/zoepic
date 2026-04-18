@@ -1,33 +1,24 @@
-"use client";
-
-import { useState } from "react";
+import type { Metadata } from "next";
 import Link from "next/link";
-import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import {
-  ImagePlay,
-  Zap,
-  Shield,
-  ArrowRight,
-  Sparkles,
-  FileImage,
-  Download,
-  ChevronDown,
-  Check,
-  X,
-  ChevronRight,
-} from "lucide-react";
-import { useSession } from "@/lib/auth-client";
-import PayPalSubscribeButton from "@/components/core/PayPalSubscribeButton";
+import { Sparkles, Zap, Shield, FileImage, Download } from "lucide-react";
 import { BrandLogo } from "@/components/icons/BrandLogo";
 import {
   AnimatedSection,
   StaggerContainer,
   StaggerItem,
 } from "@/components/core/AnimatedSection";
-import { motion } from "framer-motion";
+import NavbarActions from "@/components/landing/NavbarActions";
+import HeroButtons from "@/components/landing/HeroButtons";
+import PricingSection from "@/components/landing/PricingSection";
+import FaqAccordion from "@/components/landing/FaqAccordion";
 
-const ANNUAL_DISCOUNT = 0.25; // 25% descuento anual
+export const metadata: Metadata = {
+  title: "Convierte imágenes a WebP con IA — Renombrado SEO Automático",
+  description:
+    "Convierte tus imágenes a WebP y renómbralas automáticamente con IA para mejorar tu SEO. Compresión hasta 80% menor tamaño, privacidad total. Gratis para empezar.",
+  alternates: { canonical: "/" },
+};
 
 const FAQ_ITEMS = [
   {
@@ -62,83 +53,93 @@ const FAQ_ITEMS = [
   },
 ];
 
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebSite",
+      "@id": "https://zoepic.online/#website",
+      url: "https://zoepic.online",
+      name: "ZoePic",
+      description:
+        "Convierte imágenes a WebP y renómbralas con IA para mejorar tu SEO.",
+      inLanguage: "es",
+    },
+    {
+      "@type": "SoftwareApplication",
+      "@id": "https://zoepic.online/#app",
+      name: "ZoePic",
+      applicationCategory: "MultimediaApplication",
+      operatingSystem: "Web",
+      url: "https://zoepic.online",
+      description:
+        "Conversor de imágenes a WebP con renombrado automático usando inteligencia artificial para mejorar el SEO.",
+      inLanguage: "es",
+      offers: [
+        {
+          "@type": "Offer",
+          name: "Starter",
+          price: "0",
+          priceCurrency: "USD",
+          description: "100 conversiones WebP/mes, 50 renombrados IA/mes.",
+        },
+        {
+          "@type": "Offer",
+          name: "Pro",
+          price: "6.99",
+          priceCurrency: "USD",
+          billingPeriod: "P1M",
+          description: "WebP ilimitado, 3,000 renombrados IA/mes.",
+        },
+        {
+          "@type": "Offer",
+          name: "Agency",
+          price: "23.99",
+          priceCurrency: "USD",
+          billingPeriod: "P1M",
+          description: "WebP ilimitado, 20,000 renombrados IA/mes.",
+        },
+      ],
+    },
+    {
+      "@type": "FAQPage",
+      mainEntity: FAQ_ITEMS.map((item) => ({
+        "@type": "Question",
+        name: item.question,
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: item.answer,
+        },
+      })),
+    },
+  ],
+};
+
 export default function LandingPage() {
-  const { data: sessionData, isPending } = useSession();
-  const user = sessionData?.user as any;
-  const [billingAnnual, setBillingAnnual] = useState(false);
-  const [openFaq, setOpenFaq] = useState<number | null>(null);
-
-  const initial =
-    user?.name?.charAt(0)?.toUpperCase() ??
-    user?.email?.charAt(0)?.toUpperCase() ??
-    "U";
-
   return (
     <div className="min-h-screen bg-background text-foreground">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
+
       {/* Navbar */}
-      <motion.nav
-        className="sticky top-0 z-50 backdrop-blur-md bg-background/80 border-b border-border/50"
-        initial={{ y: -80, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94] }}
-      >
+      <nav className="sticky top-0 z-50 backdrop-blur-md bg-background/80 border-b border-border/50">
         <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-2.5">
             <BrandLogo className="h-7 w-auto text-foreground" />
           </div>
           <div className="flex items-center gap-3">
-            <Button asChild variant="ghost" size="sm" className="text-sm font-medium">
-              <a href="#pricing">Precios</a>
-            </Button>
-            {!user && !isPending && (
-              <>
-                <Button
-                  asChild
-                  variant="ghost"
-                  size="sm"
-                  className="text-sm font-medium"
-                >
-                  <Link href="/login">
-                    Iniciar Sesión
-                  </Link>
-                </Button>
-                <Button asChild size="sm" className="text-sm font-semibold">
-                  <Link href="/signup">
-                    Crear Cuenta
-                  </Link>
-                </Button>
-              </>
-            )}
-            {user && (
-              <>
-                <Button
-                  asChild
-                  size="sm"
-                  variant="outline"
-                  className="text-sm font-medium"
-                >
-                  <Link href="/dashboard">
-                    Ir al Dashboard
-                  </Link>
-                </Button>
-                <Link href="/dashboard/account">
-                  <div className="w-9 h-9 rounded-full bg-primary/10 flex items-center justify-center text-sm font-bold text-primary hover:bg-primary/20 transition-colors cursor-pointer overflow-hidden flex-shrink-0">
-                    {user?.image ? (
-                      <img
-                        src={user.image}
-                        alt={user?.name ?? "Foto de perfil"}
-                        className="w-full h-full object-cover"
-                      />
-                    ) : (
-                      initial
-                    )}
-                  </div>
-                </Link>
-              </>
-            )}
+            <a
+              href="#pricing"
+              className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors px-3 py-1.5"
+            >
+              Precios
+            </a>
+            <NavbarActions />
           </div>
         </div>
-      </motion.nav>
+      </nav>
 
       {/* Hero Section */}
       <section className="relative overflow-hidden">
@@ -173,43 +174,7 @@ export default function LandingPage() {
           </AnimatedSection>
 
           <AnimatedSection variant="fadeUp" delay={0.46}>
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-              {!user && !isPending && (
-                <Button
-                  asChild
-                  size="lg"
-                  className="h-12 px-8 text-base font-semibold shadow-lg shadow-primary/25 hover:shadow-primary/40 transition-shadow"
-                >
-                  <Link href="/signup">
-                    Comenzar Gratis
-                    <ArrowRight className="ml-2 h-4 w-4" />
-                  </Link>
-                </Button>
-              )}
-              {user && (
-                <Button
-                  asChild
-                  size="lg"
-                  className="h-12 px-8 text-base font-semibold shadow-lg shadow-primary/25 hover:shadow-primary/40 transition-shadow"
-                >
-                  <Link href="/dashboard">
-                    Ir al Dashboard
-                    <ArrowRight className="ml-2 h-4 w-4" />
-                  </Link>
-                </Button>
-              )}
-              <Button
-                asChild
-                variant="outline"
-                size="lg"
-                className="h-12 px-8 text-base font-medium"
-              >
-                <a href="#features">
-                  Saber más
-                  <ChevronDown className="ml-2 h-4 w-4" />
-                </a>
-              </Button>
-            </div>
+            <HeroButtons showLearnMore primaryLabel="Comenzar Gratis" />
           </AnimatedSection>
         </div>
       </section>
@@ -226,7 +191,11 @@ export default function LandingPage() {
           </p>
         </AnimatedSection>
 
-        <StaggerContainer className="grid md:grid-cols-3 gap-6" staggerDelay={0.12} delay={0.05}>
+        <StaggerContainer
+          className="grid md:grid-cols-3 gap-6"
+          staggerDelay={0.12}
+          delay={0.05}
+        >
           {[
             {
               icon: Sparkles,
@@ -276,7 +245,11 @@ export default function LandingPage() {
             </p>
           </AnimatedSection>
 
-          <StaggerContainer className="grid md:grid-cols-3 gap-8" staggerDelay={0.15} delay={0.05}>
+          <StaggerContainer
+            className="grid md:grid-cols-3 gap-8"
+            staggerDelay={0.15}
+            delay={0.05}
+          >
             {[
               {
                 step: "01",
@@ -322,233 +295,10 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Pricing Section */}
-      <section id="pricing" className="max-w-5xl mx-auto px-6 py-24">
-        <AnimatedSection variant="fadeUp" className="text-center mb-10">
-          <h2 className="text-3xl md:text-4xl font-bold mb-4">
-            Planes y Precios
-          </h2>
-          <p className="text-muted-foreground text-lg max-w-xl mx-auto mb-8">
-            Elige el plan que mejor se adapte a tus necesidades.
-          </p>
+      {/* Pricing — client component (billing toggle + PayPal) */}
+      <PricingSection />
 
-          {/* Billing toggle */}
-          <div className="inline-flex items-center gap-3 bg-card/60 border border-border/50 rounded-full px-4 py-2">
-            <button
-              onClick={() => setBillingAnnual(false)}
-              className={`text-sm font-medium px-3 py-1 rounded-full transition-colors ${
-                !billingAnnual
-                  ? "bg-primary text-primary-foreground"
-                  : "text-muted-foreground hover:text-foreground"
-              }`}
-            >
-              Mensual
-            </button>
-            <button
-              onClick={() => setBillingAnnual(true)}
-              className={`text-sm font-medium px-3 py-1 rounded-full transition-colors flex items-center gap-1.5 ${
-                billingAnnual
-                  ? "bg-primary text-primary-foreground"
-                  : "text-muted-foreground hover:text-foreground"
-              }`}
-            >
-              Anual
-              <span
-                className={`text-xs font-bold px-1.5 py-0.5 rounded-full ${
-                  billingAnnual
-                    ? "bg-primary-foreground/20 text-primary-foreground"
-                    : "bg-primary/15 text-primary"
-                }`}
-              >
-                -25%
-              </span>
-            </button>
-          </div>
-        </AnimatedSection>
-
-        <StaggerContainer className="grid md:grid-cols-3 gap-6" staggerDelay={0.13} delay={0.05}>
-          {/* Starter Plan */}
-          <StaggerItem variant="fadeUp">
-            <Card className="relative border-border/50 bg-card/50 backdrop-blur-sm hover:border-primary/30 hover:shadow-lg hover:-translate-y-1 transition-all duration-300 flex flex-col h-full">
-              <CardContent className="p-6 flex flex-col flex-grow">
-                <h3 className="text-xl font-bold mb-1">Starter</h3>
-                <div className="flex items-baseline gap-1 mb-4">
-                  <span className="text-4xl font-extrabold">Gratis</span>
-                </div>
-                <p className="text-sm text-muted-foreground mb-6">
-                  Perfecto para probar la herramienta.
-                </p>
-                <ul className="space-y-3 text-sm mb-8 flex-grow">
-                  <li className="flex items-center gap-2">
-                    <Check className="h-4 w-4 text-primary flex-shrink-0" />
-                    100 conversiones WebP/mes
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <Check className="h-4 w-4 text-primary flex-shrink-0" />
-                    50 renombrados con IA/mes
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <Check className="h-4 w-4 text-primary flex-shrink-0" />
-                    Hasta 5 imágenes por lote
-                  </li>
-                  <li className="flex items-center gap-2 text-muted-foreground">
-                    <X className="h-4 w-4 text-muted-foreground flex-shrink-0" />
-                    Soporte prioritario
-                  </li>
-                </ul>
-                {!user && !isPending && (
-                  <Button asChild variant="outline" className="w-full font-semibold">
-                    <Link href="/signup">
-                      Comenzar Gratis
-                    </Link>
-                  </Button>
-                )}
-                {user && (
-                  <Button asChild variant="outline" className="w-full font-semibold">
-                    <Link href="/dashboard">
-                      Ir al Dashboard
-                    </Link>
-                  </Button>
-                )}
-              </CardContent>
-            </Card>
-          </StaggerItem>
-
-          {/* Pro Plan */}
-          <StaggerItem variant="fadeUp">
-            <Card className="relative border-primary/50 bg-card/50 backdrop-blur-sm shadow-lg shadow-primary/10 hover:shadow-primary/20 hover:-translate-y-1 transition-all duration-300 flex flex-col h-full ring-2 ring-primary/30">
-              <div className="absolute -top-3 left-1/2 -translate-x-1/2">
-                <span className="bg-primary text-primary-foreground text-xs font-bold px-3 py-1 rounded-full">
-                  Popular
-                </span>
-              </div>
-              <CardContent className="p-6 flex flex-col flex-grow">
-                <h3 className="text-xl font-bold mb-1">Pro</h3>
-                <div className="flex items-baseline gap-1 mb-1">
-                  <span className="text-4xl font-extrabold">
-                    $
-                    {billingAnnual
-                      ? (6.99 * (1 - ANNUAL_DISCOUNT)).toFixed(2)
-                      : "6.99"}
-                  </span>
-                  <span className="text-muted-foreground text-sm">/mes</span>
-                </div>
-                {billingAnnual && (
-                  <p className="text-xs text-primary font-medium mb-3">
-                    Facturado anualmente — $
-                    {(6.99 * 12 * (1 - ANNUAL_DISCOUNT)).toFixed(2)}/año
-                  </p>
-                )}
-                <p
-                  className={`text-sm text-muted-foreground mb-6 ${!billingAnnual ? "mt-4" : ""}`}
-                >
-                  Ideal para creadores de contenido.
-                </p>
-                <ul className="space-y-3 text-sm mb-8 flex-grow">
-                  <li className="flex items-center gap-2">
-                    <Check className="h-4 w-4 text-primary flex-shrink-0" />
-                    Conversión WebP ilimitada
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <Check className="h-4 w-4 text-primary flex-shrink-0" />
-                    3,000 renombrados con IA/mes
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <Check className="h-4 w-4 text-primary flex-shrink-0" />
-                    Hasta 50 imágenes por lote
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <Check className="h-4 w-4 text-primary flex-shrink-0" />
-                    Soporte prioritario
-                  </li>
-                </ul>
-                {user && (
-                  <PayPalSubscribeButton
-                    planKey="pro"
-                    planLabel="Pro"
-                    onSuccess={() => (window.location.href = "/dashboard/usage")}
-                  />
-                )}
-                {!user && !isPending && (
-                  <Button asChild className="w-full font-semibold shadow-md">
-                    <Link href="/signup">
-                      Crear Cuenta para Suscribirte
-                    </Link>
-                  </Button>
-                )}
-              </CardContent>
-            </Card>
-          </StaggerItem>
-
-          {/* Agency Plan */}
-          <StaggerItem variant="fadeUp">
-            <Card className="relative border-border/50 bg-card/50 backdrop-blur-sm hover:border-primary/30 hover:shadow-lg hover:-translate-y-1 transition-all duration-300 flex flex-col h-full">
-              <div className="absolute -top-3 left-1/2 -translate-x-1/2">
-                <span className="bg-accent text-accent-foreground text-xs font-bold px-3 py-1 rounded-full">
-                  Mejor Valor
-                </span>
-              </div>
-              <CardContent className="p-6 flex flex-col flex-grow">
-                <h3 className="text-xl font-bold mb-1">Agency</h3>
-                <div className="flex items-baseline gap-1 mb-1">
-                  <span className="text-4xl font-extrabold">
-                    $
-                    {billingAnnual
-                      ? (23.99 * (1 - ANNUAL_DISCOUNT)).toFixed(2)
-                      : "23.99"}
-                  </span>
-                  <span className="text-muted-foreground text-sm">/mes</span>
-                </div>
-                {billingAnnual && (
-                  <p className="text-xs text-primary font-medium mb-3">
-                    Facturado anualmente — $
-                    {(23.99 * 12 * (1 - ANNUAL_DISCOUNT)).toFixed(2)}/año
-                  </p>
-                )}
-                <p
-                  className={`text-sm text-muted-foreground mb-6 ${!billingAnnual ? "mt-4" : ""}`}
-                >
-                  Para agencias y equipos grandes.
-                </p>
-                <ul className="space-y-3 text-sm mb-8 flex-grow">
-                  <li className="flex items-center gap-2">
-                    <Check className="h-4 w-4 text-primary flex-shrink-0" />
-                    Conversión WebP ilimitada
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <Check className="h-4 w-4 text-primary flex-shrink-0" />
-                    20,000 renombrados con IA/mes
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <Check className="h-4 w-4 text-primary flex-shrink-0" />
-                    Hasta 100 imágenes por lote
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <Check className="h-4 w-4 text-primary flex-shrink-0" />
-                    Soporte prioritario
-                  </li>
-                </ul>
-                {user && (
-                  <PayPalSubscribeButton
-                    planKey="agency"
-                    planLabel="Agency"
-                    onSuccess={() => (window.location.href = "/dashboard/usage")}
-                  />
-                )}
-                {!user && !isPending && (
-                  <Button asChild className="w-full font-semibold shadow-md">
-                    <Link href="/signup">
-                      Crear Cuenta para Suscribirte
-                    </Link>
-                  </Button>
-                )}
-              </CardContent>
-            </Card>
-          </StaggerItem>
-        </StaggerContainer>
-      </section>
-
-      {/* FAQ Section */}
+      {/* FAQ */}
       <section className="max-w-3xl mx-auto px-6 pb-24">
         <AnimatedSection variant="fadeUp" className="text-center mb-12">
           <h2 className="text-3xl md:text-4xl font-bold mb-4">
@@ -558,48 +308,10 @@ export default function LandingPage() {
             Todo lo que necesitas saber sobre ZoePic.
           </p>
         </AnimatedSection>
-
-        <StaggerContainer className="space-y-3" staggerDelay={0.07} delay={0.05}>
-          {FAQ_ITEMS.map((faq, index) => (
-            <StaggerItem key={index} variant="fadeLeft">
-              <div className="border border-border/50 rounded-xl bg-card/40 backdrop-blur-sm overflow-hidden">
-                <button
-                  onClick={() => setOpenFaq(openFaq === index ? null : index)}
-                  className="w-full flex items-center justify-between px-6 py-4 text-left hover:bg-primary/5 transition-colors"
-                  aria-expanded={openFaq === index}
-                >
-                  <span className="text-sm font-semibold pr-4">
-                    {faq.question}
-                  </span>
-                  <ChevronRight
-                    className={`h-4 w-4 flex-shrink-0 text-muted-foreground transition-transform duration-200 ${
-                      openFaq === index ? "rotate-90" : ""
-                    }`}
-                    aria-hidden="true"
-                  />
-                </button>
-                {openFaq === index && (
-                  <motion.div
-                    initial={{ height: 0, opacity: 0 }}
-                    animate={{ height: "auto", opacity: 1 }}
-                    exit={{ height: 0, opacity: 0 }}
-                    transition={{ duration: 0.25, ease: "easeInOut" }}
-                    className="overflow-hidden"
-                  >
-                    <div className="px-6 pb-4">
-                      <p className="text-sm text-muted-foreground leading-relaxed">
-                        {faq.answer}
-                      </p>
-                    </div>
-                  </motion.div>
-                )}
-              </div>
-            </StaggerItem>
-          ))}
-        </StaggerContainer>
+        <FaqAccordion items={FAQ_ITEMS} />
       </section>
 
-      {/* CTA Section */}
+      {/* CTA */}
       <section className="max-w-5xl mx-auto px-6 py-24">
         <AnimatedSection variant="scale" amount={0.2}>
           <div className="relative rounded-2xl overflow-hidden bg-gradient-to-br from-primary/10 via-primary/5 to-accent/10 border border-primary/20 p-12 text-center">
@@ -611,57 +323,32 @@ export default function LandingPage() {
                 Crea tu cuenta gratuita y comienza a convertir imágenes a WebP en
                 segundos.
               </p>
-              {!user && !isPending && (
-                <Button
-                  asChild
-                  size="lg"
-                  className="h-12 px-8 text-base font-semibold shadow-lg"
-                >
-                  <Link href="/signup">
-                    Empezar Ahora
-                    <ArrowRight className="ml-2 h-4 w-4" />
-                  </Link>
-                </Button>
-              )}
-              {user && (
-                <Button
-                  asChild
-                  size="lg"
-                  className="h-12 px-8 text-base font-semibold shadow-lg"
-                >
-                  <Link href="/dashboard">
-                    Ir al Dashboard
-                    <ArrowRight className="ml-2 h-4 w-4" />
-                  </Link>
-                </Button>
-              )}
+              <HeroButtons primaryLabel="Empezar Ahora" />
             </div>
           </div>
         </AnimatedSection>
       </section>
 
       {/* Footer */}
-      <AnimatedSection variant="fadeIn">
-        <footer className="border-t border-border/50 bg-card/20">
-          <div className="max-w-6xl mx-auto px-6 py-8 flex flex-col sm:flex-row items-center justify-between gap-4">
-            <div className="flex items-center gap-2">
-              <BrandLogo className="h-6 w-auto text-foreground" />
-            </div>
-            <div className="flex items-center gap-4">
-              <Link
-                href="/politica-de-privacidad"
-                className="text-sm text-muted-foreground hover:text-foreground transition-colors"
-              >
-                Política de Privacidad
-              </Link>
-              <p className="text-sm text-muted-foreground">
-                &copy; {new Date().getFullYear()} ZoePic. Todos los derechos
-                reservados.
-              </p>
-            </div>
+      <footer className="border-t border-border/50 bg-card/20">
+        <div className="max-w-6xl mx-auto px-6 py-8 flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div className="flex items-center gap-2">
+            <BrandLogo className="h-6 w-auto text-foreground" />
           </div>
-        </footer>
-      </AnimatedSection>
+          <div className="flex items-center gap-4">
+            <Link
+              href="/politica-de-privacidad"
+              className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+            >
+              Política de Privacidad
+            </Link>
+            <p className="text-sm text-muted-foreground">
+              &copy; {new Date().getFullYear()} ZoePic. Todos los derechos
+              reservados.
+            </p>
+          </div>
+        </div>
+      </footer>
     </div>
   );
 }
