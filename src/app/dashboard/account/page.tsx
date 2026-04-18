@@ -320,16 +320,59 @@ export default function AccountPage() {
                             </div>
                         </div>
 
-                        <div>
-                            <Label className="text-xs text-muted-foreground">Método de pago</Label>
-                            <div className="mt-1 p-3 rounded-lg border border-dashed border-border text-sm text-muted-foreground text-center">
-                                No hay método de pago configurado.
+                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                            <div className="flex-1 w-full">
+                                <Label className="text-xs text-muted-foreground flex items-center gap-1 mb-1">
+                                    Método de pago actual
+                                </Label>
+                                {appProfile?.subscriptionStatus === "active" && appProfile?.paypalSubscriptionId ? (
+                                    <div className="p-3 rounded-lg border border-primary/20 bg-primary/5 flex items-center justify-between">
+                                        <div className="flex items-center gap-2">
+                                            <div className="w-8 h-5 rounded bg-white flex items-center justify-center font-bold text-[10px] text-blue-800 italic shadow-sm tracking-tighter">
+                                                PayPal
+                                            </div>
+                                            <div className="text-sm font-medium">Cuenta vinculada</div>
+                                        </div>
+                                        <div className="text-xs text-emerald-600 font-medium bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
+                                            Activo
+                                        </div>
+                                    </div>
+                                ) : (
+                                    <div className="p-3 rounded-lg border border-dashed border-border text-sm text-muted-foreground text-center">
+                                        No hay método de pago configurado.
+                                    </div>
+                                )}
                             </div>
                         </div>
 
-                        <Button disabled variant="outline" className="font-semibold">
-                            Gestionar Pagos — Próximamente
-                        </Button>
+                        <div className="flex flex-col sm:flex-row gap-3 pt-2">
+                            {appProfile?.subscriptionStatus === "active" && appProfile?.paypalSubscriptionId ? (
+                                <>
+                                    <Button
+                                        variant="default"
+                                        className="font-semibold flex-1"
+                                        onClick={() => window.open('https://www.paypal.com/myaccount/autopay/', '_blank')}
+                                    >
+                                        Gestionar en PayPal
+                                    </Button>
+                                    <Button
+                                        variant="outline"
+                                        className="font-semibold flex-1"
+                                        onClick={() => router.push('/dashboard/usage')}
+                                    >
+                                        Ver Uso y Cancelar
+                                    </Button>
+                                </>
+                            ) : (
+                                <Button 
+                                    variant="default" 
+                                    className="font-semibold w-full"
+                                    onClick={() => router.push('/dashboard/usage')}
+                                >
+                                    Ver Planes y Mejorar
+                                </Button>
+                            )}
+                        </div>
                     </CardContent>
                 </Card>
                 </StaggerItem>
