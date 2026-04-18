@@ -49,7 +49,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="es">
+    <html lang="es" className="scroll-smooth">
       <body className={`${figtree.variable} antialiased font-sans`}>
         <InsforgeProvider>
           <SmoothScroll>

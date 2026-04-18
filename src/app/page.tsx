@@ -126,9 +126,9 @@ export default function LandingPage() {
       {/* Navbar */}
       <nav className="sticky top-0 z-50 backdrop-blur-md bg-background/80 border-b border-border/50">
         <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-2.5">
+          <Link href="/" className="flex items-center gap-2.5">
             <BrandLogo className="h-7 w-auto text-foreground" />
-          </div>
+          </Link>
           <div className="flex items-center gap-3">
             <a
               href="#pricing"
@@ -332,9 +332,9 @@ export default function LandingPage() {
       {/* Footer */}
       <footer className="border-t border-border/50 bg-card/20">
         <div className="max-w-6xl mx-auto px-6 py-8 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <div className="flex items-center gap-2">
+          <Link href="/" className="flex items-center gap-2">
             <BrandLogo className="h-6 w-auto text-foreground" />
-          </div>
+          </Link>
           <div className="flex items-center gap-4">
             <Link
               href="/politica-de-privacidad"
