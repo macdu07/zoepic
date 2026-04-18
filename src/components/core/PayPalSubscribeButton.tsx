@@ -2,7 +2,6 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { PayPalScriptProvider, PayPalButtons } from "@paypal/react-paypal-js";
-import { useSession } from "@/lib/auth-client";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2 } from "lucide-react";
 
@@ -17,8 +16,6 @@ export default function PayPalSubscribeButton({
   planLabel,
   onSuccess,
 }: PayPalSubscribeButtonProps) {
-  const { data: sessionData } = useSession();
-  const user = sessionData?.user as any;
   const { toast } = useToast();
   const [paypalPlanId, setPaypalPlanId] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -115,7 +112,6 @@ export default function PayPalSubscribeButton({
               },
               body: JSON.stringify({
                 subscriptionId: data.subscriptionID,
-                userId: user?.id,
                 planKey,
               }),
             });

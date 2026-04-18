@@ -71,8 +71,6 @@ export default function UsagePage() {
     try {
       const res = await fetch("/api/paypal/cancel", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ userId: user.id }),
       });
       const data = await res.json();
       if (data.success) {

@@ -1,24 +1,24 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import { cancelPayPalSubscription } from "@/lib/paypal";
 import { PLANS } from "@/lib/usage-types";
 import { db } from "@/db/db";
 import { userProfiles } from "@/db/schema";
 import { eq } from "drizzle-orm";
+import { requireSession } from "@/lib/auth-server";
 
 /**
  * POST /api/paypal/cancel
- * Cancels a user's PayPal subscription and downgrades to Starter.
- * Body: { userId: string }
+ * Cancela la suscripción de PayPal del usuario autenticado y lo regresa al plan Starter.
+ * El userId se obtiene siempre de la sesión del servidor — nunca del body.
  */
-export async function POST(request: NextRequest) {
+export async function POST() {
   try {
-    const { userId } = await request.json();
+    // 1. Verificar sesión — 401 si no autenticado
+    const { session, errorResponse } = await requireSession();
+    if (errorResponse) return errorResponse;
+    const userId = session.user.id;
 
-    if (!userId) {
-      return NextResponse.json({ error: "Missing userId" }, { status: 400 });
-    }
-
-    // Get the user's current subscription
+    // 2. Obtener el perfil del usuario autenticado
     const profileRecords = await db
       .select()
       .from(userProfiles)
@@ -27,7 +27,7 @@ export async function POST(request: NextRequest) {
 
     if (!profileRecords || profileRecords.length === 0) {
       return NextResponse.json(
-        { error: "User profile not found" },
+        { error: "Perfil de usuario no encontrado" },
         { status: 404 },
       );
     }
@@ -36,21 +36,22 @@ export async function POST(request: NextRequest) {
 
     if (!profile.paypalSubscriptionId) {
       return NextResponse.json(
-        { error: "No active subscription to cancel" },
+        { error: "No hay suscripción activa para cancelar" },
         { status: 400 },
       );
     }
 
-    // Cancel with PayPal
+    // 3. Cancelar con PayPal
     await cancelPayPalSubscription(
       profile.paypalSubscriptionId,
       "Usuario solicitó cancelación",
     );
 
-    // Downgrade to Starter
+    // 4. Bajar al plan Starter
     const starter = PLANS.starter;
     try {
-      await db.update(userProfiles)
+      await db
+        .update(userProfiles)
         .set({
           plan: "starter",
           aiConversionsLimit: starter.aiConversionsLimit,
@@ -62,17 +63,17 @@ export async function POST(request: NextRequest) {
     } catch (updateErr) {
       console.error("DB update error:", updateErr);
       return NextResponse.json(
-        { error: "Failed to update user profile" },
+        { error: "Error al actualizar el perfil de usuario" },
         { status: 500 },
       );
     }
 
     return NextResponse.json({
       success: true,
-      message: "Subscription cancelled. Downgraded to Starter.",
+      message: "Suscripción cancelada. Has vuelto al plan Starter.",
     });
   } catch (error) {
     console.error("Cancel error:", error);
-    return NextResponse.json({ error: String(error) }, { status: 500 });
+    return NextResponse.json({ error: "Error interno del servidor" }, { status: 500 });
   }
 }
