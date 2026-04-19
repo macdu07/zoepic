@@ -3,6 +3,7 @@ import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { emailOTP } from "better-auth/plugins";
 import { db } from "../db/db";
 import { sendEmail } from "./email";
+import { sendWebhookToN8n } from "./webhook";
 
 export const auth = betterAuth({
     database: drizzleAdapter(db, {
@@ -11,6 +12,19 @@ export const auth = betterAuth({
     emailAndPassword: {
         enabled: true,
         requireEmailVerification: true,
+    },
+    databaseHooks: {
+        user: {
+            create: {
+                after: async (user) => {
+                    sendWebhookToN8n("user.created", {
+                        id: user.id,
+                        email: user.email,
+                        name: user.name,
+                    });
+                }
+            }
+        }
     },
     plugins: [
         emailOTP({
