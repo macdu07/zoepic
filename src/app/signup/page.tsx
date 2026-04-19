@@ -27,6 +27,7 @@ import {
 import { signUp, authClient } from "@/lib/auth-client";
 import { BrandLogo } from "@/components/icons/BrandLogo";
 import { AnimatedSection } from "@/components/core/AnimatedSection";
+import { Turnstile, type TurnstileInstance } from "@marsidev/react-turnstile";
 
 type Step = "form" | "verify";
 
@@ -110,6 +111,9 @@ export default function SignUpPage() {
   const [isVerifying, setIsVerifying] = useState(false);
   const [isResending, setIsResending] = useState(false);
 
+  const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
+  const turnstileRef = useRef<TurnstileInstance>(null);
+
   const router = useRouter();
   const { toast } = useToast();
 
@@ -125,8 +129,24 @@ export default function SignUpPage() {
       toast({ title: "Error", description: "La contraseña debe tener al menos 6 caracteres.", variant: "destructive" });
       return;
     }
+    if (!turnstileToken) return;
 
     setIsLoading(true);
+
+    const verifyRes = await fetch("/api/verify-turnstile", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ token: turnstileToken }),
+    });
+    const { success: turnstileOk } = await verifyRes.json();
+
+    if (!turnstileOk) {
+      toast({ title: "Verificación fallida", description: "Completa el desafío de seguridad.", variant: "destructive" });
+      turnstileRef.current?.reset();
+      setTurnstileToken(null);
+      setIsLoading(false);
+      return;
+    }
 
     const { error } = await signUp.email({
       email,
@@ -316,7 +336,16 @@ export default function SignUpPage() {
                   </div>
                 </div>
 
-                <Button type="submit" className="w-full font-semibold h-11" disabled={isLoading}>
+                <Turnstile
+                  ref={turnstileRef}
+                  siteKey={process.env.NEXT_PUBLIC_CLOUDFLARE_TURNSTILE_SITE_KEY!}
+                  onSuccess={setTurnstileToken}
+                  onError={() => setTurnstileToken(null)}
+                  onExpire={() => setTurnstileToken(null)}
+                  options={{ theme: "auto", size: "flexible" }}
+                />
+
+                <Button type="submit" className="w-full font-semibold h-11" disabled={isLoading || !turnstileToken}>
                   {isLoading ? (
                     <>
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />

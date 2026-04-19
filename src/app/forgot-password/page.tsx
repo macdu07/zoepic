@@ -2,6 +2,7 @@
 
 import { useState, useRef, useCallback } from "react";
 import Link from "next/link";
+import { Turnstile, type TurnstileInstance } from "@marsidev/react-turnstile";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -139,6 +140,8 @@ export default function ForgotPasswordPage() {
 
   const [isLoading, setIsLoading] = useState(false);
   const [isResending, setIsResending] = useState(false);
+  const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
+  const turnstileRef = useRef<TurnstileInstance>(null);
 
   const { toast } = useToast();
 
@@ -147,7 +150,23 @@ export default function ForgotPasswordPage() {
   // ── Paso 1: Enviar OTP ─────────────────────────────────────────────
   const handleSendOtp = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    if (!turnstileToken) return;
     setIsLoading(true);
+
+    const verifyRes = await fetch("/api/verify-turnstile", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ token: turnstileToken }),
+    });
+    const { success: turnstileOk } = await verifyRes.json();
+
+    if (!turnstileOk) {
+      toast({ title: "Verificación fallida", description: "Completa el desafío de seguridad.", variant: "destructive" });
+      turnstileRef.current?.reset();
+      setTurnstileToken(null);
+      setIsLoading(false);
+      return;
+    }
 
     const { error } = await authClient.emailOtp.requestPasswordReset({ email });
 
@@ -312,7 +331,16 @@ export default function ForgotPasswordPage() {
                   </div>
                 </div>
 
-                <Button type="submit" className="w-full font-semibold h-11" disabled={isLoading}>
+                <Turnstile
+                  ref={turnstileRef}
+                  siteKey={process.env.NEXT_PUBLIC_CLOUDFLARE_TURNSTILE_SITE_KEY!}
+                  onSuccess={setTurnstileToken}
+                  onError={() => setTurnstileToken(null)}
+                  onExpire={() => setTurnstileToken(null)}
+                  options={{ theme: "auto", size: "flexible" }}
+                />
+
+                <Button type="submit" className="w-full font-semibold h-11" disabled={isLoading || !turnstileToken}>
                   {isLoading ? (
                     <>
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />
