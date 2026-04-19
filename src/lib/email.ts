@@ -8,6 +8,9 @@ const transporter = nodemailer.createTransport({
     user: process.env.SMTP_USER,
     pass: process.env.SMTP_PASS,
   },
+  connectionTimeout: 10000,
+  greetingTimeout: 10000,
+  socketTimeout: 15000,
 });
 
 export function emailWrapper(content: string): string {
@@ -15,23 +18,10 @@ export function emailWrapper(content: string): string {
 }
 
 export async function sendEmail(to: string, subject: string, html: string): Promise<void> {
-  console.log("[sendEmail] Sending to:", to, "| Subject:", subject);
-  console.log("[sendEmail] SMTP config:", {
-    host: process.env.SMTP_HOST,
-    port: process.env.SMTP_PORT,
-    user: process.env.SMTP_USER,
-    passSet: !!process.env.SMTP_PASS,
+  await transporter.sendMail({
+    from: process.env.SMTP_FROM ?? "ZoePic <noreply@zoepic.online>",
+    to,
+    subject,
+    html,
   });
-  try {
-    const info = await transporter.sendMail({
-      from: process.env.SMTP_FROM ?? "ZoePic <noreply@zoepic.online>",
-      to,
-      subject,
-      html,
-    });
-    console.log("[sendEmail] OK:", info.messageId, "| Response:", info.response);
-  } catch (err) {
-    console.error("[sendEmail] ERROR:", err);
-    throw err;
-  }
 }
