@@ -141,8 +141,16 @@ export default function SignUpPage() {
       return;
     }
 
-    // Better Auth envía el OTP automáticamente al registrar con requireEmailVerification
-    toast({ title: "Cuenta creada", description: "Te enviamos un código de verificación por email." });
+    const { error: otpError } = await authClient.emailOtp.sendVerificationOtp({
+      email,
+      type: "email-verification",
+    });
+
+    if (otpError) {
+      toast({ title: "Error al enviar código", description: "Cuenta creada, pero no pudimos enviar el código. Usa 'Reenviar código'.", variant: "destructive" });
+    } else {
+      toast({ title: "Cuenta creada", description: "Te enviamos un código de verificación por email." });
+    }
     setStep("verify");
   };
 
