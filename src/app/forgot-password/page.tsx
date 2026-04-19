@@ -337,7 +337,7 @@ export default function ForgotPasswordPage() {
                   onSuccess={setTurnstileToken}
                   onError={() => setTurnstileToken(null)}
                   onExpire={() => setTurnstileToken(null)}
-                  options={{ theme: "auto", size: "flexible" }}
+                  options={{ theme: "light", size: "flexible" }}
                 />
 
                 <Button type="submit" className="w-full font-semibold h-11" disabled={isLoading || !turnstileToken}>

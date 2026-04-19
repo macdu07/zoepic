@@ -151,7 +151,7 @@ export default function LoginPage() {
               onSuccess={setTurnstileToken}
               onError={() => setTurnstileToken(null)}
               onExpire={() => setTurnstileToken(null)}
-              options={{ theme: "auto", size: "flexible" }}
+              options={{ theme: "light", size: "flexible" }}
             />
 
             <Button
