@@ -19,6 +19,7 @@ import { signIn } from "@/lib/auth-client";
 import { BrandLogo } from "@/components/icons/BrandLogo";
 import { AnimatedSection } from "@/components/core/AnimatedSection";
 import { Turnstile, type TurnstileInstance } from "@marsidev/react-turnstile";
+import { useMounted } from "@/hooks/use-mounted";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -29,6 +30,7 @@ export default function LoginPage() {
   const turnstileRef = useRef<TurnstileInstance>(null);
   const router = useRouter();
   const { toast } = useToast();
+  const mounted = useMounted();
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -145,14 +147,18 @@ export default function LoginPage() {
               </div>
             </div>
 
-            <Turnstile
-              ref={turnstileRef}
-              siteKey={process.env.NEXT_PUBLIC_CLOUDFLARE_TURNSTILE_SITE_KEY!}
-              onSuccess={setTurnstileToken}
-              onError={() => setTurnstileToken(null)}
-              onExpire={() => setTurnstileToken(null)}
-              options={{ theme: "light", size: "flexible" }}
-            />
+            {mounted ? (
+              <Turnstile
+                ref={turnstileRef}
+                siteKey={process.env.NEXT_PUBLIC_CLOUDFLARE_TURNSTILE_SITE_KEY!}
+                onSuccess={setTurnstileToken}
+                onError={() => setTurnstileToken(null)}
+                onExpire={() => setTurnstileToken(null)}
+                options={{ theme: "light", size: "flexible" }}
+              />
+            ) : (
+              <div className="h-[65px] w-full" />
+            )}
 
             <Button
               type="submit"
@@ -181,11 +187,11 @@ export default function LoginPage() {
                 </span>
               </div>
             </div>
-            <Link href="/signup" className="block mt-4">
-              <Button variant="outline" className="w-full font-semibold h-11">
+            <Button asChild variant="outline" className="w-full font-semibold h-11 mt-4">
+              <Link href="/signup">
                 Crear una Cuenta
-              </Button>
-            </Link>
+              </Link>
+            </Button>
           </div>
         </CardContent>
         </Card>

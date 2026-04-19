@@ -28,6 +28,7 @@ import { signUp, authClient } from "@/lib/auth-client";
 import { BrandLogo } from "@/components/icons/BrandLogo";
 import { AnimatedSection } from "@/components/core/AnimatedSection";
 import { Turnstile, type TurnstileInstance } from "@marsidev/react-turnstile";
+import { useMounted } from "@/hooks/use-mounted";
 
 type Step = "form" | "verify";
 
@@ -116,6 +117,7 @@ export default function SignUpPage() {
 
   const router = useRouter();
   const { toast } = useToast();
+  const mounted = useMounted();
 
   // ── Paso 1: Registrar ──────────────────────────────────────────────
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -336,14 +338,18 @@ export default function SignUpPage() {
                   </div>
                 </div>
 
-                <Turnstile
-                  ref={turnstileRef}
-                  siteKey={process.env.NEXT_PUBLIC_CLOUDFLARE_TURNSTILE_SITE_KEY!}
-                  onSuccess={setTurnstileToken}
-                  onError={() => setTurnstileToken(null)}
-                  onExpire={() => setTurnstileToken(null)}
-                  options={{ theme: "light", size: "flexible" }}
-                />
+                {mounted ? (
+                  <Turnstile
+                    ref={turnstileRef}
+                    siteKey={process.env.NEXT_PUBLIC_CLOUDFLARE_TURNSTILE_SITE_KEY!}
+                    onSuccess={setTurnstileToken}
+                    onError={() => setTurnstileToken(null)}
+                    onExpire={() => setTurnstileToken(null)}
+                    options={{ theme: "light", size: "flexible" }}
+                  />
+                ) : (
+                  <div className="h-[65px] w-full" />
+                )}
 
                 <Button type="submit" className="w-full font-semibold h-11" disabled={isLoading || !turnstileToken}>
                   {isLoading ? (
@@ -420,11 +426,11 @@ export default function SignUpPage() {
                     <span className="bg-card px-2 text-muted-foreground">¿Ya tienes cuenta?</span>
                   </div>
                 </div>
-                <Link href="/login" className="block mt-4">
-                  <Button variant="outline" className="w-full font-semibold h-11">
+                <Button asChild variant="outline" className="w-full font-semibold h-11 mt-4">
+                  <Link href="/login">
                     Iniciar Sesión
-                  </Button>
-                </Link>
+                  </Link>
+                </Button>
               </div>
             )}
           </CardContent>

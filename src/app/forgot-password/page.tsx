@@ -4,6 +4,7 @@ import { useState, useRef, useCallback } from "react";
 import Link from "next/link";
 import { Turnstile, type TurnstileInstance } from "@marsidev/react-turnstile";
 import { Button } from "@/components/ui/button";
+import { useMounted } from "@/hooks/use-mounted";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
@@ -144,6 +145,7 @@ export default function ForgotPasswordPage() {
   const turnstileRef = useRef<TurnstileInstance>(null);
 
   const { toast } = useToast();
+  const mounted = useMounted();
 
   const stepNumber = { email: 1, code: 2, password: 3, done: 3 }[step];
 
@@ -331,14 +333,18 @@ export default function ForgotPasswordPage() {
                   </div>
                 </div>
 
-                <Turnstile
-                  ref={turnstileRef}
-                  siteKey={process.env.NEXT_PUBLIC_CLOUDFLARE_TURNSTILE_SITE_KEY!}
-                  onSuccess={setTurnstileToken}
-                  onError={() => setTurnstileToken(null)}
-                  onExpire={() => setTurnstileToken(null)}
-                  options={{ theme: "light", size: "flexible" }}
-                />
+                {mounted ? (
+                  <Turnstile
+                    ref={turnstileRef}
+                    siteKey={process.env.NEXT_PUBLIC_CLOUDFLARE_TURNSTILE_SITE_KEY!}
+                    onSuccess={setTurnstileToken}
+                    onError={() => setTurnstileToken(null)}
+                    onExpire={() => setTurnstileToken(null)}
+                    options={{ theme: "light", size: "flexible" }}
+                  />
+                ) : (
+                  <div className="h-[65px] w-full" />
+                )}
 
                 <Button type="submit" className="w-full font-semibold h-11" disabled={isLoading || !turnstileToken}>
                   {isLoading ? (
@@ -477,11 +483,11 @@ export default function ForgotPasswordPage() {
                 <p className="text-sm text-muted-foreground">
                   Ya puedes iniciar sesión con tu nueva contraseña.
                 </p>
-                <Link href="/login">
-                  <Button className="w-full font-semibold h-11" id="goto-login-btn">
+                <Button asChild className="w-full font-semibold h-11" id="goto-login-btn">
+                  <Link href="/login">
                     Ir al Login
-                  </Button>
-                </Link>
+                  </Link>
+                </Button>
               </div>
             )}
 
