@@ -39,7 +39,7 @@ const FAQ_ITEMS = [
   {
     question: "¿Qué pasa cuando llego al límite de renombrados IA?",
     answer:
-      "En el plan gratuito puedes convertir hasta 100 imágenes a WebP por mes. Simplemente el renombrado automático con IA se desactiva hasta que renueves tu periodo o actualices tu plan.",
+      "La conversión a WebP sigue disponible sin cuenta, con un límite de 100 imágenes por día. Para usar renombrado con IA necesitas una cuenta gratuita o de pago, según los límites de tu plan.",
   },
   {
     question: "¿Puedo cancelar mi suscripción en cualquier momento?",
@@ -81,7 +81,7 @@ const jsonLd = {
           name: "Starter",
           price: "0",
           priceCurrency: "USD",
-          description: "100 conversiones WebP/mes, 50 renombrados IA/mes.",
+          description: "100 conversiones WebP/día, 50 renombrados IA/mes.",
         },
         {
           "@type": "Offer",
@@ -174,7 +174,7 @@ export default function LandingPage() {
           </AnimatedSection>
 
           <AnimatedSection variant="fadeUp" delay={0.46}>
-            <HeroButtons showLearnMore primaryLabel="Comenzar Gratis" />
+            <HeroButtons showLearnMore primaryLabel="Probar Conversor" />
           </AnimatedSection>
         </div>
       </section>
@@ -320,10 +320,10 @@ export default function LandingPage() {
                 ¿Listo para optimizar tus imágenes?
               </h2>
               <p className="text-muted-foreground text-lg mb-8 max-w-lg mx-auto">
-                Crea tu cuenta gratuita y comienza a convertir imágenes a WebP en
-                segundos.
+                Convierte imágenes a WebP ahora mismo y crea una cuenta solo si
+                quieres usar IA o administrar tu suscripción.
               </p>
-              <HeroButtons primaryLabel="Empezar Ahora" />
+              <HeroButtons primaryLabel="Abrir Conversor" />
             </div>
           </div>
         </AnimatedSection>

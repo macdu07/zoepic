@@ -1,10 +1,38 @@
 "use server";
 
 import { db } from "@/db/db";
-import { userProfiles, conversionLogs } from "@/db/schema";
-import { eq, desc, and, gte, count } from "drizzle-orm";
+import { guestConversionLogs, userProfiles, conversionLogs } from "@/db/schema";
+import { cookies } from "next/headers";
+import { randomUUID } from "crypto";
+import { eq, desc, and, gte, sql } from "drizzle-orm";
 
 import { PLANS, type UserProfile, type PlanKey, type ConversionLog, type UsageCheck } from "./usage-types";
+
+const GUEST_COOKIE_NAME = "zoepic_guest_id";
+
+function getStartOfDay(date = new Date()): Date {
+  return new Date(date.getFullYear(), date.getMonth(), date.getDate());
+}
+
+async function getOrCreateGuestId(): Promise<string> {
+  const cookieStore = await cookies();
+  const existingGuestId = cookieStore.get(GUEST_COOKIE_NAME)?.value;
+
+  if (existingGuestId) {
+    return existingGuestId;
+  }
+
+  const guestId = randomUUID();
+  cookieStore.set(GUEST_COOKIE_NAME, guestId, {
+    httpOnly: true,
+    sameSite: "lax",
+    secure: process.env.NODE_ENV === "production",
+    maxAge: 60 * 60 * 24 * 365,
+    path: "/",
+  });
+
+  return guestId;
+}
 
 // ─── Get or create user profile ──────────────────────────────────────
 export async function getUserProfile(
@@ -102,13 +130,15 @@ export async function checkUsageLimit(
     }
 
     const [{ value: webpUsed }] = await db
-      .select({ value: count() })
+      .select({
+        value: sql<number>`coalesce(sum(${conversionLogs.fileCount}), 0)`,
+      })
       .from(conversionLogs)
       .where(
         and(
           eq(conversionLogs.userId, userId),
           eq(conversionLogs.aiUsed, false),
-          gte(conversionLogs.createdAt, new Date(profile.periodStart)),
+          gte(conversionLogs.createdAt, getStartOfDay()),
         ),
       );
 
@@ -136,6 +166,36 @@ export async function checkUsageLimit(
   };
 }
 
+export async function checkGuestWebpUsageLimit(
+  fileCount: number,
+): Promise<UsageCheck> {
+  const guestId = await getOrCreateGuestId();
+  const webpLimit = PLANS.starter.webpConversionsLimit ?? 0;
+
+  const [{ value: webpUsed }] = await db
+    .select({
+      value: sql<number>`coalesce(sum(${guestConversionLogs.fileCount}), 0)`,
+    })
+    .from(guestConversionLogs)
+    .where(
+      and(
+        eq(guestConversionLogs.guestId, guestId),
+        gte(guestConversionLogs.createdAt, getStartOfDay()),
+      ),
+    );
+
+  const remaining = webpLimit - webpUsed;
+
+  return {
+    allowed: remaining >= fileCount,
+    remaining,
+    limit: webpLimit,
+    used: webpUsed,
+    maxBatchSize: PLANS.starter.maxBatchSize,
+    plan: "starter",
+  };
+}
+
 // ─── Log a conversion ────────────────────────────────────────────────
 export async function logConversion(
   userId: string,
@@ -160,20 +220,31 @@ export async function logConversion(
   }
 }
 
+export async function logGuestWebpConversion(fileCount: number): Promise<void> {
+  const guestId = await getOrCreateGuestId();
+
+  await db.insert(guestConversionLogs).values({
+    guestId,
+    fileCount,
+  });
+}
+
 // ─── Get WebP conversions used this period ───────────────────────────
 export async function getWebpUsage(
   userId: string,
-  periodStart: Date,
+  since: Date,
 ): Promise<number> {
   try {
     const [{ value }] = await db
-      .select({ value: count() })
+      .select({
+        value: sql<number>`coalesce(sum(${conversionLogs.fileCount}), 0)`,
+      })
       .from(conversionLogs)
       .where(
         and(
           eq(conversionLogs.userId, userId),
           eq(conversionLogs.aiUsed, false),
-          gte(conversionLogs.createdAt, periodStart),
+          gte(conversionLogs.createdAt, since),
         ),
       );
     return value;

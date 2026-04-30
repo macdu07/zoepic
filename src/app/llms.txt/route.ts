@@ -13,7 +13,7 @@ automáticamente con nombres descriptivos optimizados para SEO.
 - Procesamiento por lotes de hasta 100 imágenes
 
 ## Planes
-- Starter: Gratis — 100 conversiones WebP/mes, 50 renombrados IA/mes, lotes de 5 imágenes
+- Starter: Gratis — 100 conversiones WebP/día, 50 renombrados IA/mes, lotes de 5 imágenes
 - Pro: $6.99/mes — WebP ilimitado, 3,000 renombrados IA/mes, lotes de 50 imágenes
 - Agency: $23.99/mes — WebP ilimitado, 20,000 renombrados IA/mes, lotes de 100 imágenes
 

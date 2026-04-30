@@ -18,7 +18,7 @@ const plans = [
     price: null as number | null,
     description: "Perfecto para probar la herramienta.",
     features: [
-      { text: "100 conversiones WebP/mes", included: true },
+      { text: "100 conversiones WebP/día", included: true },
       { text: "50 renombrados con IA/mes", included: true },
       { text: "Hasta 5 imágenes por lote", included: true },
       { text: "Soporte prioritario", included: false },
@@ -178,7 +178,7 @@ export default function PricingSection() {
                     </Button>
                   ) : (
                     <Button asChild variant="outline" className="w-full font-semibold">
-                      <Link href="/signup">Comenzar Gratis</Link>
+                      <Link href="/convert">Usar Conversor</Link>
                     </Button>
                   ))}
 

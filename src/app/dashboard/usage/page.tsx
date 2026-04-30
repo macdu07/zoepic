@@ -45,7 +45,9 @@ export default function UsagePage() {
     setProfile(p);
     setHistory(h);
     if (p) {
-      const wu = await getWebpUsage(user.id, new Date(p.periodStart));
+      const startOfToday = new Date();
+      startOfToday.setHours(0, 0, 0, 0);
+      const wu = await getWebpUsage(user.id, startOfToday);
       setWebpUsed(wu);
     }
     setLoading(false);
@@ -270,7 +272,7 @@ export default function UsagePage() {
               <CardHeader className="pb-3">
                 <CardTitle className="text-lg font-semibold flex items-center gap-2">
                   <FileImage className="h-5 w-5 text-primary" />
-                  Conversiones WebP este periodo
+                  Conversiones WebP hoy
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
@@ -288,7 +290,7 @@ export default function UsagePage() {
                 />
                 <p className="text-xs text-center text-muted-foreground">
                   {Math.min(Math.round((webpUsed / planInfo.webpConversionsLimit) * 100), 100)}% utilizado — te quedan{" "}
-                  {Math.max(planInfo.webpConversionsLimit - webpUsed, 0).toLocaleString()} conversiones WebP
+                  {Math.max(planInfo.webpConversionsLimit - webpUsed, 0).toLocaleString()} conversiones WebP hoy
                 </p>
               </CardContent>
             </Card>

@@ -13,8 +13,11 @@ import {
 } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { Loader2, Sparkles, Trash2 } from "lucide-react";
+import Link from "next/link";
 
 interface ConversionControlsProps {
+  canUseAi: boolean;
+  authLoaded: boolean;
   useAiForName: boolean;
   setUseAiForName: (value: boolean) => void;
   prefix: string;
@@ -35,6 +38,8 @@ interface ConversionControlsProps {
 }
 
 export function ConversionControls({
+  canUseAi,
+  authLoaded,
   useAiForName,
   setUseAiForName,
   prefix,
@@ -53,6 +58,8 @@ export function ConversionControls({
   hasFile,
   hasResult,
 }: ConversionControlsProps) {
+  const effectiveUseAi = canUseAi && useAiForName;
+
   return (
     <div className="space-y-6">
       <div className="flex items-center space-x-2">
@@ -60,18 +67,34 @@ export function ConversionControls({
           id="use-ai-name"
           checked={useAiForName}
           onCheckedChange={setUseAiForName}
+          disabled={!canUseAi || !authLoaded}
         />
         <Label htmlFor="use-ai-name" className="text-sm font-medium">
           Usar IA para el nombre del archivo
         </Label>
       </div>
 
+      {!canUseAi && authLoaded && (
+        <p className="text-xs text-muted-foreground">
+          La conversión a WebP está disponible sin cuenta. Para usar IA y
+          administrar tus límites o suscripción,{" "}
+          <Link href="/signup" className="text-primary underline underline-offset-4">
+            crea una cuenta
+          </Link>
+          {" "}o{" "}
+          <Link href="/login" className="text-primary underline underline-offset-4">
+            inicia sesión
+          </Link>
+          .
+        </p>
+      )}
+
       <div>
         <Label
           htmlFor="prefix"
           className="text-xs font-medium text-muted-foreground"
         >
-          {useAiForName
+          {effectiveUseAi
             ? "Prefijo opcional para el nombre"
             : "Nombre manual del archivo"}
         </Label>
@@ -80,12 +103,12 @@ export function ConversionControls({
           type="text"
           value={prefix}
           onChange={(e) => setPrefix(e.target.value)}
-          placeholder={useAiForName ? "ej. imagen-producto-" : "nombre-del-archivo"}
+          placeholder={effectiveUseAi ? "ej. imagen-producto-" : "nombre-del-archivo"}
           className="mt-1 bg-input text-foreground border-border focus:bg-background placeholder:text-muted-foreground/70"
         />
       </div>
 
-      {useAiForName && (
+      {effectiveUseAi && (
         <>
           <div>
             <Label htmlFor="ai-language" className="text-xs font-medium text-muted-foreground">
@@ -191,7 +214,11 @@ export function ConversionControls({
           ) : (
             <Sparkles className="mr-2 h-5 w-5" aria-hidden="true" />
           )}
-          {isLoading ? "Procesando..." : "Convertir y Analizar"}
+          {isLoading
+            ? "Procesando..."
+            : effectiveUseAi
+              ? "Convertir y Analizar"
+              : "Convertir a WebP"}
         </Button>
         <Button
           onClick={onClearFiles}

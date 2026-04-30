@@ -5,6 +5,7 @@ export const PLANS = {
     price: 0,
     aiConversionsLimit: 50,
     webpConversionsLimit: 100,
+    webpConversionsPeriod: "daily",
     maxBatchSize: 5,
   },
   pro: {
@@ -12,6 +13,7 @@ export const PLANS = {
     price: 6.99,
     aiConversionsLimit: 3000,
     webpConversionsLimit: null,
+    webpConversionsPeriod: null,
     maxBatchSize: 50,
   },
   agency: {
@@ -19,6 +21,7 @@ export const PLANS = {
     price: 23.99,
     aiConversionsLimit: 20000,
     webpConversionsLimit: null,
+    webpConversionsPeriod: null,
     maxBatchSize: 100,
   },
   unlimited: {
@@ -26,6 +29,7 @@ export const PLANS = {
     price: 0,
     aiConversionsLimit: 1000000,
     webpConversionsLimit: null,
+    webpConversionsPeriod: null,
     maxBatchSize: 1000,
   },
 } as const;

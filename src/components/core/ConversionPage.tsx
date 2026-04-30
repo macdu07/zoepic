@@ -1,10 +1,9 @@
 "use client";
 
 import { useState, useCallback, useEffect } from "react";
-import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
-import { Sparkles } from "lucide-react";
+import { Progress } from "@/components/ui/progress";
 import {
   generateImageName,
   type GenerateImageNameInput,
@@ -12,12 +11,15 @@ import {
 import {
   getImageMetadata,
   convertToWebP,
-  formatBytes,
   type ImageMetadata,
   type WebPConversionResult,
 } from "@/lib/imageUtils";
-import { checkUsageLimit, logConversion, getUserProfile } from "@/lib/usage";
-import { type UsageCheck } from "@/lib/usage-types";
+import {
+  checkUsageLimit,
+  getUserProfile,
+  logConversion,
+} from "@/lib/usage";
+import { PLANS, type UsageCheck } from "@/lib/usage-types";
 import { ImageUploader } from "./ImageUploader";
 import { ConversionControls } from "./ConversionControls";
 import {
@@ -26,14 +28,92 @@ import {
 } from "./ConversionResultList";
 import { useSession } from "@/lib/auth-client";
 import { AnimatedSection } from "@/components/core/AnimatedSection";
+import { FileImage } from "lucide-react";
 
 // Number of images to process concurrently
 const CONCURRENCY_LIMIT = 4;
+const GUEST_USAGE_STORAGE_KEY = "zoepic_guest_webp_usage";
+
+interface GuestUsageState {
+  date: string;
+  used: number;
+}
+
+interface DailyUsageSummary {
+  used: number;
+  limit: number | null;
+  remaining: number | null;
+}
+
+function getTodayKey(): string {
+  return new Date().toISOString().slice(0, 10);
+}
+
+function getGuestUsageState(): GuestUsageState {
+  if (typeof window === "undefined") {
+    return { date: getTodayKey(), used: 0 };
+  }
+
+  const today = getTodayKey();
+  const rawValue = window.localStorage.getItem(GUEST_USAGE_STORAGE_KEY);
+
+  if (!rawValue) {
+    return { date: today, used: 0 };
+  }
+
+  try {
+    const parsed = JSON.parse(rawValue) as Partial<GuestUsageState>;
+
+    if (parsed.date !== today) {
+      return { date: today, used: 0 };
+    }
+
+    return {
+      date: today,
+      used: typeof parsed.used === "number" ? parsed.used : 0,
+    };
+  } catch {
+    return { date: today, used: 0 };
+  }
+}
+
+function checkGuestWebpUsageLimit(fileCount: number): UsageCheck {
+  const webpLimit = PLANS.starter.webpConversionsLimit ?? 0;
+  const usageState = getGuestUsageState();
+  const remaining = webpLimit - usageState.used;
+
+  return {
+    allowed: remaining >= fileCount,
+    remaining,
+    limit: webpLimit,
+    used: usageState.used,
+    maxBatchSize: PLANS.starter.maxBatchSize,
+    plan: "starter",
+  };
+}
+
+function logGuestWebpConversion(fileCount: number): void {
+  if (typeof window === "undefined") {
+    return;
+  }
+
+  const usageState = getGuestUsageState();
+  const nextState: GuestUsageState = {
+    date: getTodayKey(),
+    used: usageState.used + fileCount,
+  };
+
+  window.localStorage.setItem(
+    GUEST_USAGE_STORAGE_KEY,
+    JSON.stringify(nextState),
+  );
+}
 
 export default function ConversionPage() {
   const { data: sessionData, isPending: isLoadedResponse } = useSession();
   const user = sessionData?.user as any;
   const isLoaded = !isLoadedResponse;
+  const canUseAi = Boolean(user);
   
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [conversionItems, setConversionItems] = useState<ConversionItem[]>([]);
@@ -45,18 +125,52 @@ export default function ConversionPage() {
   const [brandPrompt, setBrandPrompt] = useState("");
   const [useSuffix, setUseSuffix] = useState(false);
   const [maxBatchSize, setMaxBatchSize] = useState(5);
+  const [dailyUsageSummary, setDailyUsageSummary] = useState<DailyUsageSummary | null>(null);
   const { toast } = useToast();
+
+  const refreshDailyUsageSummary = useCallback(async () => {
+    if (!isLoaded) {
+      return;
+    }
+
+    if (!user) {
+      const guestUsage = checkGuestWebpUsageLimit(0);
+      setDailyUsageSummary({
+        used: guestUsage.used,
+        limit: guestUsage.limit,
+        remaining: guestUsage.remaining,
+      });
+      return;
+    }
+
+    const usage = await checkUsageLimit(user.id, 0, false);
+    setDailyUsageSummary({
+      used: usage.used,
+      limit: usage.limit === -1 ? null : usage.limit,
+      remaining: usage.remaining === -1 ? null : usage.remaining,
+    });
+  }, [isLoaded, user]);
 
   // Load user profile to get batch size limit
   useEffect(() => {
     if (isLoaded && user) {
       getUserProfile(user.id).then((profile) => {
         if (profile) {
-          setMaxBatchSize(profile.max_batch_size);
+          setMaxBatchSize(profile.maxBatchSize);
         }
       });
+      return;
+    }
+
+    if (isLoaded && !user) {
+      setUseAiForName(false);
+      setMaxBatchSize(PLANS.starter.maxBatchSize);
     }
   }, [isLoaded, user]);
+
+  useEffect(() => {
+    void refreshDailyUsageSummary();
+  }, [refreshDailyUsageSummary]);
 
   const handleFilesSelect = useCallback((files: File[]) => {
     setSelectedFiles(files);
@@ -67,6 +181,25 @@ export default function ConversionPage() {
     setSelectedFiles((prev) => prev.filter((_, i) => i !== index));
     setConversionItems([]);
   }, []);
+
+  const handleUseAiForNameChange = useCallback(
+    (value: boolean) => {
+      if (!canUseAi) {
+        if (value) {
+          toast({
+            title: "Inicia sesión para usar IA",
+            description:
+              "La conversión a WebP es pública, pero el renombrado con IA requiere una cuenta.",
+          });
+        }
+        setUseAiForName(false);
+        return;
+      }
+
+      setUseAiForName(value);
+    },
+    [canUseAi, toast],
+  );
 
   const processImage = async (
     file: File,
@@ -172,6 +305,10 @@ export default function ConversionPage() {
   };
 
   const handleConvert = async () => {
+    if (!isLoaded) {
+      return;
+    }
+
     if (selectedFiles.length === 0) {
       toast({
         title: "Sin imágenes",
@@ -181,24 +318,36 @@ export default function ConversionPage() {
       return;
     }
 
-    // Check usage limits if user is authenticated
+    if (useAiForName && !user) {
+      toast({
+        title: "Inicia sesión para usar IA",
+        description:
+          "Puedes convertir imágenes a WebP sin cuenta, pero el renombrado con IA requiere iniciar sesión.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    let usageCheck: UsageCheck | null = null;
+
     if (user) {
-      const usageCheck = await checkUsageLimit(
-        user.id,
-        selectedFiles.length,
-        useAiForName,
-      );
-      if (!usageCheck.allowed) {
-        const description = useAiForName
-          ? `Has usado ${usageCheck.used} de ${usageCheck.limit} conversiones IA este mes. Te quedan ${usageCheck.remaining}. Desactiva la IA o actualiza tu plan.`
-          : `Has usado ${usageCheck.used} de ${usageCheck.limit} conversiones WebP este mes en el plan gratuito. Te quedan ${usageCheck.remaining}. Actualiza tu plan para conversiones ilimitadas.`;
-        toast({
-          title: "Límite alcanzado",
-          description,
-          variant: "destructive",
-        });
-        return;
-      }
+      usageCheck = await checkUsageLimit(user.id, selectedFiles.length, useAiForName);
+    } else {
+      usageCheck = checkGuestWebpUsageLimit(selectedFiles.length);
+    }
+
+    if (!usageCheck.allowed) {
+      const description = useAiForName
+        ? `Has usado ${usageCheck.used} de ${usageCheck.limit} conversiones IA este mes. Te quedan ${usageCheck.remaining}. Desactiva la IA o actualiza tu plan.`
+        : user
+          ? `Has usado ${usageCheck.used} de ${usageCheck.limit} conversiones WebP hoy en el plan gratuito. Te quedan ${usageCheck.remaining}.`
+          : `Has usado ${usageCheck.used} de ${usageCheck.limit} conversiones WebP hoy como invitado. Te quedan ${usageCheck.remaining}. Crea una cuenta si quieres usar IA y gestionar tu suscripción.`;
+      toast({
+        title: "Límite alcanzado",
+        description,
+        variant: "destructive",
+      });
+      return;
     }
 
     setIsLoading(true);
@@ -274,7 +423,11 @@ export default function ConversionPage() {
     // Log the conversion
     if (user) {
       await logConversion(user.id, selectedFiles.length, useAiForName);
+    } else {
+      logGuestWebpConversion(selectedFiles.length);
     }
+
+    await refreshDailyUsageSummary();
 
     toast({
       title: "Conversión Completada",
@@ -291,6 +444,15 @@ export default function ConversionPage() {
       description: "Puedes subir nuevas imágenes. Tu configuración se mantiene.",
     });
   };
+
+  const isUnlimitedDailyUsage = dailyUsageSummary?.limit === null;
+  const dailyUsagePercent =
+    dailyUsageSummary && dailyUsageSummary.limit
+      ? Math.min(
+          Math.round((dailyUsageSummary.used / dailyUsageSummary.limit) * 100),
+          100,
+        )
+      : 0;
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -319,9 +481,61 @@ export default function ConversionPage() {
               maxFiles={maxBatchSize}
             />
 
+            {dailyUsageSummary && (
+              <div className="rounded-xl border border-border/60 bg-muted/30 p-4 space-y-3">
+                <div className="flex items-start justify-between gap-3">
+                  <div className="flex items-start gap-3">
+                    <div className="mt-0.5 rounded-lg bg-primary/10 p-2 text-primary">
+                      <FileImage className="h-4 w-4" />
+                    </div>
+                    <div>
+                      <p className="text-sm font-semibold">
+                        Conversiones WebP hoy
+                      </p>
+                      <p className="text-xs text-muted-foreground">
+                        {user
+                          ? "Tu uso diario actual en el conversor."
+                          : "Tu uso diario en este navegador."}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    {isUnlimitedDailyUsage ? (
+                      <p className="text-sm font-semibold text-emerald-600">
+                        Ilimitado
+                      </p>
+                    ) : (
+                      <>
+                        <p className="text-lg font-bold text-primary">
+                          {dailyUsageSummary.used}
+                          <span className="text-sm font-medium text-muted-foreground">
+                            {" "}/ {dailyUsageSummary.limit}
+                          </span>
+                        </p>
+                        <p className="text-xs text-muted-foreground">
+                          Restan {dailyUsageSummary.remaining}
+                        </p>
+                      </>
+                    )}
+                  </div>
+                </div>
+
+                {!isUnlimitedDailyUsage && (
+                  <>
+                    <Progress value={dailyUsagePercent} className="h-2.5" />
+                    <p className="text-xs text-muted-foreground">
+                      {dailyUsagePercent}% del límite diario usado.
+                    </p>
+                  </>
+                )}
+              </div>
+            )}
+
             <ConversionControls
+              canUseAi={canUseAi}
+              authLoaded={isLoaded}
               useAiForName={useAiForName}
-              setUseAiForName={setUseAiForName}
+              setUseAiForName={handleUseAiForNameChange}
               prefix={prefix}
               setPrefix={setPrefix}
               brandPrompt={brandPrompt}

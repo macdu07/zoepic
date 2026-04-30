@@ -68,3 +68,10 @@ export const conversionLogs = pgTable("conversion_logs", {
   aiUsed: boolean("ai_used").notNull().default(false),
   createdAt: timestamp("created_at").notNull().defaultNow()
 });
+
+export const guestConversionLogs = pgTable("guest_conversion_logs", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  guestId: text("guest_id").notNull(),
+  fileCount: integer("file_count").notNull(),
+  createdAt: timestamp("created_at").notNull().defaultNow()
+});

@@ -19,8 +19,8 @@ export default function HeroButtons({
 
   if (isPending) return <div className="h-12" />;
 
-  const label = primaryLabel ?? (user ? "Ir al Dashboard" : "Comenzar Gratis");
-  const href = user ? "/dashboard" : "/signup";
+  const label = primaryLabel ?? (user ? "Ir al Dashboard" : "Probar Conversor");
+  const href = user ? "/dashboard" : "/convert";
 
   return (
     <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
