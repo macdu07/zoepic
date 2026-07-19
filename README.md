@@ -67,7 +67,7 @@ src/
 ### Requisitos Previos
 
 - Node.js 18+
-- npm
+- pnpm 11.13.1 (mediante Corepack)
 
 ### Instalación
 
@@ -81,7 +81,8 @@ src/
 2. **Instalar dependencias:**
 
    ```bash
-   npm install
+   corepack enable
+   pnpm install --frozen-lockfile
    ```
 
 3. **Configurar variables de entorno:**
@@ -102,7 +103,7 @@ src/
 4. **Ejecutar el servidor de desarrollo:**
 
    ```bash
-   npm run dev
+   pnpm dev
    ```
 
 5. Abre tu navegador en `http://localhost:9002`.
@@ -111,13 +112,13 @@ src/
 
 | Comando                | Descripción                                     |
 | ---------------------- | ----------------------------------------------- |
-| `npm run dev`          | Servidor de desarrollo (puerto 9002, Turbopack) |
-| `npm run build`        | Build de producción                             |
-| `npm run start`        | Servidor de producción                          |
-| `npm run lint`         | Ejecutar ESLint                                 |
-| `npm run typecheck`    | Verificación de tipos TypeScript                |
-| `npm run genkit:dev`   | Servidor de desarrollo de Genkit                |
-| `npm run genkit:watch` | Watch mode para flujos de IA                    |
+| `pnpm dev`          | Servidor de desarrollo (puerto 9002, Turbopack) |
+| `pnpm build`        | Build de producción                             |
+| `pnpm start`        | Servidor de producción                          |
+| `pnpm lint`         | Ejecutar ESLint                                 |
+| `pnpm typecheck`    | Verificación de tipos TypeScript                |
+| `pnpm genkit:dev`   | Servidor de desarrollo de Genkit                |
+| `pnpm genkit:watch` | Watch mode para flujos de IA                    |
 
 ---
 

@@ -1,14 +1,15 @@
 # Dockerfile
 FROM node:20-alpine AS base
+RUN corepack enable && corepack prepare pnpm@11.13.1 --activate
 
 # Install dependencies only when needed
 FROM base AS deps
 RUN apk add --no-cache libc6-compat
 WORKDIR /app
 
-# Instala usando npm (tu paquete principal)
-COPY package.json package-lock.json ./
-RUN npm ci
+# Install dependencies from the pnpm lockfile
+COPY package.json pnpm-lock.yaml ./
+RUN pnpm install --frozen-lockfile
 
 # Rebuild the source code only when needed
 FROM base AS builder
@@ -27,7 +28,7 @@ ENV NEXT_PUBLIC_INSFORGE_ANON_KEY=$NEXT_PUBLIC_INSFORGE_ANON_KEY
 ARG NEXT_PUBLIC_PAYPAL_CLIENT_ID
 ENV NEXT_PUBLIC_PAYPAL_CLIENT_ID=$NEXT_PUBLIC_PAYPAL_CLIENT_ID
 
-RUN npm run build
+RUN pnpm build
 
 # Production image, copy all the files and run next
 FROM base AS runner

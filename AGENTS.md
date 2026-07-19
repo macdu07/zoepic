@@ -16,17 +16,17 @@ ZoePic es una aplicación web desarrollada con Next.js (App Router) para convert
 
 ### Development
 ```bash
-npm run dev              # Start dev server on port 9002
-npm run build            # Production build
-npm run start            # Start production server
-npm run lint             # Run ESLint
-npm run typecheck        # Run TypeScript type checking
+pnpm dev                  # Start dev server on port 9002
+pnpm build                # Production build
+pnpm start                # Start production server
+pnpm lint                 # Run ESLint
+pnpm typecheck            # Run TypeScript type checking
 ```
 
 ### Genkit (AI Flows)
 ```bash
-npm run genkit:dev       # Start Genkit dev server
-npm run genkit:watch     # Watch mode for AI flows
+pnpm genkit:dev           # Start Genkit dev server
+pnpm genkit:watch         # Watch mode for AI flows
 ```
 
 ---

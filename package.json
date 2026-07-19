@@ -2,6 +2,7 @@
   "name": "zoepic",
   "version": "0.1.0",
   "private": true,
+  "packageManager": "pnpm@11.13.1",
   "scripts": {
     "dev": "next dev --turbopack -p 9002",
     "genkit:dev": "genkit start -- tsx src/ai/dev.ts",
