@@ -17,6 +17,7 @@ import Link from "next/link";
 
 interface ConversionControlsProps {
   canUseAi: boolean;
+  isLoggedIn: boolean;
   authLoaded: boolean;
   useAiForName: boolean;
   setUseAiForName: (value: boolean) => void;
@@ -39,6 +40,7 @@ interface ConversionControlsProps {
 
 export function ConversionControls({
   canUseAi,
+  isLoggedIn,
   authLoaded,
   useAiForName,
   setUseAiForName,
@@ -74,7 +76,7 @@ export function ConversionControls({
         </Label>
       </div>
 
-      {!canUseAi && authLoaded && (
+      {!canUseAi && authLoaded && !isLoggedIn && (
         <p className="text-xs text-muted-foreground">
           La conversión a WebP está disponible sin cuenta. Para usar IA y
           administrar tus límites o suscripción,{" "}
@@ -86,6 +88,16 @@ export function ConversionControls({
             inicia sesión
           </Link>
           .
+        </p>
+      )}
+
+      {!canUseAi && authLoaded && isLoggedIn && (
+        <p className="text-xs text-muted-foreground">
+          El renombrado con IA está disponible solo en planes de pago.{" "}
+          <Link href="/dashboard/usage" className="text-primary underline underline-offset-4">
+            Mejora tu plan
+          </Link>{" "}
+          para desbloquearlo.
         </p>
       )}
 

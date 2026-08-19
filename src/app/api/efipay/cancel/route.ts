@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { cancelPayPalSubscription } from "@/lib/paypal";
+import { cancelEfipaySubscription } from "@/lib/efipay";
 import { PLANS } from "@/lib/usage-types";
 import { db } from "@/db/db";
 import { userProfiles } from "@/db/schema";
@@ -8,18 +8,16 @@ import { requireSession } from "@/lib/auth-server";
 import { sendEmail, emailWrapper } from "@/lib/email";
 
 /**
- * POST /api/paypal/cancel
- * Cancela la suscripción de PayPal del usuario autenticado y lo regresa al plan Starter.
+ * POST /api/efipay/cancel
+ * Cancela la suscripción de EfyPay del usuario autenticado y lo regresa al plan Starter.
  * El userId se obtiene siempre de la sesión del servidor — nunca del body.
  */
 export async function POST() {
   try {
-    // 1. Verificar sesión — 401 si no autenticado
     const { session, errorResponse } = await requireSession();
     if (errorResponse) return errorResponse;
     const userId = session.user.id;
 
-    // 2. Obtener el perfil del usuario autenticado
     const profileRecords = await db
       .select()
       .from(userProfiles)
@@ -35,20 +33,20 @@ export async function POST() {
 
     const profile = profileRecords[0];
 
-    if (!profile.paypalSubscriptionId) {
+    if (!profile.efipaySubscriptionId) {
       return NextResponse.json(
         { error: "No hay suscripción activa para cancelar" },
         { status: 400 },
       );
     }
 
-    // 3. Cancelar con PayPal
-    await cancelPayPalSubscription(
-      profile.paypalSubscriptionId,
-      "Usuario solicitó cancelación",
-    );
+    // Cancelar en EfyPay. Si falla (ej. ya terminada), continuamos con la baja.
+    try {
+      await cancelEfipaySubscription(profile.efipaySubscriptionId);
+    } catch (cancelErr) {
+      console.error("EfyPay cancel warning:", cancelErr);
+    }
 
-    // 4. Bajar al plan Starter
     const starter = PLANS.starter;
     try {
       await db
@@ -57,7 +55,7 @@ export async function POST() {
           plan: "starter",
           aiConversionsLimit: starter.aiConversionsLimit,
           maxBatchSize: starter.maxBatchSize,
-          paypalSubscriptionId: null,
+          efipaySubscriptionId: null,
           subscriptionStatus: "cancelled",
         })
         .where(eq(userProfiles.userId, userId));
@@ -77,11 +75,11 @@ export async function POST() {
         <p>Tu suscripción en <strong>ZoePic</strong> ha sido cancelada exitosamente. Has vuelto al plan Starter.</p>
         <div style="background:#f0f5e8;border-radius:8px;padding:24px;margin:24px 0">
           <p style="margin:8px 0"><strong>Plan actual:</strong> Starter (gratuito)</p>
-          <p style="margin:8px 0"><strong>Conversiones IA / mes:</strong> ${starter.aiConversionsLimit}</p>
+          <p style="margin:8px 0"><strong>Conversiones IA / mes:</strong> No incluidas (plan gratuito)</p>
           <p style="margin:8px 0"><strong>Conversiones WebP / día:</strong> ${starter.webpConversionsLimit}</p>
           <p style="margin:8px 0"><strong>Tamaño máximo de lote:</strong> ${starter.maxBatchSize} imágenes</p>
         </div>
-        <p>Si cambias de opinión, puedes reactivar tu plan en cualquier momento desde tu <a href="https://zoepic.online/dashboard/plan" style="color:#668f3d">panel de plan</a>.</p>
+        <p>Si cambias de opinión, puedes reactivar tu plan en cualquier momento desde tu <a href="https://zoepic.online/dashboard/usage" style="color:#668f3d">panel de uso</a>.</p>
         <p style="color:#666;font-size:13px">Gracias por haber usado ZoePic.</p>
       `)
     ).catch(err => console.error("Error enviando email de cancelación:", err));

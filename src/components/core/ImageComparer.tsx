@@ -6,7 +6,6 @@ import NextImage from 'next/image';
 import { Slider } from '@/components/ui/slider';
 import { ImageIcon, MoveHorizontal } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { Skeleton } from '@/components/ui/skeleton';
 
 interface ImageComparerProps {
   original?: string;

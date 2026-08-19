@@ -9,7 +9,7 @@ import { AnimatedSection } from "@/components/core/AnimatedSection";
 export const metadata: Metadata = {
   title: "Conversor WebP Gratis | ZoePic",
   description:
-    "Convierte imágenes a WebP sin iniciar sesión. Crea una cuenta solo si quieres usar renombrado con IA o gestionar tu suscripción.",
+    "Convierte imágenes a WebP sin iniciar sesión. El renombrado con IA está disponible solo en planes de pago.",
   alternates: { canonical: "/convert" },
 };
 
@@ -51,8 +51,8 @@ export default function ConvertPage() {
           <AnimatedSection variant="fadeUp" delay={0.24}>
             <p className="text-base md:text-lg text-muted-foreground max-w-2xl mx-auto">
               Usa el conversor gratis con hasta 100 imágenes al día. Si quieres
-              renombrado con IA o gestionar tu suscripción, necesitas una
-              cuenta.
+              renombrado con IA o gestionar tu suscripción, necesitas una cuenta
+              con un plan de pago.
             </p>
           </AnimatedSection>
         </div>

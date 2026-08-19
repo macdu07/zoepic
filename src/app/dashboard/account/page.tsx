@@ -343,7 +343,7 @@ export default function AccountPage() {
                                 <p className="font-semibold">{planInfo.name}</p>
                                 <p className="text-sm text-muted-foreground">
                                     {planInfo.price === 0 && planInfo.name !== "Unlimited" ? "Gratis" : planInfo.name === "Unlimited" ? "Plan Ilimitado" : `$${planInfo.price}/mes`} —{" "}
-                                    {planInfo.aiConversionsLimit >= 1000000 ? "Ilimitadas conversiones IA/mes" : `${planInfo.aiConversionsLimit.toLocaleString()} conversiones IA/mes`}
+                                    {planInfo.aiConversionsLimit >= 1000000 ? "Ilimitadas conversiones IA/mes" : planInfo.aiConversionsLimit > 0 ? `${planInfo.aiConversionsLimit.toLocaleString()} conversiones IA/mes` : "IA no incluida"}
                                 </p>
                             </div>
                         </div>
@@ -353,11 +353,11 @@ export default function AccountPage() {
                                 <Label className="text-xs text-muted-foreground flex items-center gap-1 mb-1">
                                     Método de pago actual
                                 </Label>
-                                {appProfile?.subscriptionStatus === "active" && appProfile?.paypalSubscriptionId ? (
+                                {appProfile?.subscriptionStatus === "active" && appProfile?.efipaySubscriptionId ? (
                                     <div className="p-3 rounded-lg border border-primary/20 bg-primary/5 flex items-center justify-between">
                                         <div className="flex items-center gap-2">
-                                            <div className="w-8 h-5 rounded bg-white flex items-center justify-center font-bold text-[10px] text-blue-800 italic shadow-sm tracking-tighter">
-                                                PayPal
+                                            <div className="w-8 h-5 rounded bg-white flex items-center justify-center font-bold text-[10px] text-indigo-700 italic shadow-sm tracking-tighter">
+                                                EfyPay
                                             </div>
                                             <div className="text-sm font-medium">Cuenta vinculada</div>
                                         </div>
@@ -374,23 +374,14 @@ export default function AccountPage() {
                         </div>
 
                         <div className="flex flex-col sm:flex-row gap-3 pt-2">
-                            {appProfile?.subscriptionStatus === "active" && appProfile?.paypalSubscriptionId ? (
-                                <>
-                                    <Button
-                                        variant="default"
-                                        className="font-semibold flex-1"
-                                        onClick={() => window.open('https://www.paypal.com/myaccount/autopay/', '_blank')}
-                                    >
-                                        Gestionar en PayPal
-                                    </Button>
-                                    <Button
-                                        variant="outline"
-                                        className="font-semibold flex-1"
-                                        onClick={() => router.push('/dashboard/usage')}
-                                    >
-                                        Ver Uso y Cancelar
-                                    </Button>
-                                </>
+                            {appProfile?.subscriptionStatus === "active" && appProfile?.efipaySubscriptionId ? (
+                                <Button
+                                    variant="outline"
+                                    className="font-semibold flex-1"
+                                    onClick={() => router.push('/dashboard/usage')}
+                                >
+                                    Ver Uso y Cancelar
+                                </Button>
                             ) : (
                                 <Button 
                                     variant="default" 

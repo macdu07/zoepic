@@ -3,7 +3,7 @@ import { db } from "@/db/db";
 import { user, session as sessionTable, account, userProfiles, conversionLogs } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import { requireSession } from "@/lib/auth-server";
-import { cancelPayPalSubscription } from "@/lib/paypal";
+import { cancelEfipaySubscription } from "@/lib/efipay";
 import { sendEmail, emailWrapper } from "@/lib/email";
 
 export async function DELETE() {
@@ -21,17 +21,14 @@ export async function DELETE() {
       .where(eq(userProfiles.userId, userId))
       .limit(1);
 
-    // 2. Si tiene suscripción activa en PayPal, cancelarla primero
+    // 2. Si tiene suscripción activa en EfyPay, cancelarla primero
     if (profileRecords && profileRecords.length > 0) {
       const profile = profileRecords[0];
-      if (profile.paypalSubscriptionId && profile.subscriptionStatus === "active") {
+      if (profile.efipaySubscriptionId && profile.subscriptionStatus === "active") {
         try {
-          await cancelPayPalSubscription(
-            profile.paypalSubscriptionId,
-            "Usuario eliminó su cuenta de forma definitiva"
-          );
-        } catch (paypalError) {
-          console.error("No se pudo cancelar la suscripción de PayPal al borrar cuenta:", paypalError);
+          await cancelEfipaySubscription(profile.efipaySubscriptionId);
+        } catch (efipayError) {
+          console.error("No se pudo cancelar la suscripción de EfyPay al borrar cuenta:", efipayError);
           // Seguiremos con el borrado de la cuenta aunque falle o la subscripción no exista,
           // pero al menos lo intentamos.
         }

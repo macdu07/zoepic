@@ -19,7 +19,7 @@ import {
   getUserProfile,
   logConversion,
 } from "@/lib/usage";
-import { PLANS, type UsageCheck } from "@/lib/usage-types";
+import { PLANS, planHasAiAccess, type UsageCheck } from "@/lib/usage-types";
 import { ImageUploader } from "./ImageUploader";
 import { ConversionControls } from "./ConversionControls";
 import {
@@ -113,7 +113,7 @@ export default function ConversionPage() {
   const { data: sessionData, isPending: isLoadedResponse } = useSession();
   const user = sessionData?.user as any;
   const isLoaded = !isLoadedResponse;
-  const canUseAi = Boolean(user);
+  const [canUseAi, setCanUseAi] = useState(false);
   
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [conversionItems, setConversionItems] = useState<ConversionItem[]>([]);
@@ -157,12 +157,18 @@ export default function ConversionPage() {
       getUserProfile(user.id).then((profile) => {
         if (profile) {
           setMaxBatchSize(profile.maxBatchSize);
+          const hasAi = planHasAiAccess(profile.plan);
+          setCanUseAi(hasAi);
+          if (!hasAi) {
+            setUseAiForName(false);
+          }
         }
       });
       return;
     }
 
     if (isLoaded && !user) {
+      setCanUseAi(false);
       setUseAiForName(false);
       setMaxBatchSize(PLANS.starter.maxBatchSize);
     }
@@ -186,11 +192,19 @@ export default function ConversionPage() {
     (value: boolean) => {
       if (!canUseAi) {
         if (value) {
-          toast({
-            title: "Inicia sesión para usar IA",
-            description:
-              "La conversión a WebP es pública, pero el renombrado con IA requiere una cuenta.",
-          });
+          if (!user) {
+            toast({
+              title: "Inicia sesión para usar IA",
+              description:
+                "La conversión a WebP es pública, pero el renombrado con IA requiere una cuenta.",
+            });
+          } else {
+            toast({
+              title: "IA disponible en planes de pago",
+              description:
+                "Tu plan actual no incluye renombrado con IA. Mejora tu plan para usarlo.",
+            });
+          }
         }
         setUseAiForName(false);
         return;
@@ -198,7 +212,7 @@ export default function ConversionPage() {
 
       setUseAiForName(value);
     },
-    [canUseAi, toast],
+    [canUseAi, user, toast],
   );
 
   const processImage = async (
@@ -337,11 +351,17 @@ export default function ConversionPage() {
     }
 
     if (!usageCheck.allowed) {
-      const description = useAiForName
-        ? `Has usado ${usageCheck.used} de ${usageCheck.limit} conversiones IA este mes. Te quedan ${usageCheck.remaining}. Desactiva la IA o actualiza tu plan.`
-        : user
+      let description: string;
+      if (useAiForName) {
+        description =
+          usageCheck.limit <= 0
+            ? "El renombrado con IA está disponible solo en planes de pago. Mejora tu plan para usarlo."
+            : `Has usado ${usageCheck.used} de ${usageCheck.limit} conversiones IA este mes. Te quedan ${usageCheck.remaining}. Desactiva la IA o actualiza tu plan.`;
+      } else {
+        description = user
           ? `Has usado ${usageCheck.used} de ${usageCheck.limit} conversiones WebP hoy en el plan gratuito. Te quedan ${usageCheck.remaining}.`
           : `Has usado ${usageCheck.used} de ${usageCheck.limit} conversiones WebP hoy como invitado. Te quedan ${usageCheck.remaining}. Crea una cuenta si quieres usar IA y gestionar tu suscripción.`;
+      }
       toast({
         title: "Límite alcanzado",
         description,
@@ -533,6 +553,7 @@ export default function ConversionPage() {
 
             <ConversionControls
               canUseAi={canUseAi}
+              isLoggedIn={Boolean(user)}
               authLoaded={isLoaded}
               useAiForName={useAiForName}
               setUseAiForName={handleUseAiForNameChange}

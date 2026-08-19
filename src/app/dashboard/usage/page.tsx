@@ -18,8 +18,8 @@ import {
   FileImage,
 } from "lucide-react";
 import { getUserProfile, getConversionHistory, getWebpUsage } from "@/lib/usage";
-import { PLANS, type UserProfile, type ConversionLog, type PlanKey } from "@/lib/usage-types";
-import PayPalSubscribeButton from "@/components/core/PayPalSubscribeButton";
+import { PLANS, planHasAiAccess, type UserProfile, type ConversionLog, type PlanKey } from "@/lib/usage-types";
+import EfipaySubscribeButton from "@/components/core/EfipaySubscribeButton";
 import { useToast } from "@/hooks/use-toast";
 import { AnimatedSection, StaggerContainer, StaggerItem } from "@/components/core/AnimatedSection";
 
@@ -71,7 +71,7 @@ export default function UsagePage() {
 
     setCancelLoading(true);
     try {
-      const res = await fetch("/api/paypal/cancel", {
+      const res = await fetch("/api/efipay/cancel", {
         method: "POST",
       });
       const data = await res.json();
@@ -116,19 +116,22 @@ export default function UsagePage() {
     );
   }
 
-  const usagePercent = Math.min(
-    Math.round(
-      (profile.aiConversionsUsed / profile.aiConversionsLimit) * 100,
-    ),
-    100,
-  );
+  const usagePercent =
+    profile.aiConversionsLimit > 0
+      ? Math.min(
+          Math.round(
+            (profile.aiConversionsUsed / profile.aiConversionsLimit) * 100,
+          ),
+          100,
+        )
+      : 0;
   const planInfo = PLANS[profile.plan as PlanKey] ?? PLANS.starter;
   const periodStart = new Date(profile.periodStart);
   const periodEnd = new Date(periodStart);
   periodEnd.setDate(periodEnd.getDate() + 30);
 
   const hasActiveSubscription =
-    profile.subscriptionStatus === "active" && profile.paypalSubscriptionId;
+    profile.subscriptionStatus === "active" && profile.efipaySubscriptionId;
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -163,7 +166,7 @@ export default function UsagePage() {
             {hasActiveSubscription && (
               <div className="flex items-center gap-1.5 text-sm text-emerald-500 font-medium">
                 <CheckCircle className="h-4 w-4" />
-                Suscripción activa vía PayPal
+                Suscripción activa vía EfyPay
               </div>
             )}
 
@@ -172,7 +175,9 @@ export default function UsagePage() {
                 <Sparkles className="h-3.5 w-3.5 text-primary" />
                 {planInfo.aiConversionsLimit >= 1000000
                   ? "Ilimitados renombrados IA/mes"
-                  : `${planInfo.aiConversionsLimit.toLocaleString()} renombrados IA/mes`}
+                  : planInfo.aiConversionsLimit > 0
+                    ? `${planInfo.aiConversionsLimit.toLocaleString()} renombrados IA/mes`
+                    : "IA no incluida en este plan"}
               </li>
               <li className="flex items-center gap-2">
                 <ImageIcon className="h-3.5 w-3.5 text-primary" />
@@ -230,35 +235,52 @@ export default function UsagePage() {
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="text-center">
-              <span className="text-4xl font-extrabold text-primary">
-                {profile.aiConversionsUsed}
-              </span>
-              {profile.aiConversionsLimit >= 1000000 ? (
-                <span className="text-muted-foreground text-lg"> / ∞</span>
-              ) : (
-                <span className="text-muted-foreground text-lg">
-                  {" "}
-                  / {profile.aiConversionsLimit.toLocaleString()}
-                </span>
-              )}
-            </div>
-            {profile.aiConversionsLimit >= 1000000 ? (
-              <div className="flex items-center justify-center pt-2">
-                <p className="text-sm font-medium text-emerald-500 bg-emerald-500/10 px-3 py-1 rounded-full">
-                  Plan Ilimitado Activo
+            {!planHasAiAccess(profile.plan) ? (
+              <div className="text-center py-2">
+                <p className="text-sm text-muted-foreground">
+                  Tu plan no incluye renombrado con IA.
                 </p>
+                <Button
+                  variant="link"
+                  className="mt-1 p-0 text-primary"
+                  onClick={() => setShowUpgrade(true)}
+                >
+                  Mejora tu plan para desbloquearlo
+                </Button>
               </div>
             ) : (
               <>
-                <Progress value={usagePercent} className="h-3" />
-                <p className="text-xs text-center text-muted-foreground">
-                  {usagePercent}% utilizado — te quedan{" "}
-                  {(
-                    profile.aiConversionsLimit - profile.aiConversionsUsed
-                  ).toLocaleString()}{" "}
-                  conversiones AI
-                </p>
+                <div className="text-center">
+                  <span className="text-4xl font-extrabold text-primary">
+                    {profile.aiConversionsUsed}
+                  </span>
+                  {profile.aiConversionsLimit >= 1000000 ? (
+                    <span className="text-muted-foreground text-lg"> / ∞</span>
+                  ) : (
+                    <span className="text-muted-foreground text-lg">
+                      {" "}
+                      / {profile.aiConversionsLimit.toLocaleString()}
+                    </span>
+                  )}
+                </div>
+                {profile.aiConversionsLimit >= 1000000 ? (
+                  <div className="flex items-center justify-center pt-2">
+                    <p className="text-sm font-medium text-emerald-500 bg-emerald-500/10 px-3 py-1 rounded-full">
+                      Plan Ilimitado Activo
+                    </p>
+                  </div>
+                ) : (
+                  <>
+                    <Progress value={usagePercent} className="h-3" />
+                    <p className="text-xs text-center text-muted-foreground">
+                      {usagePercent}% utilizado — te quedan{" "}
+                      {(
+                        profile.aiConversionsLimit - profile.aiConversionsUsed
+                      ).toLocaleString()}{" "}
+                      conversiones AI
+                    </p>
+                  </>
+                )}
               </>
             )}
           </CardContent>
@@ -324,7 +346,7 @@ export default function UsagePage() {
                   Soporte prioritario
                 </li>
               </ul>
-              <PayPalSubscribeButton
+              <EfipaySubscribeButton
                 planKey="pro"
                 planLabel="Pro"
                 onSuccess={() => {
@@ -357,7 +379,7 @@ export default function UsagePage() {
                   Soporte prioritario
                 </li>
               </ul>
-              <PayPalSubscribeButton
+              <EfipaySubscribeButton
                 planKey="agency"
                 planLabel="Agency"
                 onSuccess={() => {

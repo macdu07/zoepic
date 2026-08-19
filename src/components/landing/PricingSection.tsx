@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Check, X } from "lucide-react";
 import { useSession } from "@/lib/auth-client";
-import PayPalSubscribeButton from "@/components/core/PayPalSubscribeButton";
+import EfipaySubscribeButton from "@/components/core/EfipaySubscribeButton";
 import { StaggerContainer, StaggerItem } from "@/components/core/AnimatedSection";
 
 const ANNUAL_DISCOUNT = 0.25;
@@ -19,7 +19,7 @@ const plans = [
     description: "Perfecto para probar la herramienta.",
     features: [
       { text: "100 conversiones WebP/día", included: true },
-      { text: "50 renombrados con IA/mes", included: true },
+      { text: "Renombrado con IA", included: false },
       { text: "Hasta 5 imágenes por lote", included: true },
       { text: "Soporte prioritario", included: false },
     ],
@@ -183,9 +183,10 @@ export default function PricingSection() {
                   ))}
 
                 {plan.key !== "starter" && !isPending && user && (
-                  <PayPalSubscribeButton
+                  <EfipaySubscribeButton
                     planKey={plan.key}
                     planLabel={plan.name}
+                    billingPeriod={billingAnnual ? "annual" : "monthly"}
                     onSuccess={() => (window.location.href = "/dashboard/usage")}
                   />
                 )}

@@ -6,7 +6,7 @@ import { cookies } from "next/headers";
 import { randomUUID } from "crypto";
 import { eq, desc, and, gte, sql } from "drizzle-orm";
 
-import { PLANS, type UserProfile, type PlanKey, type ConversionLog, type UsageCheck } from "./usage-types";
+import { PLANS, planHasAiAccess, type UserProfile, type PlanKey, type ConversionLog, type UsageCheck } from "./usage-types";
 
 const GUEST_COOKIE_NAME = "zoepic_guest_id";
 
@@ -111,6 +111,20 @@ export async function checkUsageLimit(
 
     profile.aiConversionsUsed = 0;
     profile.periodStart = now;
+  }
+
+  // AI (renombrado con IA) está reservado para planes de pago.
+  // Se valida por plan, no por el límite almacenado, para cubrir
+  // perfiles "starter" heredados con un límite antiguo distinto de 0.
+  if (useAi && !planHasAiAccess(profile.plan)) {
+    return {
+      allowed: false,
+      remaining: 0,
+      limit: 0,
+      used: profile.aiConversionsUsed,
+      maxBatchSize: profile.maxBatchSize,
+      plan: profile.plan as PlanKey,
+    };
   }
 
   // If not using AI, check WebP-only limit (only enforced for starter plan)

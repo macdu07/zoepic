@@ -70,9 +70,10 @@ export default function PrivacyPolicyContent() {
                 período de facturación actual.
               </li>
               <li>
-                <strong>Datos de pago:</strong> gestionados íntegramente por
-                PayPal. ZoePic no almacena ni tiene acceso a los datos de tu
-                tarjeta o cuenta bancaria.
+                <strong>Datos de pago:</strong> los datos de tu tarjeta se
+                transmiten de forma segura a EfyPay para procesar el cobro
+                recurrente. ZoePic no almacena los datos de tu tarjeta ni de tu
+                cuenta bancaria.
               </li>
               <li>
                 <strong>Datos técnicos:</strong> dirección IP, tipo de
@@ -140,7 +141,7 @@ export default function PrivacyPolicyContent() {
                 contratado.
               </li>
               <li>
-                Procesar pagos y gestionar tu suscripción a través de PayPal.
+                Procesar pagos y gestionar tu suscripción a través de EfyPay.
               </li>
               <li>
                 Enviarte comunicaciones relacionadas con el servicio (cambios en
@@ -184,7 +185,7 @@ export default function PrivacyPolicyContent() {
             </p>
             <ul className="list-disc pl-6 space-y-2 mt-3">
               <li>
-                <strong>PayPal:</strong> para el procesamiento de pagos y
+                <strong>EfyPay:</strong> para el procesamiento de pagos y
                 suscripciones.
               </li>
               <li>

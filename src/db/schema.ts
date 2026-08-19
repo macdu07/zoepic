@@ -53,11 +53,11 @@ export const userProfiles = pgTable("user_profiles", {
   userId: text("user_id").notNull().references(() => user.id, { onDelete: 'cascade' }),
   plan: text("plan").notNull().default("starter"),
   aiConversionsUsed: integer("ai_conversions_used").notNull().default(0),
-  aiConversionsLimit: integer("ai_conversions_limit").notNull().default(50),
+  aiConversionsLimit: integer("ai_conversions_limit").notNull().default(0),
   maxBatchSize: integer("max_batch_size").notNull().default(5),
   periodStart: timestamp("period_start").notNull().defaultNow(),
   createdAt: timestamp("created_at").notNull().defaultNow(),
-  paypalSubscriptionId: text("paypal_subscription_id"),
+  efipaySubscriptionId: text("efipay_subscription_id"),
   subscriptionStatus: text("subscription_status")
 });
 

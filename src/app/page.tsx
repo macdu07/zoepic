@@ -39,7 +39,7 @@ const FAQ_ITEMS = [
   {
     question: "¿Qué pasa cuando llego al límite de renombrados IA?",
     answer:
-      "La conversión a WebP sigue disponible sin cuenta, con un límite de 100 imágenes por día. Para usar renombrado con IA necesitas una cuenta gratuita o de pago, según los límites de tu plan.",
+      "La conversión a WebP sigue disponible sin cuenta, con un límite de 100 imágenes por día. El renombrado con IA está disponible solo en planes de pago (Pro o Agency).",
   },
   {
     question: "¿Puedo cancelar mi suscripción en cualquier momento?",
@@ -49,7 +49,7 @@ const FAQ_ITEMS = [
   {
     question: "¿El plan anual se puede cambiar a mensual?",
     answer:
-      "Actualmente los planes disponibles son mensuales. El descuento anual refleja el ahorro al comprometerte con un año completo de suscripción.",
+      "La facturación anual se cobra una sola vez al año con un 25% de descuento. Si prefieres el plan mensual, cancela tu suscripción desde el dashboard y vuelve a suscribirte eligiendo la opción mensual.",
   },
 ];
 
@@ -81,7 +81,7 @@ const jsonLd = {
           name: "Starter",
           price: "0",
           priceCurrency: "USD",
-          description: "100 conversiones WebP/día, 50 renombrados IA/mes.",
+          description: "100 conversiones WebP/día. IA no incluida.",
         },
         {
           "@type": "Offer",
@@ -295,7 +295,7 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Pricing — client component (billing toggle + PayPal) */}
+      {/* Pricing — client component (billing toggle + EfyPay) */}
       <PricingSection />
 
       {/* FAQ */}

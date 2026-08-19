@@ -3,7 +3,7 @@ export const PLANS = {
   starter: {
     name: "Starter",
     price: 0,
-    aiConversionsLimit: 50,
+    aiConversionsLimit: 0,
     webpConversionsLimit: 100,
     webpConversionsPeriod: "daily",
     maxBatchSize: 5,
@@ -36,6 +36,13 @@ export const PLANS = {
 
 export type PlanKey = keyof typeof PLANS;
 
+// ─── AI access helpers ────────────────────────────────────────────────
+// AI (renombrado con IA) está disponible solo en planes de pago.
+export function planHasAiAccess(plan: string): boolean {
+  const planConfig = PLANS[plan as PlanKey];
+  return Boolean(planConfig && planConfig.aiConversionsLimit > 0);
+}
+
 export interface UserProfile {
   id: string;
   userId: string;
@@ -45,7 +52,7 @@ export interface UserProfile {
   maxBatchSize: number;
   periodStart: Date;
   createdAt: Date;
-  paypalSubscriptionId: string | null;
+  efipaySubscriptionId: string | null;
   subscriptionStatus: string | null;
 }
 
