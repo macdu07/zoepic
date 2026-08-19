@@ -68,8 +68,14 @@ export async function POST(request: NextRequest) {
     const email = session.user.email;
     let subscriberId = (await getEfipaySubscriberByEmail(email))?.id;
     if (!subscriberId) {
-      const created = await createEfipaySubscriber({ ...subscriber, email });
-      subscriberId = created.id;
+      try {
+        const created = await createEfipaySubscriber({ ...subscriber, email });
+        subscriberId = created.id;
+      } catch (err) {
+        throw new Error(
+          `Error creando suscriptor en EfyPay: ${err instanceof Error ? err.message : err}`,
+        );
+      }
     }
 
     const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "https://zoepic.online";
@@ -79,13 +85,20 @@ export async function POST(request: NextRequest) {
       billingPeriod === "annual" ? "(Anual)" : "(Mensual)"
     }`;
 
-    const subscription = await createEfipaySubscription({
-      planId,
-      subscriberId,
-      cardInformation: card,
-      description: `Suscripción ${planLabel} — ZoePic`,
-      webhookUrl,
-    });
+    let subscription: Record<string, unknown>;
+    try {
+      subscription = await createEfipaySubscription({
+        planId,
+        subscriberId,
+        cardInformation: card,
+        description: `Suscripción ${planLabel} — ZoePic`,
+        webhookUrl,
+      });
+    } catch (err) {
+      throw new Error(
+        `Error creando suscripción en EfyPay: ${err instanceof Error ? err.message : err}`,
+      );
+    }
 
     const subscriptionId = (subscription as { id?: string })?.id;
     if (!subscriptionId) {

@@ -33,6 +33,7 @@ async function efipayFetch<T = Record<string, unknown>>(
     headers: {
       Authorization: `Bearer ${getApiToken()}`,
       "Content-Type": "application/json",
+      Accept: "application/json",
     },
     ...(options.body !== undefined ? { body: JSON.stringify(options.body) } : {}),
   });
@@ -70,7 +71,24 @@ function extractEfipayError(
       }
     }
   }
-  return `EfyPay error ${status}: ${raw.slice(0, 300)}`;
+
+  // Si no es JSON, puede ser una página de error HTML. Extraer texto legible.
+  const text = stripHtml(raw);
+  if (text) {
+    return `EfyPay error ${status}: ${text.slice(0, 400)}`;
+  }
+  return `EfyPay error ${status}`;
+}
+
+function stripHtml(html: string): string {
+  return html
+    .replace(/<script[\s\S]*?<\/script>/gi, " ")
+    .replace(/<style[\s\S]*?<\/style>/gi, " ")
+    .replace(/<[^>]+>/g, " ")
+    .replace(/&nbsp;/g, " ")
+    .replace(/&amp;/g, "&")
+    .replace(/\s+/g, " ")
+    .trim();
 }
 
 // ─── Webhook signature verification ───────────────────────────────────
