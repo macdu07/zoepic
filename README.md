@@ -66,7 +66,7 @@ src/
 
 ### Requisitos Previos
 
-- Node.js 18+
+- Node.js 22.13+
 - pnpm 11.13.1 (mediante Corepack)
 
 ### Instalación
