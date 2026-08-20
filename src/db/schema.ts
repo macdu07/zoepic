@@ -1,4 +1,4 @@
-import { pgTable, text, integer, timestamp, boolean, uuid } from "drizzle-orm/pg-core";
+import { pgTable, text, integer, timestamp, boolean, uuid, uniqueIndex } from "drizzle-orm/pg-core";
 
 export const user = pgTable("user", {
 					id: text("id").primaryKey(),
@@ -48,18 +48,25 @@ export const verification = pgTable("verification", {
 
 // Custom App Tables
 
-export const userProfiles = pgTable("user_profiles", {
-  id: uuid("id").primaryKey().defaultRandom(),
-  userId: text("user_id").notNull().references(() => user.id, { onDelete: 'cascade' }),
-  plan: text("plan").notNull().default("starter"),
-  aiConversionsUsed: integer("ai_conversions_used").notNull().default(0),
-  aiConversionsLimit: integer("ai_conversions_limit").notNull().default(0),
-  maxBatchSize: integer("max_batch_size").notNull().default(5),
-  periodStart: timestamp("period_start").notNull().defaultNow(),
-  createdAt: timestamp("created_at").notNull().defaultNow(),
-  efipaySubscriptionId: text("efipay_subscription_id"),
-  subscriptionStatus: text("subscription_status")
-});
+export const userProfiles = pgTable(
+  "user_profiles",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    userId: text("user_id").notNull().references(() => user.id, { onDelete: 'cascade' }),
+    plan: text("plan").notNull().default("starter"),
+    aiConversionsUsed: integer("ai_conversions_used").notNull().default(0),
+    aiConversionsLimit: integer("ai_conversions_limit").notNull().default(0),
+    maxBatchSize: integer("max_batch_size").notNull().default(5),
+    periodStart: timestamp("period_start").notNull().defaultNow(),
+    createdAt: timestamp("created_at").notNull().defaultNow(),
+    efipaySubscriptionId: text("efipay_subscription_id"),
+    subscriptionStatus: text("subscription_status"),
+  },
+  (table) => [
+    uniqueIndex("user_profiles_efipay_subscription_id_unique")
+      .on(table.efipaySubscriptionId),
+  ],
+);
 
 export const conversionLogs = pgTable("conversion_logs", {
   id: uuid("id").primaryKey().defaultRandom(),

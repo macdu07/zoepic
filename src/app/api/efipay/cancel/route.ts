@@ -40,11 +40,18 @@ export async function POST() {
       );
     }
 
-    // Cancelar en EfyPay. Si falla (ej. ya terminada), continuamos con la baja.
+    // No modificar la DB hasta que EfyPay confirme la cancelación.
     try {
       await cancelEfipaySubscription(profile.efipaySubscriptionId);
     } catch (cancelErr) {
-      console.error("EfyPay cancel warning:", cancelErr);
+      console.error("EfyPay cancel error:", cancelErr);
+      return NextResponse.json(
+        {
+          error:
+            "EfyPay no confirmó la cancelación. Tu suscripción sigue registrada y puedes reintentarlo.",
+        },
+        { status: 502 },
+      );
     }
 
     const starter = PLANS.starter;

@@ -21,16 +21,21 @@ export async function DELETE() {
       .where(eq(userProfiles.userId, userId))
       .limit(1);
 
-    // 2. Si tiene suscripción activa en EfyPay, cancelarla primero
+    // 2. Cancelar cualquier suscripción antes de eliminar su identificador.
     if (profileRecords && profileRecords.length > 0) {
       const profile = profileRecords[0];
-      if (profile.efipaySubscriptionId && profile.subscriptionStatus === "active") {
+      if (profile.efipaySubscriptionId) {
         try {
           await cancelEfipaySubscription(profile.efipaySubscriptionId);
         } catch (efipayError) {
           console.error("No se pudo cancelar la suscripción de EfyPay al borrar cuenta:", efipayError);
-          // Seguiremos con el borrado de la cuenta aunque falle o la subscripción no exista,
-          // pero al menos lo intentamos.
+          return NextResponse.json(
+            {
+              error:
+                "No pudimos confirmar la cancelación en EfyPay. La cuenta no fue eliminada para evitar cobros sin seguimiento.",
+            },
+            { status: 502 },
+          );
         }
       }
     }
