@@ -142,6 +142,42 @@ src/
 
 ---
 
+## Despliegue en Dokploy
+
+La opción recomendada es crear una **Application** conectada al repositorio de GitHub y construirla con el `Dockerfile`. No se necesita Docker Compose porque Neon, EfiPay, SMTP y el resto de servicios son externos.
+
+### Configuración de la aplicación
+
+- Repositorio: `macdu07/zoepic`
+- Rama: `main`
+- Build type: `Dockerfile`
+- Build context: `/`
+- Dockerfile path: `/Dockerfile`
+- Puerto interno: `3000`
+- Health check: `GET /api/health`
+- Autodeploy: habilitado para los pushes a `main`
+
+### Dominio
+
+Configura `zoepic.online` y `www.zoepic.online` sobre el puerto `3000`, con HTTPS y certificado Let's Encrypt. En Cloudflare, los registros DNS deben apuntar a la IP pública del servidor Dokploy.
+
+### Variables de producción
+
+Carga en Dokploy todas las variables descritas en `.env.example`. Para producción, usa:
+
+```env
+BETTER_AUTH_URL=https://zoepic.online
+NEXT_PUBLIC_APP_URL=https://zoepic.online
+EFIPAY_BASE_URL=https://sag.efipay.co
+SMTP_FROM="ZoePic <noreply@zoepic.online>"
+```
+
+`NEXT_PUBLIC_APP_URL` y `NEXT_PUBLIC_CLOUDFLARE_TURNSTILE_SITE_KEY` también deben estar disponibles durante el build porque Next.js las incorpora al bundle del navegador. No expongas como build arguments las demás variables: son secretos y deben existir únicamente en runtime.
+
+Una vez publicada la aplicación, configura en EfiPay el webhook `https://zoepic.online/api/efipay/webhook` y utiliza el mismo `EFIPAY_WEBHOOK_TOKEN` guardado en Dokploy.
+
+---
+
 ## Licencia
 
 Proyecto privado. Todos los derechos reservados.
