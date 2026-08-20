@@ -18,12 +18,12 @@ COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 RUN mkdir -p /app/public
 
-# Environment variables must be present at build time
-ARG NEXT_PUBLIC_INSFORGE_BASE_URL
-ENV NEXT_PUBLIC_INSFORGE_BASE_URL=$NEXT_PUBLIC_INSFORGE_BASE_URL
+# Next.js embeds NEXT_PUBLIC_* variables in the client bundle at build time.
+ARG NEXT_PUBLIC_APP_URL=https://zoepic.online
+ENV NEXT_PUBLIC_APP_URL=$NEXT_PUBLIC_APP_URL
 
-ARG NEXT_PUBLIC_INSFORGE_ANON_KEY
-ENV NEXT_PUBLIC_INSFORGE_ANON_KEY=$NEXT_PUBLIC_INSFORGE_ANON_KEY
+ARG NEXT_PUBLIC_CLOUDFLARE_TURNSTILE_SITE_KEY
+ENV NEXT_PUBLIC_CLOUDFLARE_TURNSTILE_SITE_KEY=$NEXT_PUBLIC_CLOUDFLARE_TURNSTILE_SITE_KEY
 
 RUN pnpm build
 
@@ -49,4 +49,9 @@ USER nextjs
 EXPOSE 3000
 
 ENV PORT 3000
+ENV HOSTNAME "0.0.0.0"
+
+HEALTHCHECK --interval=30s --timeout=10s --start-period=30s --retries=3 \
+  CMD wget --no-verbose --tries=1 --spider http://127.0.0.1:3000/api/health || exit 1
+
 CMD ["node", "server.js"]
