@@ -353,7 +353,7 @@ export default function AccountPage() {
                                 <Label className="text-xs text-muted-foreground flex items-center gap-1 mb-1">
                                     Método de pago actual
                                 </Label>
-                                {appProfile?.subscriptionStatus === "active" && appProfile?.efipaySubscriptionId ? (
+                                {appProfile?.efipaySubscriptionId ? (
                                     <div className="p-3 rounded-lg border border-primary/20 bg-primary/5 flex items-center justify-between">
                                         <div className="flex items-center gap-2">
                                             <div className="w-8 h-5 rounded bg-white flex items-center justify-center font-bold text-[10px] text-indigo-700 italic shadow-sm tracking-tighter">
@@ -362,7 +362,7 @@ export default function AccountPage() {
                                             <div className="text-sm font-medium">Cuenta vinculada</div>
                                         </div>
                                         <div className="text-xs text-emerald-600 font-medium bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
-                                            Activo
+                                            {appProfile.subscriptionStatus === "active" ? "Activo" : "Registrado"}
                                         </div>
                                     </div>
                                 ) : (
@@ -374,7 +374,7 @@ export default function AccountPage() {
                         </div>
 
                         <div className="flex flex-col sm:flex-row gap-3 pt-2">
-                            {appProfile?.subscriptionStatus === "active" && appProfile?.efipaySubscriptionId ? (
+                            {appProfile?.efipaySubscriptionId ? (
                                 <Button
                                     variant="outline"
                                     className="font-semibold flex-1"

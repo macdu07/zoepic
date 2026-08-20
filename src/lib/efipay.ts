@@ -6,6 +6,16 @@ import { createHmac, timingSafeEqual } from "crypto";
 
 const EFIPAY_BASE_URL = process.env.EFIPAY_BASE_URL ?? "https://sag.efipay.co";
 
+class EfipayApiError extends Error {
+  constructor(
+    message: string,
+    readonly status: number,
+  ) {
+    super(message);
+    this.name = "EfipayApiError";
+  }
+}
+
 // ─── Credentials helpers ──────────────────────────────────────────────
 function getApiToken(): string {
   const token = process.env.EFIPAY_API_TOKEN;
@@ -36,6 +46,7 @@ async function efipayFetch<T = Record<string, unknown>>(
       Accept: "application/json",
     },
     ...(options.body !== undefined ? { body: JSON.stringify(options.body) } : {}),
+    cache: "no-store",
   });
 
   const text = await res.text();
@@ -47,7 +58,10 @@ async function efipayFetch<T = Record<string, unknown>>(
   }
 
   if (!res.ok) {
-    throw new Error(extractEfipayError(data, res.status, text));
+    throw new EfipayApiError(
+      extractEfipayError(data, res.status, text),
+      res.status,
+    );
   }
 
   return data as T;
@@ -98,9 +112,8 @@ export function verifyEfipayWebhookSignature(
 ): boolean {
   const webhookToken = process.env.EFIPAY_WEBHOOK_TOKEN;
   if (!webhookToken) {
-    // Sin token configurado no se puede verificar; se acepta y se loguea.
-    console.warn("[EfyPay] EFIPAY_WEBHOOK_TOKEN no configurado. Se omite la verificación de firma.");
-    return true;
+    console.error("[EfyPay] EFIPAY_WEBHOOK_TOKEN no configurado.");
+    return false;
   }
   if (!signature) return false;
 
@@ -236,8 +249,11 @@ export async function getEfipaySubscriberByEmail(
     return await efipayFetch<{ id: string }>(
       `/subscriptions/subscriber/${encodeURIComponent(email)}`,
     );
-  } catch {
-    return null;
+  } catch (error) {
+    if (error instanceof EfipayApiError && error.status === 404) {
+      return null;
+    }
+    throw error;
   }
 }
 

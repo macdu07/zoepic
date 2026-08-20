@@ -23,7 +23,16 @@ import { useToast } from "@/hooks/use-toast";
 import { useSession } from "@/lib/auth-client";
 import { Loader2, CreditCard } from "lucide-react";
 
-const IDENTIFICATION_TYPES = ["CC", "CE", "TI", "PA", "PEP", "PPT", "NIT", "Pasaporte", "Otro"];
+const IDENTIFICATION_TYPES = [
+  "CC",
+  "CE",
+  "TI",
+  "PPT",
+  "DNI",
+  "NIT",
+  "Pasaporte",
+  "Otro",
+] as const;
 
 interface EfipaySubscribeButtonProps {
   planKey: "pro" | "agency";

@@ -1,6 +1,6 @@
 # ZoePic
 
-Aplicación web desarrollada con **Next.js (App Router)** para convertir imágenes (JPG, JPEG, PNG) al formato WebP con asistencia de **Inteligencia Artificial**. Utiliza **Neon Serverless Postgres y Better Auth** para autenticación y base de datos, **Genkit con Gemini de Google AI** para generar nombres de archivo optimizados para SEO, y **PayPal Subscriptions API** para la gestión de planes de suscripción.
+Aplicación web desarrollada con **Next.js (App Router)** para convertir imágenes (JPG, JPEG, PNG) al formato WebP con asistencia de **Inteligencia Artificial**. Utiliza **Neon Serverless Postgres y Better Auth** para autenticación y base de datos, **Genkit con Gemini de Google AI** para generar nombres de archivo optimizados para SEO, y **EfiPay** para la gestión de planes de suscripción.
 
 ---
 
@@ -12,7 +12,7 @@ Aplicación web desarrollada con **Next.js (App Router)** para convertir imágen
 - **Comparador visual:** Visor interactivo lado a lado para comparar la imagen original con la convertida.
 - **Estadísticas detalladas:** Tamaño original, tamaño convertido y porcentaje de reducción de peso.
 - **Autenticación Base:** Registro, inicio de sesión y gestión con `better-auth` y validaciones custom.
-- **Planes de suscripción:** Integración con PayPal Subscriptions API para planes Pro y Agency con cobro recurrente mensual.
+- **Planes de suscripción:** Integración con EfiPay para planes Pro y Agency con cobro recurrente mensual o anual.
 - **Dashboard de usuario:** Panel con información de cuenta, historial de uso y gestión de suscripción.
 - **Descarga fácil:** Botón para descargar la imagen WebP con el nombre sugerido.
 - **Interfaz moderna:** Diseño con ShadCN UI, Tailwind CSS y tipografía Geist.
@@ -27,8 +27,8 @@ Aplicación web desarrollada con **Next.js (App Router)** para convertir imágen
 | Lenguaje       | TypeScript (strict)                                  |
 | UI             | React 18, ShadCN UI, Tailwind CSS 3.4                |
 | IA             | Genkit + Gemini (Google AI)                          |
-| Backend & Auth | Neon Postgres, Drizzle ORM, Better Auth                      |
-| Pagos          | PayPal Subscriptions API (`@paypal/react-paypal-js`) |
+| Backend & Auth | Neon Postgres, Drizzle ORM, Better Auth              |
+| Pagos          | EfiPay Subscriptions API                              |
 | Gráficos       | Recharts                                             |
 | Iconos         | Lucide React                                         |
 | Tipografía     | Geist                                                |
@@ -44,7 +44,7 @@ src/
 ├── app/
 │   ├── api/
 │   │   ├── auth/           # Rutas de autenticación
-│   │   └── paypal/         # Rutas de PayPal (suscripciones, webhooks)
+│   │   └── efipay/         # Suscripciones, cancelación y webhooks
 │   ├── dashboard/
 │   │   ├── account/        # Gestión de cuenta
 │   │   └── usage/          # Historial de uso
@@ -94,11 +94,19 @@ src/
    DATABASE_URL=postgresql://neondb_owner:.....
    BETTER_AUTH_SECRET=tu-auth-secret
    BETTER_AUTH_URL=http://localhost:9002
-   NEXT_PUBLIC_PAYPAL_CLIENT_ID=tu-paypal-client-id
-   PAYPAL_CLIENT_SECRET=tu-paypal-client-secret
+   EFIPAY_API_TOKEN=tu-token-de-efipay
+   EFIPAY_OFFICE=tu-id-de-sucursal
+   EFIPAY_WEBHOOK_TOKEN=tu-token-de-webhook
+   EFIPAY_PLAN_ID_PRO=tu-plan-pro-mensual
+   EFIPAY_PLAN_ID_PRO_ANNUAL=tu-plan-pro-anual
+   EFIPAY_PLAN_ID_AGENCY=tu-plan-agency-mensual
+   EFIPAY_PLAN_ID_AGENCY_ANNUAL=tu-plan-agency-anual
    ```
 
    > Consulta `.env.example` como referencia.
+
+   Antes de desplegar esta versión, aplica `drizzle/0001_efipay_subscription.sql`
+   usando una conexión directa —no pooled— de Neon.
 
 4. **Ejecutar el servidor de desarrollo:**
 

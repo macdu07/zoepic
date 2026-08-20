@@ -130,8 +130,7 @@ export default function UsagePage() {
   const periodEnd = new Date(periodStart);
   periodEnd.setDate(periodEnd.getDate() + 30);
 
-  const hasActiveSubscription =
-    profile.subscriptionStatus === "active" && profile.efipaySubscriptionId;
+  const hasManagedSubscription = Boolean(profile.efipaySubscriptionId);
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -163,10 +162,10 @@ export default function UsagePage() {
             </div>
 
             {/* Subscription status badge */}
-            {hasActiveSubscription && (
+            {hasManagedSubscription && (
               <div className="flex items-center gap-1.5 text-sm text-emerald-500 font-medium">
                 <CheckCircle className="h-4 w-4" />
-                Suscripción activa vía EfyPay
+                Suscripción {profile.subscriptionStatus === "active" ? "activa" : "registrada"} vía EfyPay
               </div>
             )}
 
@@ -201,7 +200,7 @@ export default function UsagePage() {
               </Button>
             )}
 
-            {hasActiveSubscription && (
+            {hasManagedSubscription && (
               <Button
                 variant="outline"
                 className="w-full font-semibold mt-2 text-destructive border-destructive/30 hover:bg-destructive/10"

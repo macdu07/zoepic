@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { PLANS, type PlanKey } from "@/lib/usage-types";
 import {
+  cancelEfipaySubscription,
   createEfipaySubscriber,
   getEfipaySubscriberByEmail,
   createEfipaySubscription,
@@ -9,7 +10,7 @@ import {
 } from "@/lib/efipay";
 import { db } from "@/db/db";
 import { userProfiles } from "@/db/schema";
-import { eq } from "drizzle-orm";
+import { and, eq, isNull, or } from "drizzle-orm";
 import { requireSession } from "@/lib/auth-server";
 import { sendEmail, emailWrapper } from "@/lib/email";
 
@@ -17,7 +18,16 @@ const SubscribeSchema = z.object({
   planKey: z.enum(["pro", "agency"], { message: "planKey debe ser 'pro' o 'agency'" }),
   billingPeriod: z.enum(["monthly", "annual"]).default("monthly"),
   subscriber: z.object({
-    identificationType: z.string().min(1, "Tipo de documento requerido"),
+    identificationType: z.enum([
+      "CC",
+      "CE",
+      "TI",
+      "PPT",
+      "DNI",
+      "NIT",
+      "Pasaporte",
+      "Otro",
+    ]),
     idNumber: z.string().min(5, "Número de documento inválido").max(50),
     name: z.string().min(1, "Nombre requerido"),
     lastName: z.string().min(1, "Apellido requerido"),
@@ -41,6 +51,10 @@ const SubscribeSchema = z.object({
  * recurrente con los datos de la tarjeta. El userId se obtiene de la sesión.
  */
 export async function POST(request: NextRequest) {
+  let lockedUserId: string | null = null;
+  let previousSubscriptionStatus: string | null = null;
+  let createdSubscriptionId: string | null = null;
+
   try {
     const { session, errorResponse } = await requireSession();
     if (errorResponse) return errorResponse;
@@ -63,6 +77,60 @@ export async function POST(request: NextRequest) {
         { status: 500 },
       );
     }
+
+    const profiles = await db
+      .select()
+      .from(userProfiles)
+      .where(eq(userProfiles.userId, userId))
+      .limit(1);
+    const profile = profiles[0];
+
+    if (!profile) {
+      return NextResponse.json(
+        { error: "Perfil de usuario no encontrado" },
+        { status: 404 },
+      );
+    }
+
+    if (
+      profile.efipaySubscriptionId ||
+      profile.subscriptionStatus === "active"
+    ) {
+      return NextResponse.json(
+        {
+          error:
+            "Ya tienes una suscripción activa. Cancélala antes de crear otra.",
+        },
+        { status: 409 },
+      );
+    }
+
+    previousSubscriptionStatus = profile.subscriptionStatus;
+    const lockedProfiles = await db
+      .update(userProfiles)
+      .set({ subscriptionStatus: "creating" })
+      .where(
+        and(
+          eq(userProfiles.userId, userId),
+          isNull(userProfiles.efipaySubscriptionId),
+          or(
+            isNull(userProfiles.subscriptionStatus),
+            eq(userProfiles.subscriptionStatus, "cancelled"),
+          ),
+        ),
+      )
+      .returning({ id: userProfiles.id });
+
+    if (lockedProfiles.length === 0) {
+      return NextResponse.json(
+        {
+          error:
+            "Ya hay otra operación de suscripción en curso. Espera un momento antes de reintentar.",
+        },
+        { status: 409 },
+      );
+    }
+    lockedUserId = userId;
 
     // Reutilizar suscriptor existente (email único en EfyPay)
     const email = session.user.email;
@@ -102,33 +170,36 @@ export async function POST(request: NextRequest) {
 
     const subscriptionId = (subscription as { id?: string })?.id;
     if (!subscriptionId) {
-      return NextResponse.json(
-        { error: "No se pudo crear la suscripción en EfyPay." },
-        { status: 502 },
-      );
+      throw new Error("EfyPay no devolvió el ID de la suscripción");
     }
+    createdSubscriptionId = subscriptionId;
 
     const plan = PLANS[planKey as PlanKey];
-    try {
-      await db
-        .update(userProfiles)
-        .set({
-          plan: planKey,
-          aiConversionsLimit: plan.aiConversionsLimit,
-          maxBatchSize: plan.maxBatchSize,
-          aiConversionsUsed: 0,
-          periodStart: new Date(),
-          efipaySubscriptionId: subscriptionId,
-          subscriptionStatus: "active",
-        })
-        .where(eq(userProfiles.userId, userId));
-    } catch (error) {
-      console.error("DB update error:", error);
-      return NextResponse.json(
-        { error: "Error al actualizar el perfil de usuario" },
-        { status: 500 },
-      );
+    const updatedProfiles = await db
+      .update(userProfiles)
+      .set({
+        plan: planKey,
+        aiConversionsLimit: plan.aiConversionsLimit,
+        maxBatchSize: plan.maxBatchSize,
+        aiConversionsUsed: 0,
+        periodStart: new Date(),
+        efipaySubscriptionId: subscriptionId,
+        subscriptionStatus: "active",
+      })
+      .where(
+        and(
+          eq(userProfiles.userId, userId),
+          eq(userProfiles.subscriptionStatus, "creating"),
+          isNull(userProfiles.efipaySubscriptionId),
+        ),
+      )
+      .returning({ id: userProfiles.id });
+
+    if (updatedProfiles.length === 0) {
+      throw new Error("No se pudo vincular la suscripción al perfil bloqueado");
     }
+    lockedUserId = null;
+    createdSubscriptionId = null;
 
     sendEmail(
       email,
@@ -154,8 +225,63 @@ export async function POST(request: NextRequest) {
     });
   } catch (error) {
     console.error("EfyPay subscribe error:", error);
-    const message =
-      error instanceof Error ? error.message : "Error interno del servidor";
-    return NextResponse.json({ error: message }, { status: 500 });
+
+    if (createdSubscriptionId) {
+      try {
+        await cancelEfipaySubscription(createdSubscriptionId);
+        createdSubscriptionId = null;
+      } catch (compensationError) {
+        console.error(
+          "CRITICAL: no se pudo compensar la suscripción EfyPay:",
+          compensationError,
+        );
+
+        if (lockedUserId) {
+          try {
+            await db
+              .update(userProfiles)
+              .set({
+                efipaySubscriptionId: createdSubscriptionId,
+                subscriptionStatus: "cancellation_pending",
+              })
+              .where(eq(userProfiles.userId, lockedUserId));
+          } catch (persistenceError) {
+            console.error(
+              "CRITICAL: tampoco se pudo persistir la suscripción pendiente:",
+              persistenceError,
+            );
+          }
+        }
+
+        return NextResponse.json(
+          {
+            error:
+              "La suscripción requiere conciliación. No vuelvas a enviar el pago y contacta soporte.",
+          },
+          { status: 500 },
+        );
+      }
+    }
+
+    if (lockedUserId) {
+      try {
+        await db
+          .update(userProfiles)
+          .set({ subscriptionStatus: previousSubscriptionStatus })
+          .where(
+            and(
+              eq(userProfiles.userId, lockedUserId),
+              eq(userProfiles.subscriptionStatus, "creating"),
+            ),
+          );
+      } catch (unlockError) {
+        console.error("No se pudo liberar el bloqueo de suscripción:", unlockError);
+      }
+    }
+
+    return NextResponse.json(
+      { error: "No se pudo crear la suscripción. Inténtalo nuevamente." },
+      { status: 502 },
+    );
   }
 }
