@@ -187,6 +187,16 @@ export default function PricingSection() {
                     planKey={plan.key}
                     planLabel={plan.name}
                     billingPeriod={billingAnnual ? "annual" : "monthly"}
+                    planPriceLabel={
+                      billingAnnual
+                        ? `$${(plan.price! * (1 - ANNUAL_DISCOUNT)).toFixed(2)} / mes`
+                        : `$${plan.price!.toFixed(2)} / mes`
+                    }
+                    planBillingNote={
+                      billingAnnual
+                        ? `Facturado anualmente — $${(plan.price! * 12 * (1 - ANNUAL_DISCOUNT)).toFixed(2)}`
+                        : "Facturado mensualmente"
+                    }
                     onSuccess={() => (window.location.href = "/dashboard/usage")}
                   />
                 )}
