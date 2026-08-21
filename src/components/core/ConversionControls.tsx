@@ -78,8 +78,8 @@ export function ConversionControls({
 
       {!canUseAi && authLoaded && !isLoggedIn && (
         <p className="text-xs text-muted-foreground">
-          La conversión a WebP está disponible sin cuenta. Para usar IA y
-          administrar tus límites o suscripción,{" "}
+          La conversión a WebP está disponible sin cuenta. La IA para renombrar
+          archivos está disponible solo con un plan de pago. {" "}
           <Link href="/signup" className="text-primary underline underline-offset-4">
             crea una cuenta
           </Link>
@@ -87,7 +87,7 @@ export function ConversionControls({
           <Link href="/login" className="text-primary underline underline-offset-4">
             inicia sesión
           </Link>
-          .
+          {" "}para elegir tu plan.
         </p>
       )}
 
