@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Figtree } from "next/font/google";
+import Script from "next/script";
 import "./globals.css";
 import { Toaster } from "@/components/ui/toaster";
 import { InsforgeProvider } from "./providers";
@@ -51,6 +52,12 @@ export default function RootLayout({
   return (
     <html lang="es" className="scroll-smooth">
       <body className={`${figtree.variable} antialiased font-sans`}>
+        <Script
+          async
+          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6686161902100366"
+          crossOrigin="anonymous"
+          strategy="afterInteractive"
+        />
         <InsforgeProvider>
           <SmoothScroll>
             {children}
