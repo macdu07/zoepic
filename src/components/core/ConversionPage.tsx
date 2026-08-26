@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback, useEffect, useMemo } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { Progress } from "@/components/ui/progress";
@@ -11,7 +11,12 @@ import {
 import {
   getImageMetadata,
   convertToWebP,
+  ASPECT_RATIO_PRESETS,
+  IMAGE_SIZE_PRESETS,
+  MAX_CUSTOM_DIMENSION,
   type ImageMetadata,
+  type ImageSizingSettings,
+  type ResizeMode,
   type WebPConversionResult,
 } from "@/lib/imageUtils";
 import {
@@ -124,9 +129,105 @@ export default function ConversionPage() {
   const [useAiForName, setUseAiForName] = useState(true);
   const [brandPrompt, setBrandPrompt] = useState("");
   const [useSuffix, setUseSuffix] = useState(false);
+  const [resizeMode, setResizeMode] = useState<ResizeMode>("original");
+  const [selectedPresetId, setSelectedPresetId] = useState("web-hero");
+  const [selectedAspectRatioId, setSelectedAspectRatioId] = useState("1:1");
+  const [customWidth, setCustomWidth] = useState("1200");
+  const [customHeight, setCustomHeight] = useState("630");
   const [maxBatchSize, setMaxBatchSize] = useState(5);
   const [dailyUsageSummary, setDailyUsageSummary] = useState<DailyUsageSummary | null>(null);
   const { toast } = useToast();
+
+  const selectedSizePreset = useMemo(
+    () => IMAGE_SIZE_PRESETS.find((preset) => preset.id === selectedPresetId) ?? IMAGE_SIZE_PRESETS[0],
+    [selectedPresetId],
+  );
+  const selectedAspectRatio = useMemo(
+    () => ASPECT_RATIO_PRESETS.find((ratio) => ratio.id === selectedAspectRatioId) ?? ASPECT_RATIO_PRESETS[0],
+    [selectedAspectRatioId],
+  );
+  const parsedCustomWidth = Number(customWidth);
+  const parsedCustomHeight = Number(customHeight);
+  const customSizeIsValid =
+    Number.isInteger(parsedCustomWidth) &&
+    Number.isInteger(parsedCustomHeight) &&
+    parsedCustomWidth >= 1 &&
+    parsedCustomHeight >= 1 &&
+    parsedCustomWidth <= MAX_CUSTOM_DIMENSION &&
+    parsedCustomHeight <= MAX_CUSTOM_DIMENSION;
+  const sizingError =
+    resizeMode === "custom" && !customSizeIsValid
+      ? `Usa números enteros entre 1 y ${MAX_CUSTOM_DIMENSION} px.`
+      : null;
+  const isSizingValid = resizeMode !== "custom" || customSizeIsValid;
+
+  const sizingSettings = useMemo<ImageSizingSettings>(() => {
+    if (resizeMode === "preset") {
+      return {
+        mode: resizeMode,
+        targetWidth: selectedSizePreset.width,
+        targetHeight: selectedSizePreset.height,
+        aspectRatio: selectedSizePreset.aspectRatio,
+        cropPosition: "center",
+        allowUpscale: true,
+      };
+    }
+
+    if (resizeMode === "aspect-ratio") {
+      return {
+        mode: resizeMode,
+        aspectRatio: selectedAspectRatio.value,
+        cropPosition: "center",
+        allowUpscale: false,
+      };
+    }
+
+    if (resizeMode === "custom" && customSizeIsValid) {
+      return {
+        mode: resizeMode,
+        targetWidth: parsedCustomWidth,
+        targetHeight: parsedCustomHeight,
+        aspectRatio: parsedCustomWidth / parsedCustomHeight,
+        cropPosition: "center",
+        allowUpscale: true,
+      };
+    }
+
+    return {
+      mode: "original",
+      cropPosition: "center",
+      allowUpscale: false,
+    };
+  }, [
+    customSizeIsValid,
+    parsedCustomHeight,
+    parsedCustomWidth,
+    resizeMode,
+    selectedAspectRatio.value,
+    selectedSizePreset,
+  ]);
+
+  const sizingSummary = useMemo(() => {
+    if (resizeMode === "preset") {
+      return `Salida: ${selectedSizePreset.width}×${selectedSizePreset.height} px · ${selectedSizePreset.name}`;
+    }
+    if (resizeMode === "aspect-ratio") {
+      return `Salida: máxima resolución disponible · ${selectedAspectRatio.id}`;
+    }
+    if (resizeMode === "custom") {
+      return customSizeIsValid
+        ? `Salida: ${parsedCustomWidth}×${parsedCustomHeight} px · proporción ${(parsedCustomWidth / parsedCustomHeight).toFixed(2)}:1`
+        : "Salida: completa las medidas para continuar";
+    }
+    return "Salida: dimensiones y proporción originales";
+  }, [
+    customSizeIsValid,
+    parsedCustomHeight,
+    parsedCustomWidth,
+    resizeMode,
+    selectedAspectRatio.id,
+    selectedSizePreset,
+  ]);
 
   const refreshDailyUsageSummary = useCallback(async () => {
     if (!isLoaded) {
@@ -224,6 +325,7 @@ export default function ConversionPage() {
     currentUseAi: boolean,
     currentUseSuffix: boolean,
     currentBrandPrompt: string,
+    currentSizing: ImageSizingSettings,
   ): Promise<Partial<ConversionItem>> => {
     try {
       const metadata = await getImageMetadata(file);
@@ -238,6 +340,15 @@ export default function ConversionPage() {
 
       const webpResult = await convertToWebP(metadata, {
         quality: currentQuality / 100,
+        ...(currentSizing.mode === "preset" || currentSizing.mode === "custom"
+          ? {
+              targetWidth: currentSizing.targetWidth,
+              targetHeight: currentSizing.targetHeight,
+            }
+          : {}),
+        ...(currentSizing.mode === "aspect-ratio"
+          ? { aspectRatio: currentSizing.aspectRatio }
+          : {}),
       });
 
       let finalBaseName = "imagen-convertida";
@@ -332,6 +443,15 @@ export default function ConversionPage() {
       return;
     }
 
+    if (!isSizingValid) {
+      toast({
+        title: "Medidas inválidas",
+        description: sizingError ?? "Revisa el tamaño de salida.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     if (useAiForName && !user) {
       toast({
         title: "Inicia sesión para usar IA",
@@ -379,6 +499,7 @@ export default function ConversionPage() {
     const snapshotUseAi = useAiForName;
     const snapshotUseSuffix = useSuffix;
     const snapshotBrandPrompt = brandPrompt;
+    const snapshotSizing: ImageSizingSettings = { ...sizingSettings };
 
     const initialItems: ConversionItem[] = selectedFiles.map((file, index) => ({
       id: `${file.name}-${index}-${Date.now()}`,
@@ -418,6 +539,7 @@ export default function ConversionPage() {
               snapshotUseAi,
               snapshotUseSuffix,
               snapshotBrandPrompt,
+              snapshotSizing,
             ),
           })),
         );
@@ -567,6 +689,19 @@ export default function ConversionPage() {
               setLanguage={setLanguage}
               compressionQuality={compressionQuality}
               setCompressionQuality={setCompressionQuality}
+              resizeMode={resizeMode}
+              setResizeMode={setResizeMode}
+              selectedPresetId={selectedPresetId}
+              setSelectedPresetId={setSelectedPresetId}
+              selectedAspectRatioId={selectedAspectRatioId}
+              setSelectedAspectRatioId={setSelectedAspectRatioId}
+              customWidth={customWidth}
+              setCustomWidth={setCustomWidth}
+              customHeight={customHeight}
+              setCustomHeight={setCustomHeight}
+              sizingSummary={sizingSummary}
+              sizingError={sizingError}
+              isSizingValid={isSizingValid}
               onConvert={handleConvert}
               onClearFiles={handleClearFiles}
               isLoading={isLoading}

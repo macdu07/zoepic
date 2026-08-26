@@ -190,21 +190,37 @@ export function ConversionResultList({
               {item.status === "done" &&
                 item.originalMetadata &&
                 item.convertedResult && (
-                  <div className="flex items-center gap-2 text-xs text-muted-foreground mt-1">
-                    <span>
-                      {formatBytes(item.originalMetadata.sizeBytes)} →{" "}
-                      {formatBytes(item.convertedResult.sizeBytes)}
-                    </span>
-                    <span className="text-green-500 font-medium">
-                      -
-                      {Math.round(
-                        (1 -
-                          item.convertedResult.sizeBytes /
-                            item.originalMetadata.sizeBytes) *
-                          100,
-                      )}
-                      %
-                    </span>
+                  <div className="mt-1 space-y-0.5 text-xs text-muted-foreground">
+                    <p>
+                      {item.originalMetadata.width}×{item.originalMetadata.height} px →{" "}
+                      <span className="font-medium text-foreground">
+                        {item.convertedResult.width}×{item.convertedResult.height} px
+                      </span>
+                    </p>
+                    <div className="flex flex-wrap items-center gap-2">
+                      <span>
+                        {formatBytes(item.originalMetadata.sizeBytes)} →{" "}
+                        {formatBytes(item.convertedResult.sizeBytes)}
+                      </span>
+                      <span
+                        className={
+                          item.convertedResult.sizeBytes <= item.originalMetadata.sizeBytes
+                            ? "font-medium text-green-500"
+                            : "font-medium text-amber-500"
+                        }
+                      >
+                        {item.convertedResult.sizeBytes <= item.originalMetadata.sizeBytes ? "-" : "+"}
+                        {Math.abs(
+                          Math.round(
+                            (1 -
+                              item.convertedResult.sizeBytes /
+                                item.originalMetadata.sizeBytes) *
+                              100,
+                          ),
+                        )}
+                        %
+                      </span>
+                    </div>
                   </div>
                 )}
               {item.status === "error" && (

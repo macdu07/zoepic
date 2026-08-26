@@ -10,7 +10,7 @@ export async function middleware(request: NextRequest) {
     const { data: session } = await betterFetch<Session>(
       "/api/auth/get-session",
       {
-        baseURL: process.env.BETTER_AUTH_URL || request.nextUrl.origin,
+        baseURL: request.nextUrl.origin,
         headers: {
           cookie: request.headers.get("cookie") || "",
         },
@@ -27,7 +27,7 @@ export async function middleware(request: NextRequest) {
     const { data: session } = await betterFetch<Session>(
       "/api/auth/get-session",
       {
-        baseURL: process.env.BETTER_AUTH_URL || request.nextUrl.origin,
+        baseURL: request.nextUrl.origin,
         headers: {
           cookie: request.headers.get("cookie") || "",
         },
