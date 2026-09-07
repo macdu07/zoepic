@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import { ChevronRight } from "lucide-react";
-import { motion } from "framer-motion";
 import { StaggerContainer, StaggerItem } from "@/components/core/AnimatedSection";
 
 interface FaqItem {
@@ -22,6 +21,7 @@ export default function FaqAccordion({ items }: { items: FaqItem[] }) {
               onClick={() => setOpenIndex(openIndex === index ? null : index)}
               className="w-full flex items-center justify-between px-6 py-4 text-left hover:bg-primary/5 transition-colors"
               aria-expanded={openIndex === index}
+              aria-controls={`faq-answer-${index}`}
             >
               <span className="text-sm font-semibold pr-4">{faq.question}</span>
               <ChevronRight
@@ -31,21 +31,9 @@ export default function FaqAccordion({ items }: { items: FaqItem[] }) {
                 aria-hidden="true"
               />
             </button>
-            {openIndex === index && (
-              <motion.div
-                initial={{ height: 0, opacity: 0 }}
-                animate={{ height: "auto", opacity: 1 }}
-                exit={{ height: 0, opacity: 0 }}
-                transition={{ duration: 0.25, ease: "easeInOut" }}
-                className="overflow-hidden"
-              >
-                <div className="px-6 pb-4">
-                  <p className="text-sm text-muted-foreground leading-relaxed">
-                    {faq.answer}
-                  </p>
-                </div>
-              </motion.div>
-            )}
+            <div id={`faq-answer-${index}`} hidden={openIndex !== index} className="px-6 pb-4">
+              <p className="text-sm text-muted-foreground leading-relaxed">{faq.answer}</p>
+            </div>
           </div>
         </StaggerItem>
       ))}

@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { PublicShell } from "@/components/site/PublicShell";
 
-export const metadata: Metadata = { title: "Términos de uso", description: "Condiciones generales para utilizar ZoePic.", alternates: { canonical: "/terminos" }, robots: { index: true, follow: true } };
+export const metadata: Metadata = { title: "Términos de uso", description: "Condiciones generales para utilizar ZoePic.", alternates: { canonical: "/terminos" }, openGraph: { url: "/terminos" }, robots: { index: true, follow: true } };
 const sections = [
   ["Uso del servicio", "ZoePic permite convertir imágenes y, según el plan, utilizar funciones adicionales. Debes utilizar el servicio de forma lícita y contar con autorización para procesar los archivos que selecciones."],
   ["Cuentas y seguridad", "Eres responsable de mantener la confidencialidad de tus credenciales y de la actividad realizada desde tu cuenta. Comunica cualquier acceso no autorizado mediante el canal de contacto."],

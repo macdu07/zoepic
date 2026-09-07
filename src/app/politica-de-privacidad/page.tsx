@@ -6,6 +6,7 @@ export const metadata: Metadata = {
   description:
     "Conoce cómo ZoePic recopila, usa y protege tus datos personales.",
   alternates: { canonical: "/politica-de-privacidad" },
+  openGraph: { url: "/politica-de-privacidad" },
 };
 
 export default function PrivacyPolicyPage() {

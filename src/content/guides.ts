@@ -1,12 +1,24 @@
 export interface GuideSection { heading: string; paragraphs: string[]; bullets?: string[]; }
-export interface Guide { slug: string; title: string; description: string; readingTime: string; sections: GuideSection[]; }
+export interface Guide {
+  slug: string;
+  title: string;
+  metaTitle: string;
+  description: string;
+  readingTime: string;
+  datePublished: string;
+  dateModified: string;
+  sections: GuideSection[];
+}
 
 export const guides: Guide[] = [
   {
     slug: "convertir-imagenes-webp",
     title: "Cómo convertir imágenes a WebP sin perder el control",
+    metaTitle: "Cómo convertir imágenes a WebP: guía práctica",
     description: "Un método práctico para decidir qué convertir, revisar el resultado y evitar archivos más pesados que el original.",
     readingTime: "7 min",
+    datePublished: "2026-09-06",
+    dateModified: "2026-09-06",
     sections: [
       { heading: "Qué resuelve WebP", paragraphs: ["WebP es un formato de imagen pensado para la web que admite compresión con y sin pérdida, transparencia y animación. En fotografías suele producir archivos más pequeños que JPEG a una calidad visual comparable; en gráficos con transparencia puede ser una alternativa a PNG. El resultado real depende de la imagen, no solo del formato.", "Convertir tiene sentido cuando el ahorro compensa el coste de mantener otra versión. Una fotografía grande de catálogo suele ofrecer margen; un icono diminuto ya optimizado puede crecer. Por eso conviene comparar el peso antes y después en lugar de asumir un porcentaje fijo."] },
       { heading: "Un flujo de trabajo reproducible", paragraphs: ["Conserva los originales en una carpeta separada. Trabaja sobre copias, agrupa imágenes que tendrán el mismo uso y aplica una configuración común. En ZoePic puedes mantener las dimensiones o elegir una salida concreta antes de convertir el lote."], bullets: ["Selecciona JPG, JPEG o PNG del mismo contexto.", "Empieza con calidad 82–90 para fotografía y revisa detalles finos.", "Comprueba dimensiones, peso y transparencia en cada resultado.", "Descarga solo las versiones que aportan un ahorro útil."] },
@@ -17,8 +29,11 @@ export const guides: Guide[] = [
   {
     slug: "calidad-dimensiones-imagen-web",
     title: "Calidad y dimensiones: elegir el tamaño correcto para la web",
+    metaTitle: "Calidad y dimensiones de imágenes web: guía",
     description: "Cómo equilibrar nitidez, peso y encuadre según el lugar donde aparecerá cada imagen.",
     readingTime: "8 min",
+    datePublished: "2026-09-06",
+    dateModified: "2026-09-06",
     sections: [
       { heading: "Empieza por el espacio de destino", paragraphs: ["El tamaño correcto nace del componente, no de la cámara. Si una tarjeta nunca supera 640 píxeles de ancho, publicar un archivo de 4000 píxeles obliga al visitante a descargar datos que no verá. Mide el ancho máximo del componente y considera pantallas de alta densidad cuando la imagen lo requiera.", "Una regla de trabajo razonable consiste en exportar hasta el doble del ancho CSS para imágenes importantes en pantallas densas. No siempre hace falta: miniaturas, fondos con poco detalle y conexiones lentas pueden beneficiarse de variantes más pequeñas."] },
       { heading: "Calidad no significa porcentaje visual", paragraphs: ["El control de calidad de un codificador representa un compromiso interno; 80 no equivale a conservar exactamente el 80% de la información. Dos imágenes exportadas con el mismo valor pueden tener resultados muy distintos. Una foto con follaje, cabello o grano necesita más información que un fondo plano.", "Empieza alto, observa y baja en pasos pequeños. Detente cuando el ahorro adicional introduce defectos visibles en el tamaño de uso. Guarda la configuración junto al tipo de contenido, no como norma para toda la biblioteca."] },
@@ -29,8 +44,11 @@ export const guides: Guide[] = [
   {
     slug: "nombres-archivo-imagenes-seo",
     title: "Nombres de archivo para imágenes y SEO: una guía prudente",
+    metaTitle: "Nombres de archivo para imágenes y SEO: guía",
     description: "Convenciones útiles para mantener una biblioteca clara sin prometer efectos automáticos en buscadores.",
     readingTime: "6 min",
+    datePublished: "2026-09-06",
+    dateModified: "2026-09-06",
     sections: [
       { heading: "El objetivo principal es la claridad", paragraphs: ["Un nombre descriptivo ayuda a identificar un archivo fuera del gestor de contenidos, reduce duplicados y hace más fácil colaborar. Puede aportar contexto a los sistemas que procesan la URL, pero no reemplaza el contenido de la página, el texto alternativo ni una buena arquitectura.", "Usa palabras que una persona reconocería al ver la imagen. Evita cadenas de palabras clave, adjetivos promocionales y detalles que no aparecen. `silla-roble-mesa-comedor.webp` es más útil que `IMG_4837.webp`; `mejor-silla-barata-oferta.webp` introduce afirmaciones que la imagen no demuestra."] },
       { heading: "Una convención sencilla", paragraphs: ["Trabaja en minúsculas, separa términos con guiones y elimina signos que puedan complicar una URL. Mantén el nombre lo bastante corto para leerlo en una lista. Añade una variante solo cuando distingue archivos reales."], bullets: ["Objeto o escena principal: `lampara-laton`.", "Ángulo o detalle: `lampara-laton-detalle-base`.", "Contexto útil: `lampara-laton-mesa-noche`.", "Variante estable: `lampara-laton-negra-frontal`."] },

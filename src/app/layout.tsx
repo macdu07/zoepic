@@ -4,6 +4,7 @@ import "./globals.css";
 import { Toaster } from "@/components/ui/toaster";
 import { InsforgeProvider } from "./providers";
 import SmoothScroll from "@/components/core/SmoothScroll";
+import { SITE_DESCRIPTION, SITE_URL } from "@/lib/seo";
 
 const figtree = Figtree({
   subsets: ["latin"],
@@ -12,16 +13,15 @@ const figtree = Figtree({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || "https://zoepic.online"),
+  metadataBase: new URL(SITE_URL),
   title: {
     default: "ZoePic | Convertidor WebP con IA — Optimiza tus Imágenes",
     template: "%s | ZoePic",
   },
-  description:
-    "Convierte JPG y PNG a WebP, ajusta dimensiones y prepara nombres descriptivos. La conversión WebP se realiza localmente en tu navegador.",
+  description: SITE_DESCRIPTION,
   openGraph: {
     type: "website",
-    url: "https://zoepic.online",
+    url: SITE_URL,
     siteName: "ZoePic",
     title: "ZoePic | Convertidor WebP con IA",
     description:

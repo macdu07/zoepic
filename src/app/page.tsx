@@ -4,10 +4,12 @@ import { ArrowRight, Check, FileImage, ShieldCheck, Sparkles } from "lucide-reac
 import { PublicShell } from "@/components/site/PublicShell";
 import PricingSection from "@/components/landing/PricingSection";
 import FaqAccordion from "@/components/landing/FaqAccordion";
+import { JsonLd } from "@/components/seo/JsonLd";
+import { homepageSchema } from "@/lib/seo";
 
 export const metadata: Metadata = {
   title: "Convertidor WebP para profesionales web",
-  description: "Convierte JPG y PNG a WebP, ajusta dimensiones y prepara nombres claros. Procesamiento WebP local en tu navegador.",
+  description: "Convierte JPG y PNG a WebP por lotes, ajusta dimensiones y prepara nombres claros para sitios web, tiendas y catálogos. Procesamiento local.",
   alternates: { canonical: "/" },
 };
 
@@ -29,11 +31,12 @@ const workflow = [
 export default function LandingPage() {
   return (
     <PublicShell ads>
+      <JsonLd data={homepageSchema(FAQ_ITEMS)} />
       <main>
         <section className="overflow-hidden border-b border-border/70">
           <div className="shell grid items-center gap-14 py-16 md:py-24 lg:grid-cols-[1.02fr_.98fr] lg:py-28">
             <div className="max-w-2xl animate-[enter_.6s_cubic-bezier(.16,1,.3,1)_both]">
-              <h1 className="font-display text-5xl font-medium leading-[.98] tracking-[-.035em] sm:text-6xl lg:text-[5.25rem]">Imágenes más ligeras, listas para publicar.</h1>
+              <h1 className="font-display text-5xl font-medium leading-[.98] tracking-[-.035em] sm:text-6xl lg:text-[5.25rem]">Convierte imágenes a WebP listas para publicar.</h1>
               <p className="mt-7 max-w-xl text-lg leading-8 text-muted-foreground">Convierte JPG y PNG a WebP, ajusta dimensiones y organiza nombres de archivo desde un flujo pensado para sitios web, tiendas y equipos de contenido.</p>
               <div className="mt-9 flex flex-col gap-3 sm:flex-row">
                 <Link href="/convert" className="inline-flex h-12 items-center justify-center gap-2 rounded-xl bg-primary px-6 text-sm font-semibold text-primary-foreground shadow-[0_12px_28px_-16px_hsl(var(--primary))] hover:bg-primary/90">Abrir conversor <ArrowRight className="h-4 w-4" /></Link>

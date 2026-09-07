@@ -1,25 +1,35 @@
-import { MetadataRoute } from "next";
+import type { MetadataRoute } from "next";
 import { guides } from "@/content/guides";
+import { CONTENT_LAST_MODIFIED, SITE_URL } from "@/lib/seo";
 
 export default function sitemap(): MetadataRoute.Sitemap {
+  const lastModified = new Date(CONTENT_LAST_MODIFIED);
   const pages: MetadataRoute.Sitemap = [
     {
-      url: "https://zoepic.online",
-      lastModified: new Date(),
+      url: SITE_URL,
+      lastModified,
       changeFrequency: "monthly",
       priority: 1,
     },
-    { url: "https://zoepic.online/convert", lastModified: new Date(), changeFrequency: "monthly", priority: 0.9 },
-    { url: "https://zoepic.online/guias", lastModified: new Date(), changeFrequency: "monthly", priority: 0.8 },
-    { url: "https://zoepic.online/sobre-zoepic", lastModified: new Date(), changeFrequency: "yearly", priority: 0.5 },
-    { url: "https://zoepic.online/contacto", lastModified: new Date(), changeFrequency: "yearly", priority: 0.4 },
-    { url: "https://zoepic.online/terminos", lastModified: new Date(), changeFrequency: "yearly", priority: 0.3 },
+    { url: `${SITE_URL}/convert`, lastModified, changeFrequency: "monthly", priority: 0.9 },
+    { url: `${SITE_URL}/guias`, lastModified, changeFrequency: "monthly", priority: 0.8 },
+    { url: `${SITE_URL}/sobre-zoepic`, lastModified, changeFrequency: "yearly", priority: 0.5 },
+    { url: `${SITE_URL}/contacto`, lastModified, changeFrequency: "yearly", priority: 0.4 },
+    { url: `${SITE_URL}/terminos`, lastModified, changeFrequency: "yearly", priority: 0.3 },
     {
-      url: "https://zoepic.online/politica-de-privacidad",
-      lastModified: new Date(),
+      url: `${SITE_URL}/politica-de-privacidad`,
+      lastModified,
       changeFrequency: "yearly",
       priority: 0.3,
     },
   ];
-  return [...pages, ...guides.map((guide) => ({ url: `https://zoepic.online/guias/${guide.slug}`, lastModified: new Date(), changeFrequency: "monthly" as const, priority: 0.7 }))];
+  return [
+    ...pages,
+    ...guides.map((guide) => ({
+      url: `${SITE_URL}/guias/${guide.slug}`,
+      lastModified: new Date(guide.dateModified),
+      changeFrequency: "monthly" as const,
+      priority: 0.7,
+    })),
+  ];
 }
