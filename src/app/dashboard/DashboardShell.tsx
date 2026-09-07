@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { ImagePlay, BarChart3, Sparkles, UserCog } from "lucide-react";
+import { BarChart3, Sparkles, UserCog } from "lucide-react";
 import { useSession } from "@/lib/auth-client";
 import { Button } from "@/components/ui/button";
 import { BrandLogo } from "@/components/icons/BrandLogo";
@@ -44,13 +44,13 @@ export default function DashboardLayout({
 
   return (
     <div className="min-h-screen bg-background text-foreground flex flex-col">
-      <header className="sticky top-0 z-50 backdrop-blur-md bg-background/80 border-b border-border/50">
-        <div className="container mx-auto px-4 py-3 flex items-center justify-between">
+      <header className="sticky top-0 z-50 border-b border-border/70 bg-background/90 backdrop-blur-xl">
+        <div className="shell flex h-16 items-center justify-between">
           <div className="flex items-center gap-6">
             <Link href="/" className="flex items-center gap-2.5">
               <BrandLogo className="h-7 w-auto text-foreground" />
             </Link>
-            <nav className="hidden sm:flex items-center gap-1">
+            <nav className="hidden items-center gap-1 sm:flex" aria-label="Panel">
               {navItems.map((item) => (
                 <Link key={item.href} href={item.href}>
                   <Button
@@ -91,7 +91,7 @@ export default function DashboardLayout({
           </Link>
         </div>
         {/* Mobile nav */}
-        <div className="sm:hidden border-t border-border/50 px-4 py-2 flex gap-1">
+        <nav className="flex gap-1 border-t border-border/60 px-3 py-2 sm:hidden" aria-label="Panel móvil">
           {navItems.map((item) => (
             <Link key={item.href} href={item.href} className="flex-1">
               <Button
@@ -108,12 +108,12 @@ export default function DashboardLayout({
               </Button>
             </Link>
           ))}
-        </div>
+        </nav>
       </header>
 
-      <main className="flex-grow">{children}</main>
+      <main className="shell flex-grow py-8 md:py-12">{children}</main>
 
-      <footer className="bg-background border-t border-border text-center py-4 mt-auto">
+      <footer className="mt-auto border-t border-border bg-background py-5 text-center">
         <p className="text-sm text-muted-foreground">
           &copy; {new Date().getFullYear()} ZoePic. Todos los derechos
           reservados.

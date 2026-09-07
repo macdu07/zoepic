@@ -133,15 +133,15 @@ export default function UsagePage() {
   const hasManagedSubscription = Boolean(profile.efipaySubscriptionId);
 
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div>
       <AnimatedSection variant="fadeUp" delay={0.1}>
-        <h2 className="text-2xl font-bold mb-6">Uso & Plan</h2>
+        <h1 className="mb-7 font-display text-4xl font-medium">Uso y plan</h1>
       </AnimatedSection>
 
       <StaggerContainer className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 mb-8" staggerDelay={0.1} delay={0.15}>
         {/* Current Plan */}
         <StaggerItem variant="fadeUp">
-          <Card className="shadow-lg bg-card h-full">
+          <Card className="bg-card h-full">
           <CardHeader className="pb-3">
             <CardTitle className="text-lg font-semibold flex items-center gap-2">
               <Crown className="h-5 w-5 text-primary" />
@@ -226,7 +226,7 @@ export default function UsagePage() {
 
         {/* Usage Meter */}
         <StaggerItem variant="fadeUp">
-        <Card className="shadow-lg bg-card h-full">
+        <Card className="bg-card h-full">
           <CardHeader className="pb-3">
             <CardTitle className="text-lg font-semibold flex items-center gap-2">
               <BarChart3 className="h-5 w-5 text-primary" />
@@ -289,7 +289,7 @@ export default function UsagePage() {
         {/* WebP Usage — solo starter */}
         {planInfo.webpConversionsLimit !== null && (
           <StaggerItem variant="fadeUp">
-            <Card className="shadow-lg bg-card h-full">
+            <Card className="bg-card h-full">
               <CardHeader className="pb-3">
                 <CardTitle className="text-lg font-semibold flex items-center gap-2">
                   <FileImage className="h-5 w-5 text-primary" />
@@ -323,7 +323,7 @@ export default function UsagePage() {
       {showUpgrade && profile.plan === "starter" && (
         <AnimatedSection variant="scale" amount={0.1}>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-            <Card className="shadow-lg bg-card border-primary/30 ring-1 ring-primary/20">
+            <Card className="bg-card ring-1 ring-primary/20">
             <CardHeader className="pb-3">
               <CardTitle className="text-lg font-semibold flex items-center gap-2">
                 <Sparkles className="h-5 w-5 text-primary" />
@@ -356,7 +356,7 @@ export default function UsagePage() {
             </CardContent>
           </Card>
 
-          <Card className="shadow-lg bg-card border-accent/30 ring-1 ring-accent/20">
+          <Card className="bg-card ring-1 ring-accent/20">
             <CardHeader className="pb-3">
               <CardTitle className="text-lg font-semibold flex items-center gap-2">
                 <Crown className="h-5 w-5 text-accent" />
@@ -404,7 +404,7 @@ export default function UsagePage() {
 
       {/* Conversion History */}
       <AnimatedSection variant="fadeUp" delay={0.25} amount={0.1}>
-        <Card className="shadow-lg bg-card">
+        <Card className="bg-card">
           <CardHeader>
           <CardTitle className="text-lg font-semibold">
             Historial de Conversiones

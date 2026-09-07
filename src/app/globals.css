@@ -2,62 +2,47 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Responsive base font-size: 16px mobile, 18px desktop */
 html {
   font-size: 16px;
+  scroll-behavior: smooth;
 }
 
-@media (min-width: 768px) {
-  html {
-    font-size: 18px;
-  }
-}
-
-body {
-  font-family: var(--font-figtree), Arial, Helvetica, sans-serif;
-}
+body { font-family: var(--font-figtree), Arial, Helvetica, sans-serif; }
 
 @layer base {
   :root {
-    --background: 50 75% 95%; /* Light Yellowish Beige */
-    --foreground: 90 20% 25%; /* Dark Green/Gray for text */
-
-    --card: 90 35% 78%; /* Muted Green for cards */
-    --card-foreground: 90 25% 20%; /* Dark text on cards */
-
-    --popover: 90 35% 78%; /* Muted Green for popovers */
-    --popover-foreground: 90 25% 20%; /* Dark text on popovers */
-
-    --primary: 90 40% 40%; /* Darker Green for buttons/accent */
-    --primary-foreground: 90 50% 95%; /* Light text on primary buttons */
-
-    --secondary: 90 30% 70%; /* Lighter Muted Green */
-    --secondary-foreground: 90 20% 20%; /* Dark text on secondary */
-
-    --muted: 90 40% 90%; /* Very Light Muted Green / Off-white for subtle elements */
-    --muted-foreground: 90 20% 45%; /* Darker Muted Green/Gray for muted text */
-    
-    --accent: 90 40% 50%; /* A green for highlights */
-    --accent-foreground: 90 50% 95%; /* Light text for accent */
+    --background: 60 24% 96%;
+    --foreground: 110 9% 13%;
+    --card: 0 0% 100%;
+    --card-foreground: 110 9% 13%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 110 9% 13%;
+    --primary: 147 41% 27%;
+    --primary-foreground: 60 30% 98%;
+    --secondary: 96 17% 91%;
+    --secondary-foreground: 132 20% 20%;
+    --muted: 70 15% 92%;
+    --muted-foreground: 105 7% 39%;
+    --accent: 96 22% 87%;
+    --accent-foreground: 147 41% 22%;
 
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 98%;
 
-    --border: 90 30% 70%; /* Muted Green Border for general borders */
-    --input: 50 75% 97%; /* Input background: Very light beige, almost white */
-    --ring: 90 40% 45%; /* Darker Green for focus rings */
-
-    --radius: 0.5rem;
+    --border: 80 11% 83%;
+    --input: 80 11% 83%;
+    --ring: 147 41% 27%;
+    --radius: 0.75rem;
 
     /* Sidebar specific theme (keeping as is for now) */
-    --sidebar-background: 60 40% 20%; 
-    --sidebar-foreground: 60 20% 85%; 
-    --sidebar-primary: 60 57% 44%; 
+    --sidebar-background: 120 12% 12%;
+    --sidebar-foreground: 60 15% 92%;
+    --sidebar-primary: 147 41% 42%;
     --sidebar-primary-foreground: 60 100% 95%;
-    --sidebar-accent: 60 40% 30%; 
+    --sidebar-accent: 130 12% 20%;
     --sidebar-accent-foreground: 60 20% 90%;
-    --sidebar-border: 60 40% 15%;
-    --sidebar-ring: 60 57% 44%;
+    --sidebar-border: 120 8% 23%;
+    --sidebar-ring: 147 41% 42%;
 
     --chart-1: 12 76% 61%;
     --chart-2: 173 58% 39%;
@@ -66,48 +51,6 @@ body {
     --chart-5: 27 87% 67%;
   }
 
-  .dark {
-    /* For dark mode, we can invert or use a different palette if needed.
-       Keeping original dark theme for now.
-    */
-    --background: 60 20% 10%; 
-    --foreground: 60 25% 85%; 
-
-    --card: 60 20% 12%;
-    --card-foreground: 60 25% 85%;
-
-    --popover: 60 20% 12%;
-    --popover-foreground: 60 25% 85%;
-
-    --primary: 60 100% 30%; 
-    --primary-foreground: 60 20% 95%;
-
-    --secondary: 60 30% 20%;
-    --secondary-foreground: 60 25% 85%;
-
-    --muted: 60 30% 25%;
-    --muted-foreground: 60 20% 60%;
-
-    --accent: 60 57% 50%; 
-    --accent-foreground: 60 100% 95%;
-
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 0 0% 98%;
-
-    --border: 60 20% 25%;
-    --input: 60 20% 25%;
-    --ring: 60 100% 30%;
-
-    /* Dark Sidebar specific theme */
-    --sidebar-background: 60 35% 15%;
-    --sidebar-foreground: 60 20% 80%;
-    --sidebar-primary: 60 57% 50%;
-    --sidebar-primary-foreground: 60 100% 95%;
-    --sidebar-accent: 60 35% 25%;
-    --sidebar-accent-foreground: 60 20% 85%;
-    --sidebar-border: 60 35% 10%;
-    --sidebar-ring: 60 57% 50%;
-  }
 }
 
 @layer base {
@@ -116,5 +59,32 @@ body {
   }
   body {
     @apply bg-background text-foreground;
+    min-height: 100vh;
+    text-rendering: optimizeLegibility;
+    caret-color: hsl(var(--primary));
   }
+  ::selection { background: hsl(var(--primary) / .18); color: hsl(var(--foreground)); }
+  :focus-visible { outline: 2px solid hsl(var(--ring)); outline-offset: 3px; }
+  h1, h2, h3 { text-wrap: balance; }
+  p { text-wrap: pretty; }
+}
+
+@layer utilities {
+  .font-display { font-family: var(--font-figtree), Arial, Helvetica, sans-serif; }
+  .shell { @apply mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8; }
+  .reading { @apply mx-auto w-full max-w-[72ch]; }
+  .surface { @apply rounded-2xl bg-card shadow-[0_12px_35px_-24px_rgba(31,45,34,0.35)]; }
+  .hairline { @apply border border-border/80; }
+}
+
+@keyframes enter {
+  from { opacity: 0; transform: translateY(14px); filter: blur(3px); }
+  to { opacity: 1; transform: translateY(0); filter: blur(0); }
+}
+
+* { scrollbar-width: thin; scrollbar-color: hsl(var(--primary) / .45) hsl(var(--muted)); }
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
 }

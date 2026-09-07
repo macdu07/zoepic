@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef } from "react";
-import { motion, useInView } from "framer-motion";
+import { motion, useInView, useReducedMotion } from "framer-motion";
 
 type AnimationVariant = "fadeUp" | "fadeIn" | "fadeLeft" | "fadeRight" | "scale";
 
@@ -49,13 +49,14 @@ export function AnimatedSection({
 }: AnimatedSectionProps) {
   const ref = useRef<HTMLDivElement>(null);
   const inView = useInView(ref, { once, amount });
+  const reduceMotion = useReducedMotion();
 
   return (
     <motion.div
       ref={ref}
       className={className}
       variants={variants[variant]}
-      initial="hidden"
+      initial={reduceMotion ? false : "hidden"}
       animate={inView ? "visible" : "hidden"}
       transition={{
         duration,
@@ -88,12 +89,13 @@ export function StaggerContainer({
 }: StaggerContainerProps) {
   const ref = useRef<HTMLDivElement>(null);
   const inView = useInView(ref, { once, amount });
+  const reduceMotion = useReducedMotion();
 
   return (
     <motion.div
       ref={ref}
       className={className}
-      initial="hidden"
+      initial={reduceMotion ? false : "hidden"}
       animate={inView ? "visible" : "hidden"}
       variants={{
         hidden: {},

@@ -106,19 +106,19 @@ export function ImageUploader({
         onDragOver={handleDragOver}
         onDragLeave={handleDragLeave}
         onDrop={handleDrop}
-        className={`mt-1 flex flex-col items-center justify-center p-8 rounded-md border-2 border-dashed cursor-pointer bg-background/30 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 ${
+        className={`mt-1 flex min-h-56 flex-col items-center justify-center rounded-2xl border border-dashed p-8 cursor-pointer transition-[background-color,border-color] focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 ${
           isDragging
-            ? "border-primary bg-primary/10"
-            : "border-primary/40 hover:border-primary"
+            ? "border-primary bg-primary/[.07]"
+            : "border-border bg-[#f5f6f0] hover:border-primary/60 hover:bg-[#f0f3eb]"
         }`}
       >
-        <UploadCloud className="h-12 w-12 text-muted-foreground mb-2" aria-hidden="true" />
-        <p className="text-sm font-medium text-card-foreground">
+        <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-card text-primary shadow-[0_8px_20px_-14px_rgba(31,45,34,.45)]"><UploadCloud className="h-5 w-5" aria-hidden="true" /></div>
+        <p className="text-base font-semibold text-card-foreground">
           {selectedFiles.length > 0
             ? `${selectedFiles.length} imagen(es) seleccionada(s)`
             : "Haz clic o arrastra y suelta"}
         </p>
-        <p className="text-xs text-muted-foreground">
+        <p className="mt-1 text-sm text-muted-foreground">
           JPG, JPEG o PNG (máx. {maxFiles} archivos)
         </p>
         <Input
@@ -138,7 +138,7 @@ export function ImageUploader({
           {selectedFiles.map((file, index) => (
             <div
               key={`${file.name}-${index}`}
-              className="relative group w-20 h-20 rounded-lg overflow-hidden border-2 border-border/60 hover:border-primary/50 transition-colors shadow-sm"
+              className="relative group h-20 w-20 overflow-hidden rounded-xl bg-muted"
             >
               <img
                 src={previewUrls[index]}

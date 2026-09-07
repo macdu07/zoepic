@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import { Figtree } from "next/font/google";
-import Script from "next/script";
 import "./globals.css";
 import { Toaster } from "@/components/ui/toaster";
 import { InsforgeProvider } from "./providers";
@@ -19,14 +18,14 @@ export const metadata: Metadata = {
     template: "%s | ZoePic",
   },
   description:
-    "Convierte imágenes a WebP y renómbralas automáticamente con IA para mejorar tu SEO. Compresión hasta 80% menor tamaño, privacidad total. Gratis para empezar.",
+    "Convierte JPG y PNG a WebP, ajusta dimensiones y prepara nombres descriptivos. La conversión WebP se realiza localmente en tu navegador.",
   openGraph: {
     type: "website",
     url: "https://zoepic.online",
     siteName: "ZoePic",
     title: "ZoePic | Convertidor WebP con IA",
     description:
-      "Convierte imágenes a WebP y renómbralas con IA para mejorar tu SEO. Gratis para empezar.",
+      "Convierte imágenes a WebP, ajusta dimensiones y revisa el ahorro de cada archivo.",
     images: [
       {
         url: "/og-image.jpg",
@@ -39,7 +38,7 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "ZoePic | Convertidor WebP con IA",
-    description: "Convierte imágenes a WebP y renómbralas con IA. Gratis.",
+    description: "Convierte imágenes a WebP y prepara cada lote para publicar.",
     images: ["/og-image.jpg"],
   },
 };
@@ -52,12 +51,6 @@ export default function RootLayout({
   return (
     <html lang="es" className="scroll-smooth">
       <body className={`${figtree.variable} antialiased font-sans`}>
-        <Script
-          async
-          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6686161902100366"
-          crossOrigin="anonymous"
-          strategy="afterInteractive"
-        />
         <InsforgeProvider>
           <SmoothScroll>
             {children}

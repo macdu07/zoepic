@@ -14,7 +14,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
-import { ImagePlay, Mail, KeyRound, Loader2, Eye, EyeOff } from "lucide-react";
+import { Mail, KeyRound, Loader2, Eye, EyeOff } from "lucide-react";
 import { signIn } from "@/lib/auth-client";
 import { BrandLogo } from "@/components/icons/BrandLogo";
 import { AnimatedSection } from "@/components/core/AnimatedSection";
@@ -77,14 +77,14 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen p-4 bg-background text-foreground">
+    <div className="flex min-h-screen flex-col items-center justify-center bg-[#eef0e9] p-4 text-foreground">
       <AnimatedSection variant="scale" amount={0.2} duration={0.4} className="w-full max-w-md">
-        <Card className="w-full shadow-xl bg-card text-card-foreground">
+        <Card className="w-full bg-card text-card-foreground shadow-[0_22px_60px_-36px_rgba(31,45,34,.5)]">
           <CardHeader className="text-center">
           <div className="mx-auto mb-4 flex justify-center">
             <BrandLogo className="h-9 w-auto text-foreground" />
           </div>
-          <CardTitle className="text-xl font-bold">Iniciar Sesión</CardTitle>
+          <CardTitle className="font-display text-3xl font-medium">Iniciar sesión</CardTitle>
           <CardDescription className="text-muted-foreground">
             Ingresa tus credenciales para acceder a ZoePic.
           </CardDescription>
