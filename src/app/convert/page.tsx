@@ -1,13 +1,11 @@
 import type { Metadata } from "next";
-import Link from "next/link";
-import { ArrowLeft, Sparkles } from "lucide-react";
 import ConversionPage from "@/components/core/ConversionPage";
-import { BrandLogo } from "@/components/icons/BrandLogo";
-import NavbarActions from "@/components/landing/NavbarActions";
-import { AnimatedSection } from "@/components/core/AnimatedSection";
+import { AdSlot } from "@/components/ads/AdSlot";
+import { PublicShell } from "@/components/site/PublicShell";
+import { ADSENSE_SLOTS } from "@/lib/adsense";
 
 export const metadata: Metadata = {
-  title: "Conversor WebP Gratis | ZoePic",
+  title: "Conversor WebP gratis",
   description:
     "Convierte imágenes a WebP sin iniciar sesión. El renombrado con IA está disponible solo en planes de pago.",
   alternates: { canonical: "/convert" },
@@ -15,72 +13,12 @@ export const metadata: Metadata = {
 
 export default function ConvertPage() {
   return (
-    <div className="min-h-screen bg-background text-foreground">
-      <nav className="sticky top-0 z-50 backdrop-blur-md bg-background/80 border-b border-border/50">
-        <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-2.5">
-            <BrandLogo className="h-7 w-auto text-foreground" />
-          </Link>
-          <div className="flex items-center gap-3">
-            <Link
-              href="/"
-              className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors px-3 py-1.5 inline-flex items-center gap-2"
-            >
-              <ArrowLeft className="h-4 w-4" />
-              Volver
-            </Link>
-            <NavbarActions />
-          </div>
-        </div>
-      </nav>
-
-      <section className="relative overflow-hidden border-b border-border/30">
-        <div className="absolute inset-0 bg-gradient-to-b from-primary/5 via-transparent to-transparent pointer-events-none" />
-        <div className="max-w-5xl mx-auto px-6 pt-16 pb-12 text-center relative">
-          <AnimatedSection variant="fadeUp" delay={0.08}>
-            <div className="inline-flex items-center gap-2 bg-primary/10 text-primary px-4 py-1.5 rounded-full text-sm font-medium mb-6">
-              <Sparkles className="h-3.5 w-3.5" />
-              Conversión pública a WebP
-            </div>
-          </AnimatedSection>
-          <AnimatedSection variant="fadeUp" delay={0.16}>
-            <h1 className="text-4xl md:text-5xl font-extrabold leading-tight tracking-tight mb-4">
-              Convierte imágenes a WebP sin iniciar sesión
-            </h1>
-          </AnimatedSection>
-          <AnimatedSection variant="fadeUp" delay={0.24}>
-            <p className="text-base md:text-lg text-muted-foreground max-w-2xl mx-auto">
-              Usa el conversor gratis con hasta 100 imágenes al día. Si quieres
-              renombrado con IA o gestionar tu suscripción, necesitas una cuenta
-              con un plan de pago.
-            </p>
-          </AnimatedSection>
-        </div>
-      </section>
-
-      <main className="max-w-6xl mx-auto px-6 py-10">
+    <PublicShell ads>
+      <main className="shell py-12 md:py-16">
+        <div className="mb-10 max-w-3xl"><h1 className="font-display text-4xl font-medium tracking-[-.03em] sm:text-5xl">Conversor WebP</h1><p className="mt-4 text-lg leading-8 text-muted-foreground">Selecciona el lote, define la salida y revisa cada archivo. La conversión y el cambio de tamaño se realizan en este navegador.</p></div>
         <ConversionPage />
+        <section className="reading mt-16 border-t border-border pt-12"><h2 className="font-display text-3xl font-medium">Antes de publicar</h2><p className="mt-4 leading-7 text-muted-foreground">Comprueba los bordes, el texto y las zonas con detalle fino. Si una imagen convertida pesa más que el original, reduce la calidad, ajusta sus dimensiones o conserva el archivo original.</p><AdSlot slot={ADSENSE_SLOTS.converter} /></section>
       </main>
-
-      <footer className="border-t border-border/50 bg-card/20">
-        <div className="max-w-6xl mx-auto px-6 py-8 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <Link href="/" className="flex items-center gap-2">
-            <BrandLogo className="h-6 w-auto text-foreground" />
-          </Link>
-          <div className="flex items-center gap-4">
-            <Link
-              href="/politica-de-privacidad"
-              className="text-sm text-muted-foreground hover:text-foreground transition-colors"
-            >
-              Política de Privacidad
-            </Link>
-            <p className="text-sm text-muted-foreground">
-              &copy; {new Date().getFullYear()} ZoePic. Todos los derechos
-              reservados.
-            </p>
-          </div>
-        </div>
-      </footer>
-    </div>
+    </PublicShell>
   );
 }

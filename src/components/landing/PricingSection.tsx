@@ -62,11 +62,11 @@ export default function PricingSection() {
   const user = sessionData?.user as any;
 
   return (
-    <section id="pricing" className="max-w-5xl mx-auto px-6 py-24">
+    <section id="pricing" className="shell py-20 md:py-28">
       <div className="text-center mb-10">
-        <h2 className="text-3xl md:text-4xl font-bold mb-4">Planes y Precios</h2>
+        <h2 className="font-display text-4xl font-medium tracking-[-.025em] md:text-5xl">Planes para cada ritmo</h2>
         <p className="text-muted-foreground text-lg max-w-xl mx-auto mb-8">
-          Elige el plan que mejor se adapte a tus necesidades.
+          Convierte sin cuenta o añade capacidad cuando tu flujo lo necesite.
         </p>
         <div className="inline-flex items-center gap-3 bg-card/60 border border-border/50 rounded-full px-4 py-2">
           <button
@@ -105,10 +105,10 @@ export default function PricingSection() {
         {plans.map((plan) => (
           <StaggerItem key={plan.key} variant="fadeUp">
             <Card
-              className={`relative border-border/50 bg-card/50 backdrop-blur-sm hover:-translate-y-1 transition-all duration-300 flex flex-col h-full ${
+              className={`relative flex h-full flex-col bg-card transition-transform duration-300 hover:-translate-y-1 ${
                 plan.popular
-                  ? "border-primary/50 shadow-lg shadow-primary/10 hover:shadow-primary/20 ring-2 ring-primary/30"
-                  : "hover:border-primary/30 hover:shadow-lg"
+                  ? "ring-1 ring-primary/40"
+                  : ""
               }`}
             >
               {plan.popular && (

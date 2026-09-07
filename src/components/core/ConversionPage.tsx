@@ -32,8 +32,6 @@ import {
   type ConversionItem,
 } from "./ConversionResultList";
 import { useSession } from "@/lib/auth-client";
-import { AnimatedSection } from "@/components/core/AnimatedSection";
-import { FileImage } from "lucide-react";
 
 // Number of images to process concurrently
 const CONCURRENCY_LIMIT = 4;
@@ -597,82 +595,27 @@ export default function ConversionPage() {
       : 0;
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
-        {/* Left Column: Controls & Info */}
-        <AnimatedSection variant="fadeRight" delay={0.1}>
-          <Card className="shadow-lg bg-card text-card-foreground">
-            <CardHeader>
-              <CardTitle className="text-xl font-semibold">
-                Convierte tus imágenes a WebP
-              </CardTitle>
-            </CardHeader>
-          <CardContent className="space-y-6">
-            <ImageUploader
-              selectedFiles={selectedFiles}
-              onFilesSelect={handleFilesSelect}
-              onRemoveFile={handleRemoveFile}
-              onError={(msg) => {
-                toast({
-                  title: "Error",
-                  description: msg,
-                  variant: "destructive",
-                });
-              }}
-              onClear={handleClearFiles}
-              maxFiles={maxBatchSize}
-            />
+    <div className="space-y-6">
+      <section className="rounded-2xl bg-card p-5 shadow-[0_14px_40px_-28px_rgba(31,45,34,.4)] sm:p-7" aria-labelledby="select-files-title">
+        <div className="mb-5 flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
+          <div><p className="text-xs font-semibold uppercase tracking-[.14em] text-primary">Paso 1</p><h2 id="select-files-title" className="mt-2 font-display text-3xl font-medium">Selecciona tus imágenes</h2><p className="mt-1 text-sm text-muted-foreground">JPG, JPEG o PNG. Revisa el lote antes de convertir.</p></div>
+          {dailyUsageSummary && <div className="text-left sm:text-right"><p className="text-xs text-muted-foreground">Conversiones WebP hoy</p><p className="mt-1 font-semibold tabular-nums">{isUnlimitedDailyUsage ? "Ilimitadas" : `${dailyUsageSummary.used} / ${dailyUsageSummary.limit}`}</p></div>}
+        </div>
+        <ImageUploader
+          selectedFiles={selectedFiles}
+          onFilesSelect={handleFilesSelect}
+          onRemoveFile={handleRemoveFile}
+          onError={(msg) => toast({ title: "No se pudo añadir el archivo", description: msg, variant: "destructive" })}
+          onClear={handleClearFiles}
+          maxFiles={maxBatchSize}
+        />
+        {dailyUsageSummary && !isUnlimitedDailyUsage && <div className="mt-5"><Progress value={dailyUsagePercent} className="h-1.5" /><p className="mt-2 text-xs text-muted-foreground">Quedan {dailyUsageSummary.remaining} conversiones en este navegador o cuenta.</p></div>}
+      </section>
 
-            {dailyUsageSummary && (
-              <div className="rounded-xl border border-border/60 bg-muted/30 p-4 space-y-3">
-                <div className="flex items-start justify-between gap-3">
-                  <div className="flex items-start gap-3">
-                    <div className="mt-0.5 rounded-lg bg-primary/10 p-2 text-primary">
-                      <FileImage className="h-4 w-4" />
-                    </div>
-                    <div>
-                      <p className="text-sm font-semibold">
-                        Conversiones WebP hoy
-                      </p>
-                      <p className="text-xs text-muted-foreground">
-                        {user
-                          ? "Tu uso diario actual en el conversor."
-                          : "Tu uso diario en este navegador."}
-                      </p>
-                    </div>
-                  </div>
-                  <div className="text-right">
-                    {isUnlimitedDailyUsage ? (
-                      <p className="text-sm font-semibold text-emerald-600">
-                        Ilimitado
-                      </p>
-                    ) : (
-                      <>
-                        <p className="text-lg font-bold text-primary">
-                          {dailyUsageSummary.used}
-                          <span className="text-sm font-medium text-muted-foreground">
-                            {" "}/ {dailyUsageSummary.limit}
-                          </span>
-                        </p>
-                        <p className="text-xs text-muted-foreground">
-                          Restan {dailyUsageSummary.remaining}
-                        </p>
-                      </>
-                    )}
-                  </div>
-                </div>
-
-                {!isUnlimitedDailyUsage && (
-                  <>
-                    <Progress value={dailyUsagePercent} className="h-2.5" />
-                    <p className="text-xs text-muted-foreground">
-                      {dailyUsagePercent}% del límite diario usado.
-                    </p>
-                  </>
-                )}
-              </div>
-            )}
-
+      <div className="grid gap-6 lg:grid-cols-[.82fr_1.18fr] lg:items-start">
+        <Card className="bg-card text-card-foreground">
+          <CardHeader className="pb-4"><p className="text-xs font-semibold uppercase tracking-[.14em] text-primary">Paso 2</p><CardTitle className="font-display text-3xl font-medium">Ajusta la salida</CardTitle></CardHeader>
+          <CardContent>
             <ConversionControls
               canUseAi={canUseAi}
               isLoggedIn={Boolean(user)}
@@ -710,16 +653,13 @@ export default function ConversionPage() {
             />
           </CardContent>
         </Card>
-      </AnimatedSection>
-
-        {/* Right Column: Results List */}
-        <AnimatedSection variant="fadeLeft" delay={0.2}>
+        <section aria-label="Resultados de conversión">
           <ConversionResultList
             items={conversionItems}
             compressionQuality={compressionQuality}
             useAiForName={useAiForName}
           />
-        </AnimatedSection>
+        </section>
       </div>
     </div>
   );

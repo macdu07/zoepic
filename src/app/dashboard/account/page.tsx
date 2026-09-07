@@ -158,15 +158,15 @@ export default function AccountPage() {
 
     // ── Render ────────────────────────────────────────────────────────
     return (
-        <div className="container mx-auto px-4 py-8 max-w-3xl">
+        <div className="mx-auto max-w-3xl">
             <AnimatedSection variant="fadeUp" delay={0.1}>
-                <h2 className="text-2xl font-bold mb-6">Mi Cuenta</h2>
+                <h1 className="mb-7 font-display text-4xl font-medium">Mi cuenta</h1>
             </AnimatedSection>
 
             <StaggerContainer className="space-y-6" staggerDelay={0.1} delay={0.15}>
                 {/* ── Profile Section ───────────────────────────────────── */}
                 <StaggerItem variant="fadeUp">
-                <Card className="shadow-lg bg-card">
+                <Card className="bg-card">
                     <CardHeader className="pb-3">
                         <CardTitle className="text-lg font-semibold flex items-center gap-2">
                             <User className="h-5 w-5 text-primary" />
@@ -225,7 +225,7 @@ export default function AccountPage() {
 
                 {/* ── Email Section ─────────────────────────────────────── */}
                 <StaggerItem variant="fadeUp">
-                <Card className="shadow-lg bg-card">
+                <Card className="bg-card">
                     <CardHeader className="pb-3">
                         <CardTitle className="text-lg font-semibold flex items-center gap-2">
                             <Mail className="h-5 w-5 text-primary" />
@@ -246,7 +246,7 @@ export default function AccountPage() {
 
                 {/* ── Password Section ──────────────────────────────────── */}
                 <StaggerItem variant="fadeUp">
-                <Card className="shadow-lg bg-card">
+                <Card className="bg-card">
                     <CardHeader className="pb-3">
                         <CardTitle className="text-lg font-semibold flex items-center gap-2">
                             <Lock className="h-5 w-5 text-primary" />
@@ -329,7 +329,7 @@ export default function AccountPage() {
 
                 {/* ── Plan & Payment Section ────────────────────────────── */}
                 <StaggerItem variant="fadeUp">
-                <Card className="shadow-lg bg-card">
+                <Card className="bg-card">
                     <CardHeader className="pb-3">
                         <CardTitle className="text-lg font-semibold flex items-center gap-2">
                             <CreditCard className="h-5 w-5 text-primary" />
@@ -398,7 +398,7 @@ export default function AccountPage() {
 
                 {/* ── Danger Zone ───────────────────────────────────────── */}
                 <StaggerItem variant="fadeUp">
-                <Card className="shadow-lg bg-card border-destructive/30">
+                <Card className="bg-card ring-1 ring-destructive/25">
                     <CardHeader className="pb-3">
                         <CardTitle className="text-lg font-semibold flex items-center gap-2 text-destructive">
                             <AlertTriangle className="h-5 w-5" />

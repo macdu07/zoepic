@@ -223,9 +223,9 @@ export default function SignUpPage() {
 
   // ── Render ─────────────────────────────────────────────────────────
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen p-4 bg-background text-foreground">
+    <div className="flex min-h-screen flex-col items-center justify-center bg-[#eef0e9] p-4 text-foreground">
       <AnimatedSection variant="scale" amount={0.2} duration={0.4} className="w-full max-w-md">
-        <Card className="w-full shadow-xl bg-card text-card-foreground">
+        <Card className="w-full bg-card text-card-foreground shadow-[0_22px_60px_-36px_rgba(31,45,34,.5)]">
 
           {/* ── Header ── */}
           <CardHeader className="text-center">
@@ -235,7 +235,7 @@ export default function SignUpPage() {
 
             {step === "form" ? (
               <>
-                <CardTitle className="text-xl font-bold">Crear Cuenta</CardTitle>
+                <CardTitle className="font-display text-3xl font-medium">Crear cuenta</CardTitle>
                 <CardDescription className="text-muted-foreground">
                   Regístrate para comenzar a optimizar tus imágenes.
                 </CardDescription>
@@ -245,7 +245,7 @@ export default function SignUpPage() {
                 <div className="mx-auto mb-2 flex h-14 w-14 items-center justify-center rounded-full bg-primary/10">
                   <ShieldCheck className="h-7 w-7 text-primary" />
                 </div>
-                <CardTitle className="text-xl font-bold">Verifica tu Email</CardTitle>
+                <CardTitle className="font-display text-3xl font-medium">Verifica tu correo</CardTitle>
                 <CardDescription className="text-muted-foreground">
                   Ingresa el código de 6 dígitos enviado a{" "}
                   <span className="font-medium text-foreground">{email}</span>

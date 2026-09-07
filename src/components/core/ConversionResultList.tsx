@@ -105,15 +105,14 @@ export function ConversionResultList({
 
   if (items.length === 0) {
     return (
-      <Card className="shadow-lg bg-card text-card-foreground">
+      <Card className="bg-card text-card-foreground">
         <CardHeader>
-          <CardTitle className="text-xl font-semibold">
-            Resultados de Conversión
-          </CardTitle>
+          <p className="text-xs font-semibold uppercase tracking-[.14em] text-primary">Paso 3</p>
+          <CardTitle className="font-display text-3xl font-medium">Comprueba el resultado</CardTitle>
         </CardHeader>
         <CardContent>
           <p className="text-muted-foreground text-center py-8">
-            Sube imágenes y haz clic en "Convertir" para ver los resultados aquí.
+            Los archivos convertidos aparecerán aquí con su peso, dimensiones y estado.
           </p>
         </CardContent>
       </Card>
@@ -121,12 +120,11 @@ export function ConversionResultList({
   }
 
   return (
-    <Card className="shadow-lg bg-card text-card-foreground">
+    <Card className="bg-card text-card-foreground">
       <CardHeader className="flex flex-row items-center justify-between">
         <div>
-          <CardTitle className="text-xl font-semibold">
-            Resultados de Conversión
-          </CardTitle>
+          <p className="text-xs font-semibold uppercase tracking-[.14em] text-primary">Paso 3</p>
+          <CardTitle className="font-display text-3xl font-medium">Resultados</CardTitle>
           <p className="text-sm text-muted-foreground mt-1" aria-live="polite">
             {completedCount}/{items.length} completadas
             {errorCount > 0 && ` • ${errorCount} error(es)`}
@@ -149,7 +147,7 @@ export function ConversionResultList({
         {items.map((item) => (
           <div
             key={item.id}
-            className="flex items-center gap-3 p-3 rounded-lg bg-muted/50 border border-border"
+            className="flex items-center gap-3 rounded-xl bg-muted/55 p-3"
           >
             {/* Thumbnail */}
             <div

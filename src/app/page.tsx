@@ -1,354 +1,87 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { Card, CardContent } from "@/components/ui/card";
-import { Sparkles, Zap, Shield, FileImage, Download } from "lucide-react";
-import { BrandLogo } from "@/components/icons/BrandLogo";
-import {
-  AnimatedSection,
-  StaggerContainer,
-  StaggerItem,
-} from "@/components/core/AnimatedSection";
-import NavbarActions from "@/components/landing/NavbarActions";
-import HeroButtons from "@/components/landing/HeroButtons";
+import { ArrowRight, Check, FileImage, ShieldCheck, Sparkles } from "lucide-react";
+import { PublicShell } from "@/components/site/PublicShell";
 import PricingSection from "@/components/landing/PricingSection";
 import FaqAccordion from "@/components/landing/FaqAccordion";
 
 export const metadata: Metadata = {
-  title: "Convierte imágenes a WebP con IA — Renombrado SEO Automático",
-  description:
-    "Convierte tus imágenes a WebP y renómbralas automáticamente con IA para mejorar tu SEO. Compresión hasta 80% menor tamaño, privacidad total. Gratis para empezar.",
+  title: "Convertidor WebP para profesionales web",
+  description: "Convierte JPG y PNG a WebP, ajusta dimensiones y prepara nombres claros. Procesamiento WebP local en tu navegador.",
   alternates: { canonical: "/" },
 };
 
 const FAQ_ITEMS = [
-  {
-    question: "¿Mis imágenes se suben a un servidor?",
-    answer:
-      "No. La conversión a WebP se realiza completamente en tu navegador. Tus imágenes nunca abandonan tu dispositivo, lo que garantiza privacidad total.",
-  },
-  {
-    question: "¿Qué formatos de imagen acepta ZoePic?",
-    answer:
-      "Actualmente soportamos JPG, JPEG y PNG. Estamos trabajando para añadir soporte para más formatos próximamente.",
-  },
-  {
-    question: "¿Cómo funciona el renombrado con IA?",
-    answer:
-      "Nuestra IA analiza el contenido visual de cada imagen y genera un nombre descriptivo y optimizado para SEO. Por ejemplo, 'IMG_2041.jpg' puede convertirse en 'zapatos-deportivos-rojos-running.webp'.",
-  },
-  {
-    question: "¿Qué pasa cuando llego al límite de renombrados IA?",
-    answer:
-      "La conversión a WebP sigue disponible sin cuenta, con un límite de 100 imágenes por día. El renombrado con IA está disponible solo en planes de pago (Pro o Agency).",
-  },
-  {
-    question: "¿Puedo cancelar mi suscripción en cualquier momento?",
-    answer:
-      "Sí, puedes cancelar desde tu dashboard en cualquier momento. No hay permanencia ni penalizaciones.",
-  },
-  {
-    question: "¿El plan anual se puede cambiar a mensual?",
-    answer:
-      "La facturación anual se cobra una sola vez al año con un 25% de descuento. Si prefieres el plan mensual, cancela tu suscripción desde el dashboard y vuelve a suscribirte eligiendo la opción mensual.",
-  },
+  { question: "¿Dónde se procesan las imágenes?", answer: "La conversión, el cambio de tamaño y la compresión WebP ocurren en tu navegador. Si activas el renombrado con IA, ZoePic envía una versión reducida de la imagen al servicio de IA para analizar su contenido." },
+  { question: "¿Qué formatos puedo seleccionar?", answer: "ZoePic acepta archivos JPG, JPEG y PNG. El resultado se descarga en formato WebP." },
+  { question: "¿La IA mejora por sí sola el posicionamiento SEO?", answer: "No. La IA propone nombres descriptivos para mantener una biblioteca ordenada. El posicionamiento depende también del contenido, el contexto de la página, el texto alternativo y el rendimiento." },
+  { question: "¿Puedo convertir varias imágenes?", answer: "Sí. El tamaño máximo del lote depende del plan. Cada archivo muestra sus dimensiones, peso final y porcentaje de cambio antes de descargarlo." },
+  { question: "¿Puedo conservar las dimensiones originales?", answer: "Sí. El modo Original mantiene las dimensiones. También puedes elegir tamaños habituales, relaciones de aspecto o medidas personalizadas." },
+  { question: "¿Puedo cancelar mi suscripción?", answer: "Sí. Puedes gestionar o cancelar la suscripción desde tu cuenta, de acuerdo con las condiciones del servicio." },
 ];
 
-const jsonLd = {
-  "@context": "https://schema.org",
-  "@graph": [
-    {
-      "@type": "WebSite",
-      "@id": "https://zoepic.online/#website",
-      url: "https://zoepic.online",
-      name: "ZoePic",
-      description:
-        "Convierte imágenes a WebP y renómbralas con IA para mejorar tu SEO.",
-      inLanguage: "es",
-    },
-    {
-      "@type": "SoftwareApplication",
-      "@id": "https://zoepic.online/#app",
-      name: "ZoePic",
-      applicationCategory: "MultimediaApplication",
-      operatingSystem: "Web",
-      url: "https://zoepic.online",
-      description:
-        "Conversor de imágenes a WebP con renombrado automático usando inteligencia artificial para mejorar el SEO.",
-      inLanguage: "es",
-      offers: [
-        {
-          "@type": "Offer",
-          name: "Starter",
-          price: "0",
-          priceCurrency: "USD",
-          description: "100 conversiones WebP/día. IA no incluida.",
-        },
-        {
-          "@type": "Offer",
-          name: "Pro",
-          price: "6.99",
-          priceCurrency: "USD",
-          billingPeriod: "P1M",
-          description: "WebP ilimitado, 3,000 renombrados IA/mes.",
-        },
-        {
-          "@type": "Offer",
-          name: "Agency",
-          price: "23.99",
-          priceCurrency: "USD",
-          billingPeriod: "P1M",
-          description: "WebP ilimitado, 20,000 renombrados IA/mes.",
-        },
-      ],
-    },
-    {
-      "@type": "FAQPage",
-      mainEntity: FAQ_ITEMS.map((item) => ({
-        "@type": "Question",
-        name: item.question,
-        acceptedAnswer: {
-          "@type": "Answer",
-          text: item.answer,
-        },
-      })),
-    },
-  ],
-};
+const workflow = [
+  { title: "Selecciona", text: "Arrastra JPG o PNG y revisa el lote antes de procesarlo.", icon: FileImage },
+  { title: "Ajusta", text: "Define calidad y abre dimensiones y opciones de nombre solo cuando las necesites.", icon: Sparkles },
+  { title: "Comprueba y descarga", text: "Compara peso, tamaño y estado por archivo; descarga uno o crea un ZIP.", icon: Check },
+];
 
 export default function LandingPage() {
   return (
-    <div className="min-h-screen bg-background text-foreground">
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
-
-      {/* Navbar */}
-      <nav className="sticky top-0 z-50 backdrop-blur-md bg-background/80 border-b border-border/50">
-        <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-2.5">
-            <BrandLogo className="h-7 w-auto text-foreground" />
-          </Link>
-          <div className="flex items-center gap-3">
-            <a
-              href="#pricing"
-              className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors px-3 py-1.5"
-            >
-              Precios
-            </a>
-            <NavbarActions />
-          </div>
-        </div>
-      </nav>
-
-      {/* Hero Section */}
-      <section className="relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-b from-primary/5 via-transparent to-transparent pointer-events-none" />
-        <div className="max-w-5xl mx-auto px-6 pt-24 pb-20 text-center relative">
-          <AnimatedSection variant="fadeUp" delay={0.1}>
-            <div className="inline-flex items-center gap-2 bg-primary/10 text-primary px-4 py-1.5 rounded-full text-sm font-medium mb-8">
-              <Sparkles className="h-3.5 w-3.5" />
-              Conversión inteligente de imágenes
+    <PublicShell ads>
+      <main>
+        <section className="overflow-hidden border-b border-border/70">
+          <div className="shell grid items-center gap-14 py-16 md:py-24 lg:grid-cols-[1.02fr_.98fr] lg:py-28">
+            <div className="max-w-2xl animate-[enter_.6s_cubic-bezier(.16,1,.3,1)_both]">
+              <h1 className="font-display text-5xl font-medium leading-[.98] tracking-[-.035em] sm:text-6xl lg:text-[5.25rem]">Imágenes más ligeras, listas para publicar.</h1>
+              <p className="mt-7 max-w-xl text-lg leading-8 text-muted-foreground">Convierte JPG y PNG a WebP, ajusta dimensiones y organiza nombres de archivo desde un flujo pensado para sitios web, tiendas y equipos de contenido.</p>
+              <div className="mt-9 flex flex-col gap-3 sm:flex-row">
+                <Link href="/convert" className="inline-flex h-12 items-center justify-center gap-2 rounded-xl bg-primary px-6 text-sm font-semibold text-primary-foreground shadow-[0_12px_28px_-16px_hsl(var(--primary))] hover:bg-primary/90">Abrir conversor <ArrowRight className="h-4 w-4" /></Link>
+                <Link href="/guias" className="inline-flex h-12 items-center justify-center rounded-xl border border-border bg-card px-6 text-sm font-semibold hover:bg-muted">Consultar las guías</Link>
+              </div>
+              <p className="mt-5 flex items-center gap-2 text-sm text-muted-foreground"><ShieldCheck className="h-4 w-4 text-primary" /> La conversión WebP ocurre localmente en tu navegador.</p>
             </div>
-          </AnimatedSection>
 
-          <AnimatedSection variant="fadeUp" delay={0.22}>
-            <h1 className="text-5xl md:text-6xl lg:text-7xl font-extrabold leading-[1.1] tracking-tight mb-6">
-              Convierte a WebP y
-              <br />
-              <span className="bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-                renombra con IA
-              </span>
-            </h1>
-          </AnimatedSection>
-
-          <AnimatedSection variant="fadeUp" delay={0.34}>
-            <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto mb-10 leading-relaxed">
-              La herramienta definitiva para optimizar imágenes. Compresión WebP
-              inteligente y{" "}
-              <span className="font-semibold text-foreground">
-                renombrado automático con IA
-              </span>{" "}
-              para mejorar tu SEO y organización.
-            </p>
-          </AnimatedSection>
-
-          <AnimatedSection variant="fadeUp" delay={0.46}>
-            <HeroButtons showLearnMore primaryLabel="Probar Conversor" />
-          </AnimatedSection>
-        </div>
-      </section>
-
-      {/* Features Section */}
-      <section id="features" className="max-w-5xl mx-auto px-6 py-24">
-        <AnimatedSection variant="fadeUp" className="text-center mb-16">
-          <h2 className="text-3xl md:text-4xl font-bold mb-4">
-            Todo lo que necesitas
-          </h2>
-          <p className="text-muted-foreground text-lg max-w-xl mx-auto">
-            Herramientas poderosas para optimizar tus imágenes de forma
-            profesional.
-          </p>
-        </AnimatedSection>
-
-        <StaggerContainer
-          className="grid md:grid-cols-3 gap-6"
-          staggerDelay={0.12}
-          delay={0.05}
-        >
-          {[
-            {
-              icon: Sparkles,
-              title: "Renombrado con IA",
-              description:
-                "Olvídate de 'IMG_2024'. Nuestra IA analiza el contenido y renombra tus archivos automáticamente para mejorar tu SEO.",
-            },
-            {
-              icon: Zap,
-              title: "Conversión Instantánea",
-              description:
-                "Transforma tus imágenes a WebP en milisegundos. Compresión inteligente que reduce el peso hasta un 80%.",
-            },
-            {
-              icon: Shield,
-              title: "Privacidad Total",
-              description:
-                "El procesamiento se realiza en tu navegador. Tus imágenes nunca salen de tu dispositivo ni se suben a servidores.",
-            },
-          ].map((feature, index) => (
-            <StaggerItem key={index} variant="fadeUp">
-              <Card className="group border-border/50 bg-card/50 backdrop-blur-sm hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5 hover:-translate-y-1 transition-all duration-300 h-full">
-                <CardContent className="p-6">
-                  <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center mb-4 group-hover:bg-primary/15 group-hover:scale-110 transition-all duration-300">
-                    <feature.icon className="h-5 w-5 text-primary" />
-                  </div>
-                  <h3 className="text-lg font-semibold mb-2">{feature.title}</h3>
-                  <p className="text-muted-foreground text-sm leading-relaxed">
-                    {feature.description}
-                  </p>
-                </CardContent>
-              </Card>
-            </StaggerItem>
-          ))}
-        </StaggerContainer>
-      </section>
-
-      {/* How It Works */}
-      <section className="bg-card/30 backdrop-blur-sm border-y border-border/30">
-        <div className="max-w-5xl mx-auto px-6 py-24">
-          <AnimatedSection variant="fadeUp" className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">
-              ¿Cómo funciona?
-            </h2>
-            <p className="text-muted-foreground text-lg max-w-xl mx-auto">
-              Tres simples pasos para optimizar tus imágenes.
-            </p>
-          </AnimatedSection>
-
-          <StaggerContainer
-            className="grid md:grid-cols-3 gap-8"
-            staggerDelay={0.15}
-            delay={0.05}
-          >
-            {[
-              {
-                step: "01",
-                icon: FileImage,
-                title: "Sube tus imágenes",
-                description:
-                  "Arrastra y suelta o selecciona tus archivos PNG, JPEG, GIF, BMP o TIFF.",
-              },
-              {
-                step: "02",
-                icon: Sparkles,
-                title: "Ajusta la calidad",
-                description:
-                  "Elige el nivel de compresión ideal y previsualiza los resultados en tiempo real.",
-              },
-              {
-                step: "03",
-                icon: Download,
-                title: "Descarga en WebP",
-                description:
-                  "Obtén tus imágenes optimizadas listas para usar en tu sitio web o aplicación.",
-              },
-            ].map((item, index) => (
-              <StaggerItem key={index} variant="scale">
-                <div className="text-center">
-                  <div className="relative w-16 h-16 mx-auto mb-5">
-                    <div className="absolute inset-0 rounded-2xl bg-primary/10" />
-                    <div className="absolute inset-0 rounded-2xl flex items-center justify-center">
-                      <item.icon className="h-7 w-7 text-primary" />
+            <div className="relative mx-auto w-full max-w-xl" aria-label="Ejemplo de un lote optimizado">
+              <div className="absolute -inset-8 -z-10 rounded-full bg-primary/[.07] blur-3xl" />
+              <div className="overflow-hidden rounded-2xl bg-[#1e2821] text-white shadow-[0_28px_70px_-38px_rgba(17,29,20,.75)]">
+                <div className="flex items-center justify-between border-b border-white/10 px-5 py-4"><span className="text-sm font-semibold">Lote de producto</span><span className="rounded-full bg-white/10 px-3 py-1 text-xs">3 archivos</span></div>
+                <div className="space-y-1 p-3">
+                  {[["camiseta-lino-natural.webp", "1.8 MB", "284 KB", "84%"], ["detalle-costura-frontal.webp", "920 KB", "176 KB", "81%"], ["lookbook-verano-portada.webp", "2.4 MB", "438 KB", "82%"]].map(([name, from, to, saved]) => (
+                    <div key={name} className="grid grid-cols-[2.25rem_1fr_auto] items-center gap-3 rounded-xl px-3 py-3 hover:bg-white/[.05]">
+                      <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-[#dfe7d7] text-[#286044]"><FileImage className="h-4 w-4" /></div>
+                      <div className="min-w-0"><p className="truncate text-sm font-medium">{name}</p><p className="mt-0.5 text-xs text-white/55">{from} → {to}</p></div>
+                      <span className="text-sm font-semibold tabular-nums text-[#a9d9b9]">−{saved}</span>
                     </div>
-                    <span className="absolute -top-2 -right-2 w-6 h-6 bg-primary text-primary-foreground text-xs font-bold rounded-full flex items-center justify-center">
-                      {item.step}
-                    </span>
-                  </div>
-                  <h3 className="text-lg font-semibold mb-2">{item.title}</h3>
-                  <p className="text-muted-foreground text-sm leading-relaxed max-w-xs mx-auto">
-                    {item.description}
-                  </p>
+                  ))}
                 </div>
-              </StaggerItem>
-            ))}
-          </StaggerContainer>
-        </div>
-      </section>
-
-      {/* Pricing — client component (billing toggle + EfyPay) */}
-      <PricingSection />
-
-      {/* FAQ */}
-      <section className="max-w-3xl mx-auto px-6 pb-24">
-        <AnimatedSection variant="fadeUp" className="text-center mb-12">
-          <h2 className="text-3xl md:text-4xl font-bold mb-4">
-            Preguntas Frecuentes
-          </h2>
-          <p className="text-muted-foreground text-lg max-w-xl mx-auto">
-            Todo lo que necesitas saber sobre ZoePic.
-          </p>
-        </AnimatedSection>
-        <FaqAccordion items={FAQ_ITEMS} />
-      </section>
-
-      {/* CTA */}
-      <section className="max-w-5xl mx-auto px-6 py-24">
-        <AnimatedSection variant="scale" amount={0.2}>
-          <div className="relative rounded-2xl overflow-hidden bg-gradient-to-br from-primary/10 via-primary/5 to-accent/10 border border-primary/20 p-12 text-center">
-            <div className="relative z-10">
-              <h2 className="text-3xl md:text-4xl font-bold mb-4">
-                ¿Listo para optimizar tus imágenes?
-              </h2>
-              <p className="text-muted-foreground text-lg mb-8 max-w-lg mx-auto">
-                Convierte imágenes a WebP ahora mismo y crea una cuenta solo si
-                quieres usar IA o administrar tu suscripción.
-              </p>
-              <HeroButtons primaryLabel="Abrir Conversor" />
+                <div className="flex items-center justify-between border-t border-white/10 px-5 py-4 text-sm"><span className="text-white/60">Ahorro ilustrativo</span><strong className="tabular-nums">4.2 MB</strong></div>
+              </div>
             </div>
           </div>
-        </AnimatedSection>
-      </section>
+        </section>
 
-      {/* Footer */}
-      <footer className="border-t border-border/50 bg-card/20">
-        <div className="max-w-6xl mx-auto px-6 py-8 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <Link href="/" className="flex items-center gap-2">
-            <BrandLogo className="h-6 w-auto text-foreground" />
-          </Link>
-          <div className="flex items-center gap-4">
-            <Link
-              href="/politica-de-privacidad"
-              className="text-sm text-muted-foreground hover:text-foreground transition-colors"
-            >
-              Política de Privacidad
-            </Link>
-            <p className="text-sm text-muted-foreground">
-              &copy; {new Date().getFullYear()} ZoePic. Todos los derechos
-              reservados.
-            </p>
+        <section id="features" className="shell py-20 md:py-28">
+          <div className="grid gap-12 lg:grid-cols-[.72fr_1.28fr]">
+            <div><h2 className="font-display text-4xl font-medium tracking-[-.025em] md:text-5xl">Un flujo breve para una tarea repetitiva.</h2><p className="mt-5 max-w-md leading-7 text-muted-foreground">Cada paso mantiene visible lo que importa: los archivos, el ajuste aplicado y el resultado real.</p></div>
+            <div className="divide-y divide-border border-y border-border">
+              {workflow.map(({ title, text, icon: Icon }) => <div key={title} className="grid gap-4 py-7 sm:grid-cols-[3rem_1fr]"><Icon className="h-5 w-5 text-primary" /><div><h3 className="text-lg font-semibold">{title}</h3><p className="mt-2 leading-7 text-muted-foreground">{text}</p></div></div>)}
+            </div>
           </div>
-        </div>
-      </footer>
-    </div>
+        </section>
+
+        <section className="border-y border-border bg-[#eef0e9]"><div className="shell grid gap-10 py-20 md:grid-cols-3 md:py-24">
+          <div><p className="font-display text-3xl">Conversión local</p><p className="mt-3 text-sm leading-6 text-muted-foreground">Tus archivos no necesitan viajar a un servidor para convertirse o cambiar de tamaño.</p></div>
+          <div><p className="font-display text-3xl">Control por lote</p><p className="mt-3 text-sm leading-6 text-muted-foreground">Aplica una configuración coherente y revisa cada resultado antes de descargar.</p></div>
+          <div><p className="font-display text-3xl">IA opcional</p><p className="mt-3 text-sm leading-6 text-muted-foreground">Actívala cuando quieras propuestas de nombres descriptivos y tu plan la incluya.</p></div>
+        </div></section>
+
+        <PricingSection />
+
+        <section className="shell grid gap-12 py-20 md:grid-cols-[.7fr_1.3fr] md:py-28"><div><h2 className="font-display text-4xl font-medium tracking-[-.025em]">Preguntas frecuentes</h2><p className="mt-4 text-muted-foreground">Respuestas directas sobre archivos, privacidad y planes.</p></div><FaqAccordion items={FAQ_ITEMS} /></section>
+
+        <section className="shell pb-12"><div className="grid items-center gap-8 rounded-2xl bg-[#1e2821] px-7 py-10 text-white md:grid-cols-[1fr_auto] md:px-12 md:py-12"><div><h2 className="font-display text-4xl font-medium">Prepara tu próximo lote.</h2><p className="mt-3 max-w-xl text-white/65">No necesitas una cuenta para empezar. La IA y la suscripción se activan desde tu plan.</p></div><Link href="/convert" className="inline-flex h-12 items-center justify-center gap-2 rounded-xl bg-white px-6 text-sm font-semibold text-[#1e2821] hover:bg-[#eef0e9]">Abrir conversor <ArrowRight className="h-4 w-4" /></Link></div></section>
+      </main>
+    </PublicShell>
   );
 }
