@@ -21,6 +21,12 @@ revisión humana.
 - Pro: $6.99/mes — WebP ilimitado, 3.000 renombrados con IA/mes, lotes de 50 imágenes
 - Agency: $23.99/mes — WebP ilimitado, 20.000 renombrados con IA/mes, lotes de 100 imágenes
 
+## Responsable y privacidad
+- Responsable del servicio: Mauricio Correa, Colombia
+- Contacto para soporte y privacidad: privacy@zoepic.online
+- La conversión y el cambio de tamaño son locales. El renombrado con IA es opcional y envía una versión reducida para análisis.
+- Consulta la política de privacidad: https://zoepic.online/politica-de-privacidad
+
 ## Páginas públicas
 - Inicio y producto: https://zoepic.online/
 - Conversor: https://zoepic.online/convert

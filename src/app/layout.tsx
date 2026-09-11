@@ -5,6 +5,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { InsforgeProvider } from "./providers";
 import SmoothScroll from "@/components/core/SmoothScroll";
 import { SITE_DESCRIPTION, SITE_URL } from "@/lib/seo";
+import { ADSENSE_PUBLISHER_ID } from "@/lib/adsense";
 
 const figtree = Figtree({
   subsets: ["latin"],
@@ -40,6 +41,9 @@ export const metadata: Metadata = {
     title: "ZoePic | Convertidor WebP con IA",
     description: "Convierte imágenes a WebP y prepara cada lote para publicar.",
     images: ["/og-image.jpg"],
+  },
+  other: {
+    "google-adsense-account": ADSENSE_PUBLISHER_ID,
   },
 };
 

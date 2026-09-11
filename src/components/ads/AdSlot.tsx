@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
-import { ADSENSE_PUBLISHER_ID } from "@/lib/adsense";
+import { ADSENSE_ENABLED, ADSENSE_PUBLISHER_ID } from "@/lib/adsense";
 
 declare global {
   interface Window { adsbygoogle?: Record<string, unknown>[]; }
@@ -11,11 +11,11 @@ interface AdSlotProps { slot?: string; label?: string; }
 
 export function AdSlot({ slot, label = "Anuncio" }: AdSlotProps) {
   useEffect(() => {
-    if (!slot) return;
+    if (!ADSENSE_ENABLED || !slot) return;
     try { (window.adsbygoogle = window.adsbygoogle || []).push({}); } catch {}
   }, [slot]);
 
-  if (!slot) return null;
+  if (!ADSENSE_ENABLED || !slot) return null;
 
   return (
     <aside className="my-12 border-y border-border/70 py-5" aria-label={label}>

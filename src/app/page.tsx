@@ -10,6 +10,7 @@ import {
 import { PublicShell } from "@/components/site/PublicShell";
 import PricingSection from "@/components/landing/PricingSection";
 import FaqAccordion from "@/components/landing/FaqAccordion";
+import { MeasuredExample } from "@/components/content/MeasuredExample";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { homepageSchema } from "@/lib/seo";
 
@@ -73,7 +74,7 @@ const workflow = [
 
 export default function LandingPage() {
   return (
-    <PublicShell ads>
+    <PublicShell>
       <JsonLd data={homepageSchema(FAQ_ITEMS)} />
       <main>
         <section className="overflow-hidden border-b border-border/70">
@@ -117,41 +118,11 @@ export default function LandingPage() {
               <div className="overflow-hidden rounded-2xl bg-[#1e2821] text-white shadow-[0_28px_70px_-38px_rgba(17,29,20,.75)]">
                 <div className="flex items-center justify-between border-b border-white/10 px-5 py-4">
                   <span className="text-sm font-semibold">
-                    Lote de producto
+                    Muestra de producto
                   </span>
-                  <span className="rounded-full bg-white/10 px-3 py-1 text-xs">
-                    3 archivos
-                  </span>
+                  <span className="rounded-full bg-white/10 px-3 py-1 text-xs">Prueba local</span>
                 </div>
-                <div className="space-y-1 p-3">
-                  {[
-                    ["camiseta-lino-natural.webp", "1.8 MB", "284 KB", "84%"],
-                    ["detalle-costura-frontal.webp", "920 KB", "176 KB", "81%"],
-                    ["lookbook-verano-portada.webp", "2.4 MB", "438 KB", "82%"],
-                  ].map(([name, from, to, saved]) => (
-                    <div
-                      key={name}
-                      className="grid grid-cols-[2.25rem_1fr_auto] items-center gap-3 rounded-xl px-3 py-3 hover:bg-white/[.05]"
-                    >
-                      <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-[#dfe7d7] text-[#286044]">
-                        <FileImage className="h-4 w-4" />
-                      </div>
-                      <div className="min-w-0">
-                        <p className="truncate text-sm font-medium">{name}</p>
-                        <p className="mt-0.5 text-xs text-white/55">
-                          {from} → {to}
-                        </p>
-                      </div>
-                      <span className="text-sm font-semibold tabular-nums text-[#a9d9b9]">
-                        −{saved}
-                      </span>
-                    </div>
-                  ))}
-                </div>
-                <div className="flex items-center justify-between border-t border-white/10 px-5 py-4 text-sm">
-                  <span className="text-white/60">Ahorro ilustrativo</span>
-                  <strong className="tabular-nums">4.2 MB</strong>
-                </div>
+                <MeasuredExample />
               </div>
             </div>
           </div>

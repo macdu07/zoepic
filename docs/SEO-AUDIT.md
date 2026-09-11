@@ -1,6 +1,6 @@
 # Auditoría SEO de ZoePic
 
-Fecha de revisión: 6 de septiembre de 2026  
+Fecha de revisión: 11 de septiembre de 2026
 Alcance: repositorio y sitio público `https://zoepic.online`, sin acceso a Search Console ni Analytics.
 
 ## Resumen ejecutivo
@@ -87,7 +87,7 @@ La portada enlaza al conversor, precios, guías y página de confianza. El hub e
 - Desplegar los cambios y comprobar que JSON-LD aparece en HTML renderizado de portada, conversor, hub y guías.
 - Ejecutar Rich Results Test sobre las URLs públicas desplegadas.
 - Confirmar en Search Console el dominio, sitemap y cobertura de las 10 URLs públicas.
-- Verificar que la identidad legal del responsable y el correo publicado coinciden con la cuenta real.
+- Confirmar que la identidad publicada (Mauricio Correa, Colombia, `privacy@zoepic.online`) coincide con la cuenta real antes de solicitar revisión.
 
 ### P1 — Próxima iteración
 

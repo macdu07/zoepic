@@ -7,7 +7,7 @@ export const SITE_DESCRIPTION =
   "Convierte imágenes JPG y PNG a WebP, ajusta dimensiones y prepara nombres claros para sitios web, tiendas y catálogos.";
 export const SITE_LOGO_URL = `${SITE_URL}/icon.svg`;
 export const SITE_IMAGE_URL = `${SITE_URL}/og-image.jpg`;
-export const CONTENT_LAST_MODIFIED = "2026-09-06T00:00:00.000Z";
+export const CONTENT_LAST_MODIFIED = "2026-09-11T00:00:00.000Z";
 
 export interface FaqSchemaItem {
   question: string;
